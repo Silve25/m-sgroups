@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande de Prêt | Magdeleine Solutions groups</title>
+  <link rel="shortcut icon" href="logoMsg.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://m-sgroups.github.io/MSG/ameliorations.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <style>
+    :root {
+      --primary: #0a2540;
+      --primary-light: #1a3a5f;
+      --primary-dark: #051a30;
+      --secondary: #c8a45c;
+      --secondary-light: #d9bc7d;
+      --secondary-dark: #b08d3e;
+      --accent: #e6f0ff;
+      --text: #333333;
+      --text-light: #666666;
+      --light: #f8f9fa;
+      --white: #ffffff;
+      --dark: #1a1a1a;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --shadow-strong: 0 15px 35px rgba(0, 0, 0, 0.12);
+      --radius: 12px;
+      --radius-sm: 6px;
+      --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    /* FORCER LE MASQUAGE DE LA CROIX SUR DESKTOP */
+.mobile-menu-close {
+  display: none !important;
+}
+
+/* Afficher UNIQUEMENT sur mobile */
+@media (max-width: 768px) {
+  .mobile-menu-close {
+    display: flex !important;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: var(--transition);
+    width: 50px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .mobile-menu-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+    color: var(--secondary);
+  }
+}
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--light);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      transition: var(--transition);
+      padding: 20px 0;
+      background: rgba(10, 37, 64, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      transition: var(--transition);
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary);
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(200, 164, 92, 0.3);
+    }
+
+    .logo-text {
+      color: var(--white);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 8px 0;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--secondary);
+      transition: var(--transition);
+    }
+
+    nav a:hover {
+      color: var(--secondary);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      background: var(--secondary);
+      color: var(--primary-dark) !important;
+      padding: 10px 20px !important;
+      border-radius: 30px;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(200, 164, 92, 0.3);
+      transition: var(--transition);
+    }
+
+    .nav-cta:hover {
+      background: var(--secondary-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(200, 164, 92, 0.4);
+    }
+
+    .nav-cta::after {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    /* Page Header */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: var(--white);
+      padding: 150px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.1;
+      z-index: 0;
+    }
+
+    .page-header .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-title {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      opacity: 0.9;
+    }
+
+    /* Form Section */
+    .form-section {
+      padding: 80px 0;
+    }
+
+    .form-container {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .form-header {
+      background: var(--primary);
+      color: var(--white);
+      padding: 30px;
+      text-align: center;
+    }
+
+    .form-header h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .form-header p {
+      opacity: 0.8;
+      font-size: 0.95rem;
+    }
+
+    .form-content {
+      padding: 40px;
+    }
+
+    .form-section-title {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--secondary);
+      position: relative;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .form-group label .required {
+      color: #e74c3c;
+      margin-left: 3px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: 'Montserrat', sans-serif;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(200, 164, 92, 0.1);
+    }
+
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-note {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-top: 5px;
+    }
+
+    .form-divider {
+      height: 1px;
+      background: rgba(0, 0, 0, 0.1);
+      margin: 40px 0;
+    }
+
+    .file-upload {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .file-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: var(--primary);
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px dashed var(--primary-light);
+    }
+
+    .file-upload-btn:hover {
+      background: var(--primary-light);
+      color: var(--white);
+    }
+
+    .file-upload-btn i {
+      font-size: 1.2rem;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-list {
+      margin-top: 15px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--light);
+      padding: 10px 15px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+    }
+
+    .file-item i {
+      color: var(--primary);
+    }
+
+    .file-name {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .file-remove {
+      color: #e74c3c;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .file-remove:hover {
+      transform: scale(1.1);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .btn-submit {
+      display: inline-block;
+      padding: 15px 40px;
+      background: var(--secondary);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 5px 15px rgba(200, 164, 92, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: var(--secondary-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(200, 164, 92, 0.4);
+    }
+
+    /* Success Message */
+    .success-message {
+      display: none;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .success-icon {
+      font-size: 5rem;
+      color: #2ecc71;
+      margin-bottom: 20px;
+    }
+
+    .success-title {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .success-text {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+
+    .btn-back {
+      display: inline-block;
+      padding: 12px 30px;
+      background: var(--primary);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-back:hover {
+      background: var(--primary-light);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--primary-dark);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 80px 0 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right, var(--primary), var(--secondary), var(--primary));
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 50px;
+      margin-bottom: 50px;
+    }
+
+    .footer-column h4 {
+      color: var(--white);
+      font-size: 1.3rem;
+      margin-bottom: 25px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    .footer-column h4::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: var(--secondary);
+    }
+
+    .footer-about .logo-circle {
+      width: 80px;
+      height: 80px;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .footer-about p {
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+      transform: translateX(5px);
+    }
+
+    .footer-links a i {
+      font-size: 0.8rem;
+    }
+
+    .footer-contact p {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .footer-contact i {
+      color: var(--secondary);
+      font-size: 1.2rem;
+      margin-top: 3px;
+    }
+
+    .footer-newsletter p {
+      margin-bottom: 20px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-size: 0.9rem;
+    }
+
+    .newsletter-input:focus {
+      outline: none;
+      border-color: var(--secondary);
+    }
+
+    .newsletter-button {
+      background: var(--secondary);
+      color: var(--primary-dark);
+      border: none;
+      padding: 12px 15px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .newsletter-button:hover {
+      background: var(--secondary-light);
+      transform: translateY(-3px);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .social-icon:hover {
+      background: var(--secondary);
+      color: var(--primary-dark);
+      transform: translateY(-5px);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .footer-bottom a {
+      color: var(--secondary);
+      text-decoration: none;
+    }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: var(--secondary);
+      color: var(--primary-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 999;
+    }
+
+    .back-to-top.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      background: var(--secondary-light);
+      transform: translateY(-5px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.5rem;
+      }
+      
+      .page-subtitle {
+        font-size: 1.1rem;
+      }
+      
+      nav ul {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(10, 37, 64, 0.95);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        z-index: 1000;
+        transition: var(--transition);
+      }
+      
+      nav ul.active {
+        display: flex;
+      }
+      
+      nav a {
+        font-size: 1.2rem;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .form-content {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        padding: 0 20px;
+      }
+      
+      .page-title {
+        font-size: 2rem;
+      }
+      
+      .form-header {
+        padding: 20px;
+      }
+      
+      .form-header h2 {
+        font-size: 1.5rem;
+      }
+      
+      .form-section-title {
+        font-size: 1.3rem;
+      }
+      
+      .btn-submit {
+        width: 100%;
+      }
+    }
+
+    /* Amélioration du menu mobile */
+@media (max-width: 768px) {
+  nav ul {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(10, 37, 64, 0.98);
+    backdrop-filter: blur(10px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    z-index: 1000;
+    transition: var(--transition);
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  nav ul.active {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Bouton de fermeture du menu mobile */
+  .mobile-menu-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: var(--transition);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .mobile-menu-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+    color: var(--secondary);
+  }
+  
+  /* Animation d'entrée du menu */
+  nav ul.active li {
+    animation: slideInFromTop 0.5s ease forwards;
+    opacity: 0;
+  }
+  
+  nav ul.active li:nth-child(1) { animation-delay: 0.1s; }
+  nav ul.active li:nth-child(2) { animation-delay: 0.2s; }
+  nav ul.active li:nth-child(3) { animation-delay: 0.3s; }
+  nav ul.active li:nth-child(4) { animation-delay: 0.4s; }
+  nav ul.active li:nth-child(5) { animation-delay: 0.5s; }
+  nav ul.active li:nth-child(6) { animation-delay: 0.6s; }
+  
+  nav a {
+    font-size: 1.3rem;
+    padding: 15px 30px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+    text-align: center;
+    min-width: 200px;
+  }
+  
+  nav a:hover {
+    background: var(--secondary);
+    color: var(--primary-dark);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(200, 164, 92, 0.3);
+  }
+}
+
+/* Animation pour les éléments du menu */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Overlay pour fermer le menu en cliquant à côté */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-overlay.active {
+  display: block;
+  opacity: 1;
+}
+    
+    /* Styles pour le sélecteur de langue */
+    .language-selector-container {
+      position: relative;
+      margin-left: 20px;
+    }
+    
+    .language-selector {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--white);
+      padding: 8px 30px 8px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+      transition: var(--transition);
+    }
+    
+    .language-selector:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .language-selector:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--secondary);
+    }
+    
+    .language-selector option {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+    
+    @media (max-width: 768px) {
+      .language-selector-container {
+        position: absolute;
+        top: 20px;
+        right: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header & Navigation -->
+  <header id="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo i18n-link">
+        <div class="logo-circle">MSG</div>
+        <span class="logo-text">Magdeleine Solutions</span>
+      </a>
+      <nav>
+        <button class="menu-toggle" id="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <ul id="nav-menu">
+          <!-- Bouton de fermeture pour mobile -->
+          <button class="mobile-menu-close" id="mobile-menu-close">
+            <i class="fas fa-times"></i>
+          </button>     
+          <li><a href="index.html" class="i18n-link" data-i18n="nav_home">Accueil</a></li>
+          <li><a href="index.html#about" class="i18n-link" data-i18n="nav_about">À propos</a></li>
+          <li><a href="index.html#testimonials" class="i18n-link" data-i18n="nav_testimonials">Témoignages</a></li>
+          <li><a href="biographie.html" class="i18n-link" data-i18n="nav_biography">Biographie</a></li>
+          <li><a href="simulation.html" class="i18n-link" data-i18n="nav_simulation">Simulation</a></li>
+          <li><a href="formulaire_demande.html" class="nav-cta i18n-link" data-i18n="nav_loan_request">Demande de prêt</a></li>
+        </ul>
+        <div class="language-selector-container">
+          <select id="language-selector" class="language-selector" aria-label="Changer de langue">
+            <option value="fr" data-i18n="lang_fr">Français</option>
+            <option value="en" data-i18n="lang_en">Anglais</option>
+            <option value="pl" data-i18n="lang_pl">Polonais</option>
+            <option value="de" data-i18n="lang_de">Allemand</option>
+            <option value="it" data-i18n="lang_it">Italien</option>
+            <option value="pt" data-i18n="lang_pt">Portugais</option>
+          </select>
+        </div>
+      </nav>
+            <!-- Overlay pour fermer le menu -->
+      <div class="menu-overlay" id="menu-overlay"></div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title" data-aos="fade-up" data-i18n="form_title">Demande de prêt</h1>
+      <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200" data-i18n="form_subtitle">Complétez le formulaire ci-dessous pour soumettre votre demande de financement</p>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <section class="form-section">
+    <div class="container">
+      <div class="form-container" data-aos="fade-up">
+        <div class="form-header">
+          <h2 data-i18n="form_header">Formulaire de demande de prêt</h2>
+          <p data-i18n="form_required">Tous les champs marqués d'un astérisque (*) sont obligatoires</p>
+        </div>
+        
+        <div id="loanRequestForm">
+          <div class="form-content">
+            <!-- Personal Information -->
+            <h3 class="form-section-title" data-i18n="form_section1">Informations personnelles</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName" data-i18n="form_firstname">Prénom<span class="required">*</span></label>
+                <input type="text" id="firstName" name="firstName" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName" data-i18n="form_lastname">Nom<span class="required">*</span></label>
+                <input type="text" id="lastName" name="lastName" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email" data-i18n="form_email">Email<span class="required">*</span></label>
+                <input type="email" id="email" name="email" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="phone" data-i18n="form_phone">Téléphone<span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="birthdate" data-i18n="form_birthdate">Date de naissance<span class="required">*</span></label>
+                <input type="date" id="birthdate" name="birthdate" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="nationality" data-i18n="form_nationality">Nationalité<span class="required">*</span></label>
+                <input type="text" id="nationality" name="nationality" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="address" data-i18n="form_address">Adresse complète<span class="required">*</span></label>
+              <textarea id="address" name="address" class="form-control" required></textarea>
+            </div>
+            
+            <div class="form-divider"></div>
+            
+            <!-- Loan Information -->
+            <h3 class="form-section-title" data-i18n="form_section2">Informations sur le prêt</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="loanType" data-i18n="form_loan_type">Type de prêt<span class="required">*</span></label>
+                <select id="loanType" name="loanType" class="form-control" required>
+                  <option value="" data-i18n="form_select_option">Sélectionnez une option</option>
+                  <option value="personal" data-i18n="loan_type_personal">Prêt personnel</option>
+                  <option value="mortgage" data-i18n="loan_type_mortgage">Prêt immobilier</option>
+                  <option value="business" data-i18n="loan_type_business">Prêt professionnel</option>
+                  <option value="debt_consolidation" data-i18n="loan_type_debt">Rachat de crédit</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="loanAmount" data-i18n="form_loan_amount">Montant du prêt (€)<span class="required">*</span></label>
+                <input type="number" id="loanAmount" name="loanAmount" min="2000" max="1000000" class="form-control" required>
+                <p class="form-note" data-i18n="form_amount_note">Montant entre 2 000€ et 1 000 000€</p>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="loanDuration" data-i18n="form_loan_duration">Durée du prêt (mois)<span class="required">*</span></label>
+                <select id="loanDuration" name="loanDuration" class="form-control" required>
+                  <option value="" data-i18n="form_select_option">Sélectionnez une option</option>
+                  <option value="12" data-i18n="form_duration_12">12 mois (1 an)</option>
+                  <option value="24" data-i18n="form_duration_24">24 mois (2 ans)</option>
+                  <option value="36" data-i18n="form_duration_36">36 mois (3 ans)</option>
+                  <option value="48" data-i18n="form_duration_48">48 mois (4 ans)</option>
+                  <option value="60" data-i18n="form_duration_60">60 mois (5 ans)</option>
+                  <option value="72" data-i18n="form_duration_72">72 mois (6 ans)</option>
+                  <option value="84" data-i18n="form_duration_84">84 mois (7 ans)</option>
+                  <option value="96" data-i18n="form_duration_96">96 mois (8 ans)</option>
+                  <option value="108" data-i18n="form_duration_108">108 mois (9 ans)</option>
+                  <option value="120" data-i18n="form_duration_120">120 mois (10 ans)</option>
+                  <option value="180" data-i18n="form_duration_180">180 mois (15 ans)</option>
+                  <option value="240" data-i18n="form_duration_240">240 mois (20 ans)</option>
+                  <option value="300" data-i18n="form_duration_300">300 mois (25 ans)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="loanPurpose" data-i18n="form_loan_purpose">Objet du prêt<span class="required">*</span></label>
+                <input type="text" id="loanPurpose" name="loanPurpose" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="loanDetails" data-i18n="form_loan_details">Détails supplémentaires sur votre projet</label>
+              <textarea id="loanDetails" name="loanDetails" class="form-control"></textarea>
+            </div>
+            
+            <div class="form-divider"></div>
+            
+            <!-- Financial Information -->
+            <h3 class="form-section-title" data-i18n="form_section3">Informations financières</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="monthlyIncome" data-i18n="form_monthly_income">Revenu mensuel net (€)<span class="required">*</span></label>
+                <input type="number" id="monthlyIncome" name="monthlyIncome" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="employmentStatus" data-i18n="form_employment_status">Statut professionnel<span class="required">*</span></label>
+                <select id="employmentStatus" name="employmentStatus" class="form-control" required>
+                  <option value="" data-i18n="form_select_option">Sélectionnez une option</option>
+                  <option value="employed" data-i18n="form_status_employed">Salarié(e) en CDI</option>
+                  <option value="self_employed" data-i18n="form_status_self_employed">Travailleur indépendant</option>
+                  <option value="business_owner" data-i18n="form_status_business_owner">Chef d'entreprise</option>
+                  <option value="retired" data-i18n="form_status_retired">Retraité(e)</option>
+                  <option value="unemployed" data-i18n="form_status_unemployed">Sans emploi</option>
+                  <option value="other" data-i18n="form_status_other">Autre</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="existingLoans" data-i18n="form_existing_loans">Avez-vous d'autres prêts en cours ?<span class="required">*</span></label>
+                <select id="existingLoans" name="existingLoans" class="form-control" required>
+                  <option value="" data-i18n="form_select_option">Sélectionnez une option</option>
+                  <option value="yes" data-i18n="form_yes">Oui</option>
+                  <option value="no" data-i18n="form_no">Non</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="monthlyDebt" data-i18n="form_monthly_debt">Mensualités totales de vos dettes actuelles (€)</label>
+                <input type="number" id="monthlyDebt" name="monthlyDebt" class="form-control">
+                <p class="form-note" data-i18n="form_debt_note">Laissez vide si vous n'avez pas de dettes</p>
+              </div>
+            </div>
+            
+            <div class="form-divider"></div>
+            
+            <!-- Supporting Documents -->
+            <h3 class="form-section-title" data-i18n="form_section4">Documents justificatifs</h3>
+            <p class="form-note" data-i18n="form_documents_note">Veuillez fournir les documents suivants pour accélérer le traitement de votre demande. Formats acceptés : PDF, JPG, PNG (max 5MB par fichier)</p>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="form_id_document">Pièce d'identité<span class="required">*</span></label>
+                <div class="file-upload">
+                  <label class="file-upload-btn">
+                    <i class="fas fa-upload"></i>
+                    <span data-i18n="form_upload_file">Télécharger un fichier</span>
+                    <input type="file" id="idDocument" name="idDocument" accept=".pdf,.jpg,.jpeg,.png" required>
+                  </label>
+                  <div id="idDocumentList" class="file-list"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label data-i18n="form_proof_address">Justificatif de domicile<span class="required">*</span></label>
+                <div class="file-upload">
+                  <label class="file-upload-btn">
+                    <i class="fas fa-upload"></i>
+                    <span data-i18n="form_upload_file">Télécharger un fichier</span>
+                    <input type="file" id="proofOfAddress" name="proofOfAddress" accept=".pdf,.jpg,.jpeg,.png" required>
+                  </label>
+                  <div id="proofOfAddressList" class="file-list"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="form_proof_income">Justificatif de revenus<span class="required">*</span></label>
+                <div class="file-upload">
+                  <label class="file-upload-btn">
+                    <i class="fas fa-upload"></i>
+                    <span data-i18n="form_upload_file">Télécharger un fichier</span>
+                    <input type="file" id="proofOfIncome" name="proofOfIncome" accept=".pdf,.jpg,.jpeg,.png" required>
+                  </label>
+                  <div id="proofOfIncomeList" class="file-list"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label data-i18n="form_bank_statements">Relevés bancaires (3 derniers mois)<span class="required">*</span></label>
+                <div class="file-upload">
+                  <label class="file-upload-btn">
+                    <i class="fas fa-upload"></i>
+                    <span data-i18n="form_upload_file">Télécharger un fichier</span>
+                    <input type="file" id="bankStatements" name="bankStatements" accept=".pdf,.jpg,.jpeg,.png" multiple required>
+                  </label>
+                  <div id="bankStatementsList" class="file-list"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label data-i18n="form_additional_documents">Documents supplémentaires (facultatif)</label>
+              <div class="file-upload">
+                <label class="file-upload-btn">
+                  <i class="fas fa-upload"></i>
+                  <span data-i18n="form_upload_file">Télécharger un fichier</span>
+                  <input type="file" id="additionalDocuments" name="additionalDocuments" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                </label>
+                <div id="additionalDocumentsList" class="file-list"></div>
+              </div>
+              <p class="form-note" data-i18n="form_additional_note">Tout document supplémentaire pertinent pour votre demande</p>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" id="submitBtn" class="btn-submit" data-i18n="form_submit">Soumettre ma demande</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Success Message (Hidden by default) -->
+        <div id="successMessage" class="success-message">
+          <i class="fas fa-check-circle success-icon"></i>
+          <h2 class="success-title" data-i18n="form_success_title">Demande envoyée avec succès !</h2>
+          <p class="success-text" data-i18n="form_success_text">Nous avons bien reçu votre demande de prêt. Notre équipe va l'examiner dans les plus brefs délais et vous contactera sous 24 à 48 heures pour discuter des prochaines étapes.</p>
+          <a href="index.html" class="btn-back i18n-link" data-i18n="form_back_home">Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column footer-about">
+          <div class="logo-circle">MSG</div>
+          <p>Magdeleine Solutions groups</p>
+          <p data-i18n="footer_about">Services de prêts entre particuliers depuis 2009</p>
+          <div class="footer-social">
+            <a href="formulaire_demande.html#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="formulaire_demande.html#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="formulaire_demande.html#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="formulaire_demande.html#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-column footer-links">
+          <h4 data-i18n="footer_quick_links">Liens rapides</h4>
+          <ul>
+            <li><a href="index.html" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="nav_home">Accueil</span></a></li>
+            <li><a href="index.html#about" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="nav_about">À propos</span></a></li>
+            <li><a href="index.html#services" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="nav_services">Services</span></a></li>
+            <li><a href="index.html#testimonials" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="nav_testimonials">Témoignages</span></a></li>
+            <li><a href="index.html#contact" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="footer_contact">Contact</span></a></li>
+          </ul>
+        </div>
+        <div class="footer-column footer-links">
+          <h4 data-i18n="footer_services">Nos services</h4>
+          <ul>
+            <li><a href="index.html#services" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="service1_title">Prêt personnel</span></a></li>
+            <li><a href="index.html#services" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="service2_title">Prêt immobilier</span></a></li>
+            <li><a href="index.html#services" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="service3_title">Prêt professionnel</span></a></li>
+            <li><a href="index.html#services" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="service4_title">Rachat de crédit</span></a></li>
+            <li><a href="biographie.html" class="i18n-link"><i class="fas fa-chevron-right"></i> <span data-i18n="nav_biography">Biographie</span></a></li>
+          </ul>
+        </div>
+        <div class="footer-column footer-newsletter">
+          <h4 data-i18n="footer_newsletter">Newsletter</h4>
+          <p data-i18n="footer_newsletter_desc">Inscrivez-vous à notre newsletter pour recevoir nos actualités et conseils financiers.</p>
+          <form class="newsletter-form">
+            <input type="email" data-i18n-placeholder="newsletter_placeholder" placeholder="Votre email" class="newsletter-input" required>
+            <button type="submit" class="newsletter-button"><i class="fas fa-paper-plane"></i></button>
+          </form>
+          <div class="footer-contact">
+            <p><i class="fas fa-phone-alt"></i> +33 7 45 40 20 18</p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:groupe@sergemagdeleinesolutions.com" style="text-decoration: none; color: inherit;">groupe@sergemagdeleinesolutions.com</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year">2025</span> Magdeleine Solutions groups. <span data-i18n="footer_rights">Tous droits réservés.</span> | <a href="formulaire_demande.html#" data-i18n="footer_privacy">Politique de confidentialité</a> | <a href="formulaire_demande.html#" data-i18n="footer_terms">Conditions d'utilisation</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <div class="back-to-top" id="back-to-top">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="translations.js"></script>
+  <script src="language.js"></script>
+  <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease',
+      once: true,
+      offset: 100
+    });
+
+    // Set current year
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+   // Mobile Menu Toggle amélioré
+const menuToggle = document.getElementById('menu-toggle');
+const navMenu = document.getElementById('nav-menu');
+const mobileMenuClose = document.getElementById('mobile-menu-close');
+const menuOverlay = document.getElementById('menu-overlay');
+
+function openMobileMenu() {
+  navMenu.classList.add('active');
+  menuOverlay.classList.add('active');
+  menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMenu() {
+  navMenu.classList.remove('active');
+  menuOverlay.classList.remove('active');
+  menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  document.body.style.overflow = '';
+}
+
+// Event listeners pour le menu mobile
+menuToggle.addEventListener('click', function() {
+  if (navMenu.classList.contains('active')) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+});
+
+// Bouton de fermeture dans le menu
+mobileMenuClose.addEventListener('click', closeMobileMenu);
+
+// Fermer le menu en cliquant sur l'overlay
+menuOverlay.addEventListener('click', closeMobileMenu);
+
+// Fermer le menu en cliquant sur un lien
+const navLinks = document.querySelectorAll('#nav-menu a');
+navLinks.forEach(link => {
+  link.addEventListener('click', closeMobileMenu);
+});
+
+// Fermer le menu avec la touche Escape
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape' && navMenu.classList.contains('active')) {
+    closeMobileMenu();
+  }
+});
+
+    // Back to Top Button
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.add('active');
+      } else {
+        backToTopButton.classList.remove('active');
+      }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // File Upload Handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      
+      fileInputs.forEach(input => {
+        const listId = input.id + 'List';
+        const fileList = document.getElementById(listId);
+        
+        input.addEventListener('change', function() {
+          fileList.innerHTML = '';
+          
+          if (this.files.length > 0) {
+            for (let i = 0; i < this.files.length; i++) {
+              const file = this.files[i];
+              const fileItem = document.createElement('div');
+              fileItem.className = 'file-item';
+              
+              // Determine icon based on file type
+              let icon = 'fa-file';
+              if (file.type.includes('pdf')) {
+                icon = 'fa-file-pdf';
+              } else if (file.type.includes('image')) {
+                icon = 'fa-file-image';
+              }
+              
+              fileItem.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span class="file-name">${file.name}</span>
+                <i class="fas fa-times file-remove"></i>
+              `;
+              
+              fileList.appendChild(fileItem);
+              
+              // Remove file functionality
+              const removeBtn = fileItem.querySelector('.file-remove');
+              removeBtn.addEventListener('click', function() {
+                fileItem.remove();
+                // Reset file input
+                input.value = '';
+              });
+            }
+          }
+        });
+      });
+      
+      // Form Submission
+      const loanRequestForm = document.getElementById('loanRequestForm');
+      const successMessage = document.getElementById('successMessage');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      submitBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        // Basic form validation
+        const requiredInputs = loanRequestForm.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredInputs.forEach(input => {
+          if (!input.value) {
+            input.style.borderColor = '#e74c3c';
+            isValid = false;
+          } else {
+            input.style.borderColor = '';
+          }
+        });
+        
+        if (!isValid) {
+          const currentLang = localStorage.getItem('preferredLanguage') || 'fr';
+          let errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+          
+          if (currentLang === 'en') {
+            errorMessage = 'Please fill in all required fields.';
+          } else if (currentLang === 'de') {
+            errorMessage = 'Bitte füllen Sie alle Pflichtfelder aus.';
+          } else if (currentLang === 'pl') {
+            errorMessage = 'Proszę wypełnić wszystkie wymagane pola.';
+          } else if (currentLang === 'it') {
+            errorMessage = 'Si prega di compilare tutti i campi obbligatori.';
+          } else if (currentLang === 'pt') {
+            errorMessage = 'Por favor, preencha todos os campos obrigatórios.';
+          }
+          
+          alert(errorMessage);
+          return;
+        }
+        
+        // Simulate form submission
+        submitBtn.disabled = true;
+        const currentLang = localStorage.getItem('preferredLanguage') || 'fr';
+        let loadingText = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+        
+        if (currentLang === 'en') {
+          loadingText = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        } else if (currentLang === 'de') {
+          loadingText = '<i class="fas fa-spinner fa-spin"></i> Senden...';
+        } else if (currentLang === 'pl') {
+          loadingText = '<i class="fas fa-spinner fa-spin"></i> Wysyłanie...';
+        } else if (currentLang === 'it') {
+          loadingText = '<i class="fas fa-spinner fa-spin"></i> Invio in corso...';
+        } else if (currentLang === 'pt') {
+          loadingText = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        }
+        
+        submitBtn.innerHTML = loadingText;
+        
+        try {
+          // Collect form data
+          const formData = new FormData();
+          
+          // Personal Information
+          formData.append('firstName', document.getElementById('firstName').value);
+          formData.append('lastName', document.getElementById('lastName').value);
+          formData.append('email', document.getElementById('email').value);
+          formData.append('phone', document.getElementById('phone').value);
+          formData.append('birthdate', document.getElementById('birthdate').value);
+          formData.append('nationality', document.getElementById('nationality').value);
+          formData.append('address', document.getElementById('address').value);
+          
+          // Loan Information
+          formData.append('loanType', document.getElementById('loanType').value);
+          formData.append('loanAmount', document.getElementById('loanAmount').value);
+          formData.append('loanDuration', document.getElementById('loanDuration').value);
+          formData.append('loanPurpose', document.getElementById('loanPurpose').value);
+          formData.append('loanDetails', document.getElementById('loanDetails').value);
+          
+          // Financial Information
+          formData.append('monthlyIncome', document.getElementById('monthlyIncome').value);
+          formData.append('employmentStatus', document.getElementById('employmentStatus').value);
+          formData.append('existingLoans', document.getElementById('existingLoans').value);
+          formData.append('monthlyDebt', document.getElementById('monthlyDebt').value || '0');
+          
+          // Documents
+          const idDocument = document.getElementById('idDocument').files[0];
+          const proofOfAddress = document.getElementById('proofOfAddress').files[0];
+          const proofOfIncome = document.getElementById('proofOfIncome').files[0];
+          
+          if (idDocument) formData.append('idDocument', idDocument);
+          if (proofOfAddress) formData.append('proofOfAddress', proofOfAddress);
+          if (proofOfIncome) formData.append('proofOfIncome', proofOfIncome);
+          
+          // Bank Statements (multiple files)
+          const bankStatements = document.getElementById('bankStatements').files;
+          for (let i = 0; i < bankStatements.length; i++) {
+            formData.append('bankStatements', bankStatements[i]);
+          }
+          
+          // Additional Documents (multiple files)
+          const additionalDocuments = document.getElementById('additionalDocuments').files;
+          for (let i = 0; i < additionalDocuments.length; i++) {
+            formData.append('additionalDocuments', additionalDocuments[i]);
+          }
+          
+          // Simulate API call to Supabase
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Show success message
+          loanRequestForm.style.display = 'none';
+          successMessage.style.display = 'block';
+          
+          // Scroll to success message
+          successMessage.scrollIntoView({ behavior: 'smooth' });
+          
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          
+          const currentLang = localStorage.getItem('preferredLanguage') || 'fr';
+          let errorMessage = 'Une erreur est survenue lors de l\'envoi du formulaire. Veuillez réessayer.';
+          
+          if (currentLang === 'en') {
+            errorMessage = 'An error occurred while submitting the form. Please try again.';
+          } else if (currentLang === 'de') {
+            errorMessage = 'Beim Absenden des Formulars ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
+          } else if (currentLang === 'pl') {
+            errorMessage = 'Wystąpił błąd podczas wysyłania formularza. Proszę spróbować ponownie.';
+          } else if (currentLang === 'it') {
+            errorMessage = 'Si è verificato un errore durante l\'invio del modulo. Si prega di riprovare.';
+          } else if (currentLang === 'pt') {
+            errorMessage = 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.';
+          }
+          
+          alert(errorMessage);
+          
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = document.querySelector('[data-i18n="form_submit"]').textContent;
+        }
+      });
+      
+      // Initialize language
+      initializeLanguage();
+      
+      // Update links with current language
+      updateLinks();
+    });
+    
+    // Function to update links with current language
+    function updateLinks() {
+      const currentLang = localStorage.getItem('preferredLanguage') || 'fr';
+      const links = document.querySelectorAll('.i18n-link');
+      
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        // Check if the link already contains a language parameter
+        if (!href.includes('?lang=')) {
+          link.setAttribute('href', `${href}?lang=${currentLang}`);
+        }
+      });
+    }
+    
+    // Listen for language changes
+    document.addEventListener('languageChanged', function() {
+      // Update links when language changes
+      updateLinks();
+    });
+  </script>
+  <script src="https://m-sgroups.github.io/MSG/amelioration_site.js"></script>
+</body>
+</html>
