@@ -10,6 +10,10 @@
 <meta name="keywords" content="prêt rapide, financement, crédit, rachat de crédit, prêt professionnel, prêt immobilier, Magdeleine Solutions">
 <meta name="author" content="Magdeleine Solutions">
 
+<!-- Favicons / share image (logo) -->
+<link rel="icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
+<link rel="apple-touch-icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
+
 <!-- Open Graph (aperçu réseaux sociaux) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sergemagdeleinesolutions.fr/">
@@ -26,15 +30,14 @@
 <meta name="twitter:description" content="Obtenez votre prêt rapidement et simplement. Offre valable jusqu'au 15 septembre.">
 <meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
 
-<!-- JSON-LD (organisation + page) -->
+<!-- JSON-LD (organisation) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Magdeleine Solutions",
   "url": "https://sergemagdeleinesolutions.fr/",
-  "logo": "https://sergemagdeleinesolutions.fr/logoMsg.png",
-  "sameAs": []
+  "logo": "https://sergemagdeleinesolutions.fr/logoMsg.png"
 }
 </script>
 
@@ -67,9 +70,9 @@
   .iframe-wrap{height:820px;border-radius:10px;overflow:hidden;border:1px solid rgba(15,23,36,0.06)}
   .iframe-wrap iframe{width:100%;height:100%;border:0;display:block}
 
-  /* Témoignages (carrousel) */
+  /* Témoignages (carrousel) — plus rapide */
   .testi-wrap{margin-top:22px;position:relative;overflow:hidden;height:150px}
-  .carousel-inner{display:flex;gap:18px;align-items:center;padding:8px 2px;animation:scroll 18s linear infinite}
+  .carousel-inner{display:flex;gap:18px;align-items:center;padding:8px 2px;animation:scroll 10s linear infinite}
   .carousel-inner:hover{animation-play-state:paused} /* pause on hover */
   @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
   .slide{min-width:340px;background:#f8fafc;padding:14px 16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03);text-align:left}
@@ -88,12 +91,17 @@
     .wrap{max-width:96%;margin:20px auto}
     header img{height:72px}
     .hero h2{font-size:22px}
-    .iframe-wrap{height:720px}
+    .iframe-wrap{height:740px}
     .slide{min-width:280px}
   }
   @media (max-width:420px){
     .iframe-wrap{height:720px}
     .slide{min-width:260px;font-size:14px}
+  }
+
+  /* Respect user motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-inner { animation: none !important; }
   }
 </style>
 </head>
@@ -118,7 +126,7 @@
 
   <!-- card -->
   <div class="card" role="region" aria-label="Formulaire de demande de financement">
-    <!-- iframe: j'ai gardé data-tally-src + src pour compatibilité -->
+    <!-- iframe: src set for compatibility -->
     <div class="iframe-wrap" aria-hidden="false">
       <iframe 
         src="https://tally.so/r/mONppg?transparentBackground=1&formEventsForwarding=1"
@@ -165,7 +173,7 @@
 
         <!-- Duplicate set for smooth infinite scroll -->
         <div class="slide">
-          <p>"Très satisfait : prêt auto accepté rapidement et conditions claires. Petit bémol : quelques échanges d'email en plus auraient aidé."</p>
+          <p>"Très satisfait : prêt auto accepté rapidement and conditions claires. Petit bémol : quelques échanges d'email en plus auraient aidé."</p>
           <div class="who">— Marc L., Particulier</div>
         </div>
 
@@ -206,7 +214,7 @@
 </div>
 
 <script>
-  // Safety: if tally widget didn't auto-replace data-tally-src, ensure src is set
+  // Ensure iframe src set (fallback)
   (function(){
     var ifr = document.querySelector('iframe[data-tally-src]');
     if(ifr && !ifr.getAttribute('src')) {
