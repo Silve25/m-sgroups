@@ -47,16 +47,16 @@
 <style>
   /* Reset & base */
   *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,"Helvetica Neue";-webkit-font-smoothing:antialiased}
-  body{background:#f6f8fb;color:#0f1724;line-height:1.5}
+  body{background:#f6f8fb;color:#0f1724;line-height:1.45;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
   img{display:block;max-width:100%}
 
   /* Layout centré */
-  .wrap{max-width:820px;margin:36px auto;padding:20px;text-align:center}
+  .wrap{max-width:920px;margin:34px auto;padding:20px;text-align:center}
   /* Header / logo */
   header{margin-bottom:18px}
   header a{display:inline-block}
-  header img{height:80px;border-radius:8px}
+  header img{height:88px;border-radius:8px}
   header h1{font-size:22px;margin-top:10px;color:#0b5bd7;font-weight:700}
 
   /* Hero */
@@ -70,38 +70,46 @@
   .iframe-wrap{height:820px;border-radius:10px;overflow:hidden;border:1px solid rgba(15,23,36,0.06)}
   .iframe-wrap iframe{width:100%;height:100%;border:0;display:block}
 
-  /* Témoignages (carrousel) — plus rapide */
-  .testi-wrap{margin-top:22px;position:relative;overflow:hidden;height:150px}
-  .carousel-inner{display:flex;gap:18px;align-items:center;padding:8px 2px;animation:scroll 10s linear infinite}
-  .carousel-inner:hover{animation-play-state:paused} /* pause on hover */
-  @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-  .slide{min-width:340px;background:#f8fafc;padding:14px 16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03);text-align:left}
+  /* Carousel manuel */
+  .testi-container{margin-top:22px;position:relative}
+  .testi-viewport{overflow:hidden;padding:6px 0}
+  .track{display:flex;gap:18px;scroll-snap-type:x mandatory;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px}
+  .track::-webkit-scrollbar{height:8px}
+  .track::-webkit-scrollbar-thumb{background:rgba(11,91,215,0.18);border-radius:8px}
+  .slide{flex:0 0 320px;scroll-snap-align:center;background:#f8fafc;padding:16px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03);text-align:left}
   .slide p{font-size:15px;color:#1f2937;margin-bottom:8px;line-height:1.4}
   .who{font-weight:700;color:#0b5bd7;font-size:13px}
 
-  /* Footer boutons */
+  /* Controls */
+  .controls{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
+  .ctrl-btn{background:rgba(2,6,23,0.06);border:0;padding:8px;border-radius:10px;cursor:pointer;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .ctrl-btn:active{transform:scale(0.98)}
+  .ctrl-btn svg{width:18px;height:18px;fill:#0f1724;opacity:0.9}
+
+  /* Footer buttons */
   .footer-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:700;color:#fff;min-width:180px}
   .btn.whatsapp{background:#25d366}
   .btn.email{background:#0b5bd7}
 
-  /* Responsive adjustments */
+  /* Responsive */
   @media (max-width:920px){.wrap{padding:16px}.iframe-wrap{height:760px}}
   @media (max-width:680px){
     .wrap{max-width:96%;margin:20px auto}
-    header img{height:72px}
+    header img{height:78px}
     .hero h2{font-size:22px}
-    .iframe-wrap{height:740px}
-    .slide{min-width:280px}
+    .iframe-wrap{height:720px}
+    .slide{flex:0 0 280px}
+    .controls{right:6px}
   }
   @media (max-width:420px){
-    .iframe-wrap{height:720px}
-    .slide{min-width:260px;font-size:14px}
+    .iframe-wrap{height:700px}
+    .slide{flex:0 0 260px}
   }
 
-  /* Respect user motion preference */
-  @media (prefers-reduced-motion: reduce) {
-    .carousel-inner { animation: none !important; }
+  /* accessibility reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .track{scroll-behavior:auto}
   }
 </style>
 </head>
@@ -126,7 +134,6 @@
 
   <!-- card -->
   <div class="card" role="region" aria-label="Formulaire de demande de financement">
-    <!-- iframe: src set for compatibility -->
     <div class="iframe-wrap" aria-hidden="false">
       <iframe 
         src="https://tally.so/r/mONppg?transparentBackground=1&formEventsForwarding=1"
@@ -137,70 +144,50 @@
       ></iframe>
     </div>
 
-    <!-- Témoignages: chaque slide = 90% positif + 10% point constructif -->
-    <div class="testi-wrap" aria-hidden="false" aria-label="Témoignages clients">
-      <div class="carousel-inner" id="carouselInner">
-        <!-- Set 1 -->
-        <div class="slide">
-          <p>"Très satisfait : prêt auto accepté rapidement et conditions claires. Petit bémol : quelques échanges d'email en plus auraient aidé."</p>
-          <div class="who">— Marc L., Particulier</div>
-        </div>
+    <!-- Manual carousel -->
+    <div class="testi-container" aria-label="Témoignages clients">
+      <div class="testi-viewport">
+        <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Témoignages - défilez horizontalement">
+          <div class="slide">
+            <p>"Très satisfait : prêt auto accepté rapidement et conditions claires. Petit bémol : échanges d'e-mails nécessitant parfois un rappel."</p>
+            <div class="who">— Marc L., Particulier</div>
+          </div>
 
-        <div class="slide">
-          <p>"Financement pro trouvé en 48h, montant conforme à ma demande. Seul inconvénient : délai de signature un peu plus long que prévu."</p>
-          <div class="who">— Claire B., Entrepreneure</div>
-        </div>
+          <div class="slide">
+            <p>"Financement pro trouvé en 48h, montant conforme. Seul inconvénient : délai de signature légèrement long."</p>
+            <div class="who">— Claire B., Entrepreneure</div>
+          </div>
 
-        <div class="slide">
-          <p>"Rachat de crédit efficace et économies visibles. J'aurais aimé une mise à jour quotidienne du dossier, mais le résultat est top."</p>
-          <div class="who">— Julien R., Particulier</div>
-        </div>
+          <div class="slide">
+            <p>"Rachat de crédit efficace et économies visibles. J'aurais aimé un suivi quotidien, mais le résultat est positif."</p>
+            <div class="who">— Julien R., Particulier</div>
+          </div>
 
-        <div class="slide">
-          <p>"Montant élevé accepté sans complication majeure ; l'équipe a été rassurante. Petit retard administratif à signaler, vite résolu."</p>
-          <div class="who">— Antoine D., Investisseur</div>
-        </div>
+          <div class="slide">
+            <p>"Montant accepté sans complication ; l'équipe a été rassurante. Délai administratif à noter, rapidement résolu."</p>
+            <div class="who">— Antoine D., Investisseur</div>
+          </div>
 
-        <div class="slide">
-          <p>"Processus clair et professionnel, réponse rapide. Je recommande — seul point : délai de validation parfois variable."</p>
-          <div class="who">— Sophie M., Particulier</div>
-        </div>
+          <div class="slide">
+            <p>"Processus clair et professionnel. Un léger délai sur la validation, mais l'accompagnement est sérieux."</p>
+            <div class="who">— Sophie M., Particulier</div>
+          </div>
 
-        <div class="slide">
-          <p>"Bonne prise en charge, offre adaptée. Conseil : prévoir un peu plus de temps pour la réception des documents signés."</p>
-          <div class="who">— Emilie P., Auto-entrepreneure</div>
+          <div class="slide">
+            <p>"Bonne prise en charge et offre adaptée. Conseil : prévoir un peu de temps pour la réception des documents."</p>
+            <div class="who">— Emilie P., Auto-entrepreneure</div>
+          </div>
         </div>
+      </div>
 
-        <!-- Duplicate set for smooth infinite scroll -->
-        <div class="slide">
-          <p>"Très satisfait : prêt auto accepté rapidement and conditions claires. Petit bémol : quelques échanges d'email en plus auraient aidé."</p>
-          <div class="who">— Marc L., Particulier</div>
-        </div>
-
-        <div class="slide">
-          <p>"Financement pro trouvé en 48h, montant conforme à ma demande. Seul inconvénient : délai de signature un peu plus long que prévu."</p>
-          <div class="who">— Claire B., Entrepreneure</div>
-        </div>
-
-        <div class="slide">
-          <p>"Rachat de crédit efficace et économies visibles. J'aurais aimé une mise à jour quotidienne du dossier, mais le résultat est top."</p>
-          <div class="who">— Julien R., Particulier</div>
-        </div>
-
-        <div class="slide">
-          <p>"Montant élevé accepté sans complication majeure ; l'équipe a été rassurante. Petit retard administratif à signaler, vite résolu."</p>
-          <div class="who">— Antoine D., Investisseur</div>
-        </div>
-
-        <div class="slide">
-          <p>"Processus clair et professionnel, réponse rapide. Je recommande — seul point : délai de validation parfois variable."</p>
-          <div class="who">— Sophie M., Particulier</div>
-        </div>
-
-        <div class="slide">
-          <p>"Bonne prise en charge, offre adaptée. Conseil : prévoir un peu plus de temps pour la réception des documents signés."</p>
-          <div class="who">— Emilie P., Auto-entrepreneure</div>
-        </div>
+      <!-- Controls -->
+      <div class="controls" aria-hidden="false">
+        <button class="ctrl-btn" id="prev" aria-label="Témoignages précédent">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <button class="ctrl-btn" id="next" aria-label="Témoignages suivant">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </button>
       </div>
     </div>
 
@@ -220,6 +207,63 @@
     if(ifr && !ifr.getAttribute('src')) {
       ifr.setAttribute('src', ifr.getAttribute('data-tally-src'));
     }
+  })();
+
+  // Manual carousel logic: buttons, drag-to-scroll, keyboard
+  (function(){
+    const track = document.getElementById('track');
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+    if(!track) return;
+
+    // calculate scroll amount (one slide width + gap)
+    function getScrollAmount(){
+      const slide = track.querySelector('.slide');
+      if(!slide) return Math.round(track.clientWidth * 0.8);
+      const style = window.getComputedStyle(track);
+      const gap = parseInt(style.columnGap || style.gap) || 18;
+      return Math.round(slide.getBoundingClientRect().width + gap);
+    }
+
+    prev.addEventListener('click', ()=> {
+      track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    });
+    next.addEventListener('click', ()=> {
+      track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    });
+
+    // keyboard support (left/right)
+    track.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowLeft') { e.preventDefault(); track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); }
+      if(e.key === 'ArrowRight') { e.preventDefault(); track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }); }
+    });
+
+    // drag / swipe support
+    let isDown = false, startX, scrollLeft;
+    track.addEventListener('pointerdown', (e)=>{
+      isDown = true;
+      track.setPointerCapture(e.pointerId);
+      startX = e.clientX;
+      scrollLeft = track.scrollLeft;
+      track.classList.add('dragging');
+    });
+    track.addEventListener('pointermove', (e)=>{
+      if(!isDown) return;
+      const x = e.clientX;
+      const walk = startX - x;
+      track.scrollLeft = scrollLeft + walk;
+    });
+    track.addEventListener('pointerup', (e)=>{
+      isDown = false;
+      try{ track.releasePointerCapture(e.pointerId); } catch(e){}
+      track.classList.remove('dragging');
+    });
+    track.addEventListener('pointercancel', ()=>{ isDown = false; track.classList.remove('dragging'); });
+
+    // Improve UX: on resize, ensure scroll position stays valid (optional)
+    window.addEventListener('resize', ()=> {
+      // no-op for now; scroll behaves well with smooth
+    });
   })();
 </script>
 
