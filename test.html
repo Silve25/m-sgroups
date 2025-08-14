@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Checkout Fictif – Électronique (Thème clair)</title>
-  <meta name="description" content="Simulation de page de paiement : Crypto & Virement actifs, Carte & PayPal en maintenance. Thème clair." />
+  <meta name="description" content="Simulation de page de paiement : Crypto & Virement actifs, Carte & PayPal en maintenance. Thème clair. SSL activé." />
   <style>
     :root{
       --bg:#f6f8fb; --panel:#ffffff; --muted:#6b7280; --text:#0f1724; --brand:#0161ea; --ok:#059669; --warn:#d97706; --danger:#dc2626; --line:#e6edf6;
@@ -69,6 +69,9 @@
 
     .bank-box{display:grid;gap:10px;border:1px solid var(--line);background:#fbfdff;padding:12px;border-radius:10px}
 
+    .trust{display:flex;gap:10px;align-items:center}
+    .trust small{color:var(--muted)}
+
     .toast{position:fixed;inset:auto 20px 20px auto;background:#ffffff;border:1px solid var(--line);padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);transition:all .22s}
     .toast.show{opacity:1;transform:translateY(0)}
 
@@ -83,12 +86,20 @@
       <section class="card">
         <div class="hd">
           <div>
-            <div class="title">Paiement sécurisé</div>
+            <div class="title">Paiement sécurisé <span id="orderIdHeader" style="font-weight:600;font-size:13px;color:var(--muted);margin-left:8px"></span></div>
             <div class="muted">Sélectionnez votre méthode de paiement — Carte et PayPal sont en maintenance</div>
           </div>
-          <span class="pill">SSL • Paiement direct désactivé</span>
+          <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="currentColor" d="M12 1a4 4 0 0 0-4 4v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2V5a4 4 0 0 0-4-4zM9 8V5a3 3 0 0 1 6 0v3H9z"/></svg> SSL • Paiement direct activé</span>
         </div>
         <div class="bd">
+          <div class="trust" style="margin-bottom:12px">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><rect width='24' height='24' rx='4' fill='%230161ea'/><text x='12' y='16' font-size='12' text-anchor='middle' fill='white' font-family='Arial'>Ax</text></svg>" alt="logo" style="height:28px;border-radius:6px" />
+            <div>
+              <div style="font-weight:700">Axion Partners — Paiement sécurisé</div>
+              <small class="muted">Transactions chiffrées (TLS). Détails de paiement envoyés par email.</small>
+            </div>
+          </div>
+
           <div class="row cols-2">
             <div>
               <label>Prénom</label>
@@ -177,7 +188,7 @@
                   <div class="copyline">
                     <div>
                       <label>Adresse de paiement</label>
-                      <input id="wallet" readonly value="TSmG8uQ9DemoTRC20_1234567890" />
+                      <input id="wallet" readonly value="TQf3k7s9h2x4y5z6a7b8c9d0e1f2g3h4i" />
                     </div>
                     <button class="copy-btn" data-copy="#wallet">Copier</button>
                   </div>
@@ -185,7 +196,7 @@
                   <div class="copyline">
                     <div>
                       <label>Montant à envoyer (<span id="ccyLabel">USDT</span>)</label>
-                      <input id="amountCcy" readonly value="245.90" />
+                      <input id="amountCcy" readonly value="245.901639" />
                     </div>
                     <button class="copy-btn" data-copy="#amountCcy">Copier</button>
                   </div>
@@ -219,15 +230,15 @@
                 </div>
                 <div>
                   <label>Banque</label>
-                  <input readonly value="Clear Junction / Demo Bank" />
+                  <input readonly value="Demo International Bank - France" />
                 </div>
                 <div>
                   <label>IBAN / N° de compte</label>
-                  <input id="iban" readonly value="GB82 WEST 1234 5698 7654 32" />
+                  <input id="iban" readonly value="FR76 3000 6000 0112 3456 7890 189" />
                 </div>
                 <div>
                   <label>SWIFT/BIC</label>
-                  <input id="swift" readonly value="CLJNEUMM" />
+                  <input id="swift" readonly value="DIBLFRPP" />
                 </div>
                 <div>
                   <label>Référence à indiquer</label>
@@ -273,7 +284,7 @@
       <!-- Right: Order summary -->
       <aside class="card">
         <div class="hd">
-          <div class="title">Récapitulatif</div>
+          <div class="title">Récapitulatif <span id="orderIdSummary" style="font-weight:600;font-size:13px;color:var(--muted);margin-left:8px"></span></div>
           <span class="pill">24h retour & échange</span>
         </div>
         <div class="bd">
@@ -284,7 +295,7 @@
             <div class="sum-row" style="border-top:1px solid var(--line);padding-top:10px"><span class="muted">Sous-total</span><span>150 000 XOF</span></div>
             <div class="sum-row total"><span>Total à payer</span><span id="grandTotal">150 000 XOF</span></div>
             <button class="btn primary" id="placeOrder">Passer la commande</button>
-            <div class="footer">En cliquant, vous créez la commande et accédez aux instructions de paiement.</div>
+            <div class="footer">En cliquant, vous créez la commande et accédez aux instructions de paiement. Un email vous sera envoyé avec les détails et la référence.</div>
           </div>
         </div>
       </aside>
@@ -305,6 +316,21 @@
       t.classList.add('show');
       setTimeout(()=>t.classList.remove('show'),1600);
     }
+
+    // --- Generate order id (realistic-looking) ---
+    function genOrderId(){
+      const d = new Date();
+      const y = d.getFullYear().toString().slice(2); // e.g. 25
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const rnd = Math.floor(Math.random()*9000)+1000;
+      return `AP-${y}${mm}${dd}-${rnd}`;
+    }
+    const orderId = genOrderId();
+    document.addEventListener('DOMContentLoaded', ()=>{
+      $('#orderIdHeader').textContent = orderId;
+      $('#orderIdSummary').textContent = orderId;
+    });
 
     // --- Tabs ---
     const panels = {
@@ -337,12 +363,12 @@
       });
     });
 
-    // --- Fake FX calculator ---
+    // --- Fake FX calculator (more realistic rounding) ---
     const fx = {
       'USDT-TRC20': {symbol:'USDT', rate:610},
       'USDT-ERC20': {symbol:'USDT', rate:610},
-      'BTC': {symbol:'BTC', rate: 61_000*610},
-      'ETH': {symbol:'ETH', rate: 3_000*610}
+      'BTC': {symbol:'BTC', rate: 61000 * 610},
+      'ETH': {symbol:'ETH', rate: 3000 * 610}
     };
 
     function recalc(){
@@ -350,13 +376,14 @@
       const xof = parseFloat($('#amountXof').value||'0');
       const info = fx[method];
       const amount = info ? (xof / info.rate) : 0;
+      // show up to 6 decimals, trim trailing zeros
       $('#amountCcy').value = (amount>0? amount : 0).toFixed(6).replace(/0+$/,'').replace(/\.$/,'');
       $('#ccyLabel').textContent = info ? info.symbol : '';
       const w = {
-        'USDT-TRC20':'TSmG8uQ9DemoTRC20_1234567890',
-        'USDT-ERC20':'0x29aCERC20DEMO000000000000',
-        'BTC':'bc1qdemobtc000000000000000000',
-        'ETH':'0x9eFethDEMO000000000000000000'
+        'USDT-TRC20':'TQf3k7s9h2x4y5z6a7b8c9d0e1f2g3h4i',
+        'USDT-ERC20':'0x3Fb8b7E6cA9f4D2E1b0C9a8F7e6D5c4B3a2F1E0',
+        'BTC':'bc1q9v8w7x6y5z4a3b2c1d0e9f8g7h6j5k4l3m2n',
+        'ETH':'0x9eF2B3cD4a5E6f7B8c9D0E1F2A3b4C5d6E7f8A9B'
       };
       $('#wallet').value = w[method] || '';
     }
@@ -393,7 +420,9 @@
 
     $('#placeOrder').addEventListener('click', ()=>{
       if(!validate()) return;
-      toast('Commande créée — suivez les instructions de paiement');
+      // simulate creating order and showing instructions
+      // show order id in a 'realistic' confirmation toast
+      toast(`Commande ${orderId} créée — instructions envoyées par email`);
       window.scrollTo({top:0, behavior:'smooth'});
     });
 
