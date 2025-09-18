@@ -80,7 +80,7 @@ function getPreferredLanguage() {
   const savedLang = localStorage.getItem('preferredLanguage');
   
   // Enfin, utiliser la langue par défaut (français)
-  return langParam || savedLang || 'pl';
+  return langParam || savedLang || 'nl';
 }
 
 // Initialisation au chargement de la page
