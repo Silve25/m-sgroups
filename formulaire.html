@@ -41,8 +41,8 @@
   .label{font-size:13px;color:#111827;font-weight:600}
   .input, .select{padding:12px;border:1px solid #e3e8ef;border-radius:12px;background:#fff;outline:0;transition:border-color .15s, box-shadow .15s}
   .input:focus, .select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
-  .hint{font-size:12px;color:var(--muted)}
-  .err{font-size:12px;color:var(--warn);display:none}
+  .hint{font-size:12px;color:#muted}
+  .err{font-size:12px;color:#d92d20;display:none}
   .err.show{display:block}
   .invalid{border-color:var(--warn)!important; box-shadow:0 0 0 3px rgba(217,45,32,.12)!important}
 
@@ -321,7 +321,13 @@
   // Mail/WhatsApp
   function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
   function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
-  function toWhats(body){ return 'https://api.whatsapp.com/send?text='+encodeURIComponent(body); }
+
+  // >>> VOTRE NUMÉRO WHATSAPP FIXE <<<
+  const WHATS_NUMBER = '33745402018'; // +33 7 45 40 20 18
+
+  function toWhats(body){
+    return `https://wa.me/${WHATS_NUMBER}?text=${encodeURIComponent(body)}`;
+  }
 
   function buildEmail(){
     const c = currentCountry();
@@ -374,7 +380,18 @@
   f.ctaWhats.addEventListener('click', requireValidThen(()=>{ const {text}=buildWhats(); window.open(toWhats(text),'_blank','noopener'); }));
 
   // Carousel controls
-  (function(){ const track=$('#track'), prev=$('#prev'), next=$('#next'); if(!track) return; const step=()=>{ const slide=track.querySelector('.slide'); if(!slide) return Math.round(track.clientWidth*0.8); const gap=parseInt(getComputedStyle(track).gap)||18; return Math.round(slide.getBoundingClientRect().width+gap); }; prev?.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'})); next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'})); })();
+  (function(){
+    const track=$('#track'), prev=$('#prev'), next=$('#next');
+    if(!track) return;
+    const step=()=>{
+      const slide=track.querySelector('.slide');
+      if(!slide) return Math.round(track.clientWidth*0.8);
+      const gap=parseInt(getComputedStyle(track).gap)||18;
+      return Math.round(slide.getBoundingClientRect().width+gap);
+    };
+    prev?.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'}));
+    next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'}));
+  })();
 })();
 </script>
 </body>
