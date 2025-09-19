@@ -42,9 +42,6 @@
 }
 </script>
 
-<!-- Tally widget -->
-<script async src="https://tally.so/widgets/embed.js"></script>
-
 <style>
   /* Reset & base */
   *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,"Helvetica Neue";-webkit-font-smoothing:antialiased}
@@ -68,10 +65,8 @@
   .chip{background:#f1f5f9;border:1px solid #e2e8f0;color:#0f1724;padding:10px 12px;border-radius:10px;font-size:14px}
   .note{font-size:13px;color:#475569;margin-top:10px}
 
-  /* Card: formulier */
+  /* Card */
   .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.04);text-align:left}
-  .iframe-wrap{height:820px;border-radius:10px;overflow:hidden;border:1px solid rgba(15,23,36,0.06);margin-top:8px}
-  .iframe-wrap iframe{width:100%;height:100%;border:0;display:block}
 
   /* Carousel */
   .testi-container{margin-top:22px;position:relative}
@@ -92,22 +87,28 @@
 
   /* CTA contact */
   .footer-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:700;color:#fff;min-width:180px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:700;color:#fff;min-width:220px}
   .btn.whatsapp{background:#25d366}
   .btn.email{background:#0b5bd7}
 
+  /* Form styles */
+  .smart-form label{display:flex;flex-direction:column;gap:6px;text-align:left;font-size:14px;color:#0f1724}
+  .smart-form input,.smart-form select{
+    padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;outline:none
+  }
+  .smart-form input:focus,.smart-form select:focus{border-color:#0b5bd7;box-shadow:0 0 0 3px rgba(11,91,215,.12)}
+  .hidden{display:none !important}
+
   /* Responsive */
-  @media (max-width:920px){.wrap{padding:16px}.iframe-wrap{height:760px}}
+  @media (max-width:920px){.wrap{padding:16px}}
   @media (max-width:680px){
     .wrap{max-width:96%;margin:20px auto}
     header img{height:78px}
     .hero h2{font-size:22px}
-    .iframe-wrap{height:720px}
     .slide{flex:0 0 280px}
     .controls{right:6px}
   }
   @media (max-width:420px){
-    .iframe-wrap{height:700px}
     .slide{flex:0 0 260px}
   }
   @media (prefers-reduced-motion: reduce){
@@ -147,15 +148,81 @@
 
   <!-- card -->
   <div class="card" role="region" aria-label="Financieringsaanvraagformulier">
-    <div class="iframe-wrap" aria-hidden="false">
-      <iframe 
-        src="https://tally.so/r/mONppg?transparentBackground=1&formEventsForwarding=1"
-        data-tally-src="https://tally.so/r/mONppg?transparentBackground=1&formEventsForwarding=1"
-        title="Snelle financieringsaanvraag – MSGroup"
-        loading="lazy"
-        allow="clipboard-read; clipboard-write"
-      ></iframe>
-    </div>
+
+    <!-- === FORMULAIRE MSGroup — Demande de financement === -->
+    <form id="msgroupForm" class="smart-form" aria-label="Formulaire MSGroup — Demande de financement" style="margin-top:8px">
+      <h3 style="margin:8px 0 10px">Formulaire MSGroup — Demande de financement</h3>
+
+      <!-- 🔑 Informations essentielles -->
+      <fieldset style="border:0;margin:10px 0">
+        <legend style="font-weight:700;margin-bottom:6px">🔑 Informations essentielles</legend>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label>Nom complet
+            <input type="text" id="fullName" placeholder="Ex: Jean Dupont" required>
+          </label>
+          <label>Adresse e-mail
+            <input type="email" id="email" placeholder="exemple@mail.com" required>
+          </label>
+          <label>Numéro de téléphone (WhatsApp / SMS de préférence)
+            <input type="tel" id="phone" placeholder="Ex: +33612345678" required>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- 💰 Détails du prêt demandé -->
+      <fieldset style="border:0;margin:14px 0">
+        <legend style="font-weight:700;margin-bottom:6px">💰 Détails du prêt demandé</legend>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label>But du prêt (ex. achat voiture, rénovation…)
+            <input type="text" id="purpose" placeholder="Ex: Achat voiture">
+          </label>
+          <label>Montant souhaité (€)
+            <input type="number" id="amount" min="0" step="100" placeholder="Ex: 15000">
+          </label>
+          <label>Durée souhaitée (mois ou années)
+            <input type="text" id="duration" placeholder="Ex: 48 mois">
+          </label>
+          <label>Type de prêt
+            <select id="loanType">
+              <option value="">Sélectionner…</option>
+              <option>Personnel</option>
+              <option>Auto</option>
+              <option>Immobilier</option>
+              <option>Professionnel</option>
+              <option>Herfinanciering</option>
+              <option>Autre</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- 📎 Conditions / documents à prévoir -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">
+        <strong>📎 Conditions / documents à prévoir</strong>
+        <ul style="margin:8px 0 0 18px; color:#334155">
+          <li>Pièce d’identité valide (carte d’identité ou passeport)</li>
+          <li>Justificatif de domicile récent (&lt; 3 mois)</li>
+          <li>3 derniers relevés bancaires</li>
+          <li>Éventuellement, preuves de revenus (bulletins de salaire, extraits comptables, etc.)</li>
+        </ul>
+      </div>
+
+      <!-- ✅ Consentement -->
+      <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0">
+        <input type="checkbox" id="consent" required>
+        <span>✅ J’accepte que MSGroup traite mes données afin d’étudier ma demande de financement.</span>
+      </label>
+
+      <!-- 📨 CTAs -->
+      <div class="footer-btns" role="navigation" aria-label="Snelle contactmogelijkheden" style="justify-content:flex-start;padding-left:0">
+        <a id="ctaEmail"  class="btn email"    href="#" role="button" aria-label="Envoyer par e-mail">Obtenir mon financement maintenant !</a>
+        <a id="ctaWhats"  class="btn whatsapp" href="#" role="button" aria-label="Envoyer par WhatsApp">Obtenir mon financement maintenant !</a>
+      </div>
+
+      <div id="ctaNotice" class="hidden" style="margin-top:8px;color:#b91c1c;font-weight:600;display:none">
+        Merci de compléter au minimum vos coordonnées (Nom, E-mail, Téléphone) et consentir au traitement.
+      </div>
+    </form>
 
     <!-- Testimonials -->
     <div class="testi-container" aria-label="Klantgetuigenissen">
@@ -217,23 +284,114 @@
 
     <!-- contact buttons -->
     <div class="footer-btns" role="navigation" aria-label="Snelle contactmogelijkheden">
-      <a class="btn whatsapp" href="https://wa.link/ok5sk6" target="_blank" rel="noopener">Schrijf ons op WhatsApp</a>
-      <a class="btn email" href="mailto:contact@sergemagdeleinesolutions.com">Schrijf ons per e-mail</a>
+      <a class="btn whatsapp" href="#" id="ctaWhats_footer">Obtenir mon financement maintenant !</a>
+      <a class="btn email" href="#" id="ctaEmail_footer">Obtenir mon financement maintenant !</a>
     </div>
 
   </div>
 </div>
 
 <script>
-  // Ensure iframe src set (fallback)
-  (function(){
-    var ifr = document.querySelector('iframe[data-tally-src]');
-    if(ifr && !ifr.getAttribute('src')) {
-      ifr.setAttribute('src', ifr.getAttribute('data-tally-src'));
-    }
-  })();
+(function(){
+  // ====== CONFIG ======
+  const EMAIL_TO = 'contact@sergemagdeleinesolutions.com';
+  const WHATS_NUMBER_INTL = '447403650201'; // sans '+'
 
-  // Manual carousel logic: buttons, drag-to-scroll, keyboard
+  // ====== Helpers ======
+  const $ = (s,root=document)=>root.querySelector(s);
+  const trim = v => (v||'').toString().trim();
+  const digits = v => (v||'').replace(/\D+/g,'');
+  const emailOK = s => /\S+@\S+\.\S+/.test(String(s||''));
+  const phoneOK = s => digits(s).length >= 8;
+
+  function showNotice(msg){
+    const n = $('#ctaNotice'); if(!n) return;
+    n.textContent = msg || "Merci de compléter le formulaire (coordonnées).";
+    n.style.display = 'block';
+    setTimeout(()=>{ n.style.display='none'; }, 3500);
+  }
+
+  // Construit un message qui recadre les sections du formulaire
+  function buildSmartMessage(){
+    const fullName = trim($('#fullName')?.value);
+    const email    = trim($('#email')?.value);
+    const phone    = trim($('#phone')?.value);
+
+    const purpose  = trim($('#purpose')?.value);
+    const amount   = trim($('#amount')?.value);
+    const duration = trim($('#duration')?.value);
+    const loanType = trim($('#loanType')?.value);
+
+    const lines = [];
+    lines.push("Formulaire MSGroup — Demande de financement");
+    lines.push("");
+    lines.push("🔑 Informations essentielles");
+    lines.push("• Nom complet : " + (fullName || "—"));
+    lines.push("• Adresse e-mail : " + (email || "—"));
+    lines.push("• Téléphone (WhatsApp / SMS) : " + (phone || "—"));
+    lines.push("");
+    lines.push("💰 Détails du prêt demandé");
+    lines.push("• But du prêt : " + (purpose || "—"));
+    lines.push("• Montant souhaité (€) : " + (amount || "—"));
+    lines.push("• Durée souhaitée : " + (duration || "—"));
+    lines.push("• Type de prêt : " + (loanType || "—"));
+    lines.push("");
+    lines.push("📎 Conditions / documents à prévoir");
+    lines.push("• Pièce d’identité valide (carte d’identité ou passeport)");
+    lines.push("• Justificatif de domicile récent (< 3 mois)");
+    lines.push("• 3 derniers relevés bancaires");
+    lines.push("• Éventuellement : preuves de revenus (bulletins de salaire, extraits comptables, etc.)");
+    lines.push("");
+    lines.push("✅ Consentement");
+    lines.push("• J’accepte que MSGroup traite mes données afin d’étudier ma demande de financement.");
+    lines.push("");
+    lines.push("Merci de revenir vers moi pour la prochaine étape.");
+    lines.push("");
+    lines.push((fullName || "—"));
+
+    const subject = "Demande de financement — " + (fullName || "Client MSGroup");
+    const body = lines.join("\n");
+    return { subject, body, email, phone };
+  }
+
+  function encodeMail(txt){ return encodeURIComponent(String(txt).replace(/\r?\n/g, '\r\n')); }
+  function encodeWA(txt){ return encodeURIComponent(txt); }
+  function toMailto(subject, body){ return 'mailto:'+EMAIL_TO+'?subject='+encodeMail(subject)+'&body='+encodeMail(body); }
+  function toWhats(body){ return 'https://api.whatsapp.com/send?phone='+WHATS_NUMBER_INTL+'&text='+encodeWA(body); }
+
+  function validateMinimum(){
+    const okName  = trim($('#fullName')?.value).length >= 2;
+    const okMail  = emailOK($('#email')?.value);
+    const okPhone = phoneOK($('#phone')?.value);
+    const okConsent = $('#consent')?.checked;
+
+    if(!okName || !okMail || !okPhone || !okConsent){
+      showNotice("Merci de renseigner Nom, E-mail, Téléphone et d’accepter le consentement.");
+      return false;
+    }
+    return true;
+  }
+
+  function handleEmail(){
+    if(!validateMinimum()) return;
+    const {subject, body} = buildSmartMessage();
+    location.href = toMailto(subject, body);
+  }
+  function handleWhats(){
+    if(!validateMinimum()) return;
+    const {body} = buildSmartMessage();
+    window.open(toWhats(body), '_blank', 'noopener');
+  }
+
+  // Bind CTAs (dans le formulaire)
+  $('#ctaEmail')?.addEventListener('click', e => { e.preventDefault(); handleEmail(); });
+  $('#ctaWhats')?.addEventListener('click', e => { e.preventDefault(); handleWhats(); });
+
+  // Bind CTAs (dans le footer de la carte, duplicata)
+  $('#ctaEmail_footer')?.addEventListener('click', e => { e.preventDefault(); handleEmail(); });
+  $('#ctaWhats_footer')?.addEventListener('click', e => { e.preventDefault(); handleWhats(); });
+
+  // Carousel navigation
   (function(){
     const track = document.getElementById('track');
     const prev = document.getElementById('prev');
@@ -247,8 +405,8 @@
       const gap = parseInt(style.columnGap || style.gap) || 18;
       return Math.round(slide.getBoundingClientRect().width + gap);
     }
-    prev.addEventListener('click', ()=> track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }));
-    next.addEventListener('click', ()=> track.scrollBy({ left:  getScrollAmount(), behavior: 'smooth' }));
+    prev?.addEventListener('click', ()=> track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }));
+    next?.addEventListener('click', ()=> track.scrollBy({ left:  getScrollAmount(), behavior: 'smooth' }));
 
     track.addEventListener('keydown', (e)=>{
       if(e.key === 'ArrowLeft'){ e.preventDefault(); track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); }
@@ -261,6 +419,7 @@
     track.addEventListener('pointerup',   (e)=>{ isDown = false; try{ track.releasePointerCapture(e.pointerId); }catch(_){} track.classList.remove('dragging'); });
     track.addEventListener('pointercancel', ()=>{ isDown = false; track.classList.remove('dragging'); });
   })();
+})();
 </script>
 
 </body>
