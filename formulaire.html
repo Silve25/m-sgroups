@@ -3,424 +3,379 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snelle & betrouwbare lening — MSGroup (Aanbieding tot 30 september)</title>
-
-<!-- SEO -->
-<meta name="description" content="MSGroup: persoonlijke, zakelijke, auto- en hypothecaire leningen vanaf 2% JKP. Indicatieve goedkeuring binnen 24–48u en vaak uitbetaling in minder dan 3 dagen. Aanbieding tot 30 september.">
-<meta name="keywords" content="lening snel, financiering, krediet, herfinanciering, zakelijke lening, hypothecaire lening, MSGroup">
-<meta name="author" content="MSGroup">
-
-<!-- Favicons / share image (logo) -->
+<title>Snelle & betrouwbare lening — Serge Magdeleine Solutions</title>
+<meta name="description" content="Persoonlijke en zakelijke leningen vanaf 2% JKP. NL standaard (wijzigbaar). Simulatie onder het formulier, CTA's daaronder.">
 <link rel="icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
-<link rel="apple-touch-icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://sergemagdeleinesolutions.fr/">
-<meta property="og:title" content="Snelle & betrouwbare lening — MSGroup">
-<meta property="og:description" content="Leningen vanaf 2% JKP, vaak uitbetaald in minder dan 3 dagen. Aanbieding tot 30 september.">
-<meta property="og:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
-<meta property="og:image:alt" content="MSGroup - Logo">
-<meta property="og:locale" content="nl_NL">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://sergemagdeleinesolutions.fr/">
-<meta name="twitter:title" content="Snelle & betrouwbare lening — MSGroup">
-<meta name="twitter:description" content="Snel een lening aanvragen vanaf 2% JKP — vaak binnen 3 dagen geregeld. Aanbieding tot 30 september.">
-<meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
-
-<!-- JSON-LD (organisatie) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "MSGroup",
-  "url": "https://sergemagdeleinesolutions.fr/",
-  "logo": "https://sergemagdeleinesolutions.fr/logoMsg.png",
-  "sameAs": []
-}
-</script>
-
 <style>
-  /* Reset & base */
-  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,"Helvetica Neue";-webkit-font-smoothing:antialiased}
-  body{background:#f6f8fb;color:#0f1724;line-height:1.45}
+  :root{ --bg:#f7f8fb; --fg:#0f1724; --muted:#667085; --line:#e6e9f2; --brand:#1a56db; --ok:#12b76a; --warn:#d92d20; --card:#fff; --radius:16px; --shadow:0 10px 28px rgba(2,6,23,.06); }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial}
+  strong,b{font-weight:600}
   a{color:inherit;text-decoration:none}
   img{display:block;max-width:100%}
+  .wrap{max-width:1040px;margin:34px auto;padding:0 18px}
 
-  /* Layout */
-  .wrap{max-width:980px;margin:34px auto;padding:20px;text-align:center}
-  header{margin-bottom:18px}
-  header a{display:inline-block}
-  header img{height:88px;border-radius:8px}
-  header h1{font-size:22px;margin-top:10px;color:#0b5bd7;font-weight:700}
+  header{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:14px}
+  header img{height:56px;border-radius:12px}
+  header h1{font-weight:600;font-size:22px;color:var(--brand)}
 
-  /* Hero */
-  .hero{background:#fff;padding:28px;border-radius:14px;box-shadow:0 10px 30px rgba(11,91,215,0.06);margin-bottom:18px;text-align:left}
-  .kicker{display:inline-block;background:rgba(220,38,38,0.08);color:#b91c1c;font-weight:700;padding:6px 12px;border-radius:999px;font-size:13px;margin-bottom:12px}
-  .hero h2{font-size:26px;margin:10px 0 8px;color:#0f1724}
-  .hero p{color:#374151;font-size:15px;margin-bottom:12px}
-  .usp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px}
-  .chip{background:#f1f5f9;border:1px solid #e2e8f0;color:#0f1724;padding:10px 12px;border-radius:10px;font-size:14px}
-  .note{font-size:13px;color:#475569;margin-top:10px}
+  /* HERO */
+  .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+  .kicker{display:inline-flex;gap:8px;align-items:center;background:#eef4ff;color:#3538CD;border:1px solid #d9e0ff;border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px}
+  .hero h2{font-size:22px;margin:10px 0 6px;font-weight:600}
+  .hero p{color:#475467}
+  .usps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .usp{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .usp b{display:block;margin-bottom:6px;font-weight:600}
+  @media (max-width:900px){ .usps{grid-template-columns:1fr} }
 
-  /* Card */
-  .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.04);text-align:left}
+  /* CARD */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
 
-  /* Carousel */
-  .testi-container{margin-top:22px;position:relative}
-  .testi-viewport{overflow:hidden;padding:6px 0}
+  /* FORM (nouvelle disposition) */
+  .form-shell{display:grid;grid-template-columns:1fr;gap:14px}
+  .form-title{font-size:18px;font-weight:600}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
+  .field{display:flex;flex-direction:column;gap:6px}
+  .label{font-size:13px;color:#111827;font-weight:600}
+  .input, .select{padding:12px;border:1px solid #e3e8ef;border-radius:12px;background:#fff;outline:0;transition:border-color .15s, box-shadow .15s}
+  .input:focus, .select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+  .hint{font-size:12px;color:var(--muted)}
+  .err{font-size:12px;color:var(--warn);display:none}
+  .err.show{display:block}
+  .invalid{border-color:var(--warn)!important; box-shadow:0 0 0 3px rgba(217,45,32,.12)!important}
+
+  /* Slider bloc (unique) */
+  .slider-block{margin-top:4px}
+  .panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+  .panel h4{font-size:15px;font-weight:600;margin-bottom:8px}
+  .amount-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .valbox{min-width:150px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#f8fafc;font-weight:600;text-align:center}
+  .slider{appearance:none;width:100%;height:8px;border-radius:999px;background:#e7ecf4;outline:none}
+  .slider::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 3px rgba(37,99,235,.2);cursor:pointer}
+
+  /* Testimonials */
+  .testi-title{font-size:18px;font-weight:600;margin:18px 0 8px}
+  .testi-viewport{overflow:hidden}
   .track{display:flex;gap:18px;scroll-snap-type:x mandatory;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px}
   .track::-webkit-scrollbar{height:8px}
-  .track::-webkit-scrollbar-thumb{background:rgba(11,91,215,0.18);border-radius:8px}
-  .slide{flex:0 0 320px;scroll-snap-align:center;background:#f8fafc;padding:16px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03);text-align:left}
-  .slide p{font-size:15px;color:#1f2937;margin-bottom:8px;line-height:1.45}
-  .who{font-weight:700;color:#0b5bd7;font-size:13px}
-  .addr{font-size:12px;color:#64748b;margin-top:2px}
+  .track::-webkit-scrollbar-thumb{background:rgba(26,86,219,0.18);border-radius:8px}
+  .slide{flex:0 0 320px;scroll-snap-align:center;background:#f8fafc;padding:16px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03)}
+  .slide p{font-size:15px;color:#1f2937;margin-bottom:8px}
+  .who{font-weight:600;color:#1a56db;font-size:13px}
+  .addr{font-size:12px;color:#64748b}
+  .controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+  .ctrl-btn{background:#eef2f7;border:1px solid #dde3ee;padding:8px 10px;border-radius:10px;cursor:pointer}
+  .ctrl-btn:hover{background:#e7edf7}
 
-  /* Controls */
-  .controls{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
-  .ctrl-btn{background:rgba(2,6,23,0.06);border:0;padding:8px;border-radius:10px;cursor:pointer;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center}
-  .ctrl-btn:active{transform:scale(0.98)}
-  .ctrl-btn svg{width:18px;height:18px;fill:#0f1724;opacity:0.9}
-
-  /* CTA contact */
-  .footer-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:700;color:#fff;min-width:220px}
+  /* CTA */
+  .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;font-weight:600;color:#fff;min-width:220px;border:0;opacity:.6;pointer-events:none}
+  .btn.enabled{opacity:1;pointer-events:auto}
+  .btn.email{background:#1a56db}
   .btn.whatsapp{background:#25d366}
-  .btn.email{background:#0b5bd7}
 
-  /* Form styles */
-  .smart-form label{display:flex;flex-direction:column;gap:6px;text-align:left;font-size:14px;color:#0f1724}
-  .smart-form input,.smart-form select{
-    padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;outline:none
-  }
-  .smart-form input:focus,.smart-form select:focus{border-color:#0b5bd7;box-shadow:0 0 0 3px rgba(11,91,215,.12)}
-  .hidden{display:none !important}
+  footer{margin:22px 0 8px;text-align:center}
+  .sitebtn{display:inline-block;background:#1a56db;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
 
-  /* Responsive */
-  @media (max-width:920px){.wrap{padding:16px}}
-  @media (max-width:680px){
-    .wrap{max-width:96%;margin:20px auto}
-    header img{height:78px}
-    .hero h2{font-size:22px}
-    .slide{flex:0 0 280px}
-    .controls{right:6px}
-  }
-  @media (max-width:420px){
-    .slide{flex:0 0 260px}
-  }
-  @media (prefers-reduced-motion: reduce){
-    .track{scroll-behavior:auto}
-  }
+  /* Small print */
+  .disclaimer{margin-top:10px;color:#64748b;font-size:12px}
 </style>
 </head>
 <body>
-
 <div class="wrap">
-
-  <!-- header -->
   <header>
-    <a href="https://sergemagdeleinesolutions.fr/" aria-label="Ga naar de startpagina">
-      <img src="logoMsg.png" alt="MSGroup - logo">
-    </a>
-    <h1>MSGroup</h1>
+    <img src="logoMsg.png" alt="Serge Magdeleine Solutions">
+    <h1>Serge Magdeleine Solutions</h1>
   </header>
 
-  <!-- hero -->
+  <!-- HERO -->
   <section class="hero" aria-labelledby="hero-title">
-    <div class="kicker">Beperkt aanbod — geldig tot <strong>30 september</strong></div>
+    <div class="kicker">Beperkte aanbieding — geldig tot <strong>30 september</strong></div>
     <h2 id="hero-title">Vraag uw lening aan — snel, transparant, realistisch</h2>
-    <p><strong>Wat doen wij bij MSGroup (Serge Magdeleine Solutions Group)?</strong> We financieren uw ambities met <strong>leningen vanaf 2% JKP</strong>, heldere voorwaarden en <strong>flexibele looptijden</strong>. <u>In veel gevallen rond u uw financiering in minder dan 3 dagen af</u> — dankzij onze directe analyse en rechtstreekse lijnen met partners. Of het nu gaat om een persoonlijke, zakelijke, auto- of hypothecaire lening: we vergelijken, adviseren en begeleiden tot de uitbetaling.</p>
-
-    <div class="usp">
-      <div class="chip">✅ Rente vanaf <strong>2% JKP</strong> — marktconform en transparant</div>
-      <div class="chip">⚡ Indicatieve goedkeuring binnen <strong>24–48u</strong></div>
-      <div class="chip">⏱️ Vaardig traject — vaak <strong>uitbetaling &lt; 3 dagen</strong></div>
-      <div class="chip">🧩 Looptijd op maat — van enkele maanden tot 30 jaar</div>
-      <div class="chip">🔒 Duidelijke documenten — transparante communicatie</div>
-      <div class="chip">👤 1-op-1 begeleiding — van aanvraag tot uitbetaling</div>
-      <div class="chip">♻️ Herfinanciering — consolideer en verlaag uw maandlast</div>
+    <p><strong>Wat doen wij?</strong> Financiering op maat met <strong>rente vanaf 2% JKP</strong>, duidelijke voorwaarden en <strong>flexibele looptijden</strong>. Vaak <strong>uitbetaling &lt; 3 dagen</strong>.</p>
+    <div class="usps">
+      <div class="usp"><b>✔ Lage rente vanaf 2% JKP</b><span>Marktconform en afgestemd op uw profiel.</span></div>
+      <div class="usp"><b>✔ Snelle goedkeuring</b><span>Indicatief binnen 24–48u; vaak uitbetaling binnen 3 dagen.</span></div>
+      <div class="usp"><b>✔ Flexibele looptijd</b><span>Van enkele maanden tot 30 jaar, met persoonlijke begeleiding.</span></div>
     </div>
-    <p class="note">Indicatieve simulatie. Het uiteindelijke tarief is afhankelijk van uw situatie en kredietwaardigheid. In gunstige dossiers gebeurt de uitbetaling vaak in <strong>minder dan 3 dagen</strong>.</p>
   </section>
 
-  <!-- card -->
-  <div class="card" role="region" aria-label="Financieringsaanvraagformulier">
+  <div class="card">
+    <!-- FORM -->
+    <div class="form-shell">
+      <div class="form-title">Aanvraagformulier</div>
 
-    <!-- === FORMULAIRE MSGroup — Demande de financement === -->
-    <form id="msgroupForm" class="smart-form" aria-label="Formulaire MSGroup — Demande de financement" style="margin-top:8px">
-      <h3 style="margin:8px 0 10px">Formulaire MSGroup — Demande de financement</h3>
-
-      <!-- 🔑 Informations essentielles -->
-      <fieldset style="border:0;margin:10px 0">
-        <legend style="font-weight:700;margin-bottom:6px">🔑 Informations essentielles</legend>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <label>Nom complet
-            <input type="text" id="fullName" placeholder="Ex: Jean Dupont" required>
-          </label>
-          <label>Adresse e-mail
-            <input type="email" id="email" placeholder="exemple@mail.com" required>
-          </label>
-          <label>Numéro de téléphone (WhatsApp / SMS de préférence)
-            <input type="tel" id="phone" placeholder="Ex: +33612345678" required>
-          </label>
+      <form id="leadForm" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <span class="label">Voornaam</span>
+            <input id="firstName" class="input" type="text" placeholder="Bijv. Jan" autocomplete="given-name" required>
+            <div id="e_fname" class="err">Vul uw voornaam in.</div>
+          </div>
+          <div class="field">
+            <span class="label">Achternaam</span>
+            <input id="lastName" class="input" type="text" placeholder="Bijv. Jansen" autocomplete="family-name" required>
+            <div id="e_lname" class="err">Vul uw achternaam in.</div>
+          </div>
         </div>
-      </fieldset>
 
-      <!-- 💰 Détails du prêt demandé -->
-      <fieldset style="border:0;margin:14px 0">
-        <legend style="font-weight:700;margin-bottom:6px">💰 Détails du prêt demandé</legend>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <label>But du prêt (ex. achat voiture, rénovation…)
-            <input type="text" id="purpose" placeholder="Ex: Achat voiture">
-          </label>
-          <label>Montant souhaité (€)
-            <input type="number" id="amount" min="0" step="100" placeholder="Ex: 15000">
-          </label>
-          <label>Durée souhaitée (mois ou années)
-            <input type="text" id="duration" placeholder="Ex: 48 mois">
-          </label>
-          <label>Type de prêt
-            <select id="loanType">
-              <option value="">Sélectionner…</option>
-              <option>Personnel</option>
-              <option>Auto</option>
-              <option>Immobilier</option>
-              <option>Professionnel</option>
-              <option>Herfinanciering</option>
-              <option>Autre</option>
+        <div class="form-grid">
+          <div class="field">
+            <span class="label">E-mailadres</span>
+            <input id="email" class="input" type="email" placeholder="bijv. naam@domein.nl" autocomplete="email" required>
+            <div class="hint">Gebruik uw echte e-mail (geen tijdelijk adres).</div>
+            <div id="e_email" class="err">Voer een geldig e-mailadres in.</div>
+          </div>
+          <div class="field">
+            <span class="label">Land</span>
+            <select id="country" class="select" required></select>
+            <div class="hint">Standaard: Nederland. U kunt dit wijzigen.</div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <span class="label">Telefoon (WhatsApp mogelijk)</span>
+            <input id="phone" class="input" type="tel" inputmode="tel" placeholder="Voorbeeld: +31 6 12 34 56 78" required>
+            <div class="hint">Typ uw <strong>volledig internationaal nummer</strong> met "+" (bv. <strong>+31 …</strong>).</div>
+            <div id="e_phone" class="err">Nummer ongeldig.</div>
+          </div>
+          <div class="field">
+            <span class="label">Duur van de lening</span>
+            <select id="duration" class="select">
+              <option value="12">12 maanden</option>
+              <option value="24">24 maanden</option>
+              <option value="36">36 maanden</option>
+              <option value="48">48 maanden</option>
+              <option value="60" selected>60 maanden (5 jaar)</option>
+              <option value="84">84 maanden</option>
+              <option value="120">120 maanden</option>
+              <option value="180">180 maanden</option>
+              <option value="240">240 maanden</option>
+              <option value="360">360 maanden</option>
             </select>
-          </label>
+            <div class="hint">Kies een comfortabele looptijd.</div>
+          </div>
         </div>
-      </fieldset>
 
-      <!-- 📎 Conditions / documents à prévoir -->
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">
-        <strong>📎 Conditions / documents à prévoir</strong>
-        <ul style="margin:8px 0 0 18px; color:#334155">
-          <li>Pièce d’identité valide (carte d’identité ou passeport)</li>
-          <li>Justificatif de domicile récent (&lt; 3 mois)</li>
-          <li>3 derniers relevés bancaires</li>
-          <li>Éventuellement, preuves de revenus (bulletins de salaire, extraits comptables, etc.)</li>
-        </ul>
-      </div>
+        <div class="field" style="margin-top:2px">
+          <span class="label">Doel van de lening</span>
+          <input id="purpose" class="input" type="text" placeholder="Bijv. auto, renovatie, consolidatie, investering…">
+        </div>
 
-      <!-- ✅ Consentement -->
-      <label style="display:flex;gap:8px;align-items:flex-start;margin:10px 0">
-        <input type="checkbox" id="consent" required>
-        <span>✅ J’accepte que MSGroup traite mes données afin d’étudier ma demande de financement.</span>
-      </label>
+        <label class="field" style="flex-direction:row;align-items:flex-start;gap:10px;margin-top:6px">
+          <input type="checkbox" id="consent" required>
+          <span class="hint" style="margin-top:0">Ik ga akkoord dat Serge Magdeleine Solutions mijn gegevens verwerkt om mijn aanvraag te beoordelen.</span>
+        </label>
+      </form>
 
-      <!-- 📨 CTAs -->
-      <div class="footer-btns" role="navigation" aria-label="Snelle contactmogelijkheden" style="justify-content:flex-start;padding-left:0">
-        <a id="ctaEmail"  class="btn email"    href="#" role="button" aria-label="Envoyer par e-mail">Obtenir mon financement maintenant !</a>
-        <a id="ctaWhats"  class="btn whatsapp" href="#" role="button" aria-label="Envoyer par WhatsApp">Obtenir mon financement maintenant !</a>
-      </div>
-
-      <div id="ctaNotice" class="hidden" style="margin-top:8px;color:#b91c1c;font-weight:600;display:none">
-        Merci de compléter au minimum vos coordonnées (Nom, E-mail, Téléphone) et consentir au traitement.
-      </div>
-    </form>
-
-    <!-- Testimonials -->
-    <div class="testi-container" aria-label="Klantgetuigenissen">
-      <div class="testi-viewport">
-        <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
-          <div class="slide">
-            <p>“Autolening snel goedgekeurd, contracten helder. Ik had het geld <strong>binnen 3 dagen</strong>.”</p>
-            <div class="who">— Marc L.</div><div class="addr">Keizersgracht 241, 1016 EA Amsterdam</div>
+      <!-- Slider UNIQUE sous le formulaire -->
+      <div class="slider-block">
+        <div class="panel">
+          <div class="amount-row">
+            <h4>Gewenst leenbedrag</h4>
+            <div id="amtBox" class="valbox">10 000 €</div>
           </div>
-          <div class="slide">
-            <p>“Binnen 48 uur zakelijke financiering gevonden. Uitbetaling volgde <strong>razendsnel</strong>.”</p>
-            <div class="who">— Claire B.</div><div class="addr">Coolsingel 85, 3012 AG Rotterdam</div>
-          </div>
-          <div class="slide">
-            <p>“Herfinanciering verlaagde mijn maandlast aanzienlijk. Alles <strong>in minder dan 3 dagen</strong> rond.”</p>
-            <div class="who">— Julien R.</div><div class="addr">Grote Markt 1, 2511 BG Den Haag</div>
-          </div>
-          <div class="slide">
-            <p>“Bedrag zonder gedoe geaccepteerd. Team hield me perfect op de hoogte.”</p>
-            <div class="who">— Antoine D.</div><div class="addr">Stationsweg 5, 9726 AC Groningen</div>
-          </div>
-          <div class="slide">
-            <p>“Transparant advies en eerlijk tarief. Startfinanciering was <strong>bliksemsnel geregeld</strong>.”</p>
-            <div class="who">— Sophie M.</div><div class="addr">Domplein 4, 3512 JC Utrecht</div>
-          </div>
-          <div class="slide">
-            <p>“Goede begeleiding bij documentatie. Sneller dan verwacht — <strong>&lt; 3 dagen</strong>.”</p>
-            <div class="who">— Emilie P.</div><div class="addr">Vrijthof 20, 6211 LD Maastricht</div>
-          </div>
-          <div class="slide">
-            <p>“Hypothecaire lening op maat en duidelijke uitleg. Geen verrassingen.”</p>
-            <div class="who">— Pieter V.</div><div class="addr">Oudegracht 200, 3511 NK Utrecht</div>
-          </div>
-          <div class="slide">
-            <p>“Zakelijke lease uitstekend geregeld. Flexibel en betaalbaar.”</p>
-            <div class="who">— Noor K.</div><div class="addr">Blaak 31, 3011 GA Rotterdam</div>
-          </div>
-          <div class="slide">
-            <p>“Snelle uitbetaling en topservice. Mijn auto direct kunnen financieren.”</p>
-            <div class="who">— Ahmed S.</div><div class="addr">Markt 12, 5611 EB Eindhoven</div>
-          </div>
-          <div class="slide">
-            <p>“Heldere simulatie en scherp tarief. <strong>In 3 dagen</strong> alles digitaal afgehandeld.”</p>
-            <div class="who">— Linda J.</div><div class="addr">Noordeinde 44, 2514 GK Den Haag</div>
-          </div>
+          <input id="amount" class="slider" type="range" min="1000" max="200000" step="500" value="10000">
+          <div class="hint">Minimum 1 000 €, maximum 200 000 €.</div>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls" aria-hidden="false">
-        <button class="ctrl-btn" id="prev" aria-label="Vorige getuigenissen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-        </button>
-        <button class="ctrl-btn" id="next" aria-label="Volgende getuigenissen">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-        </button>
+      <!-- CTA's en bas -->
+      <div class="btns">
+        <button id="ctaEmail" class="btn email" type="button" disabled>E-mail sturen</button>
+        <button id="ctaWhats" class="btn whatsapp" type="button" disabled>WhatsApp bericht</button>
       </div>
     </div>
 
-    <!-- contact buttons -->
-    <div class="footer-btns" role="navigation" aria-label="Snelle contactmogelijkheden">
-      <a class="btn whatsapp" href="#" id="ctaWhats_footer">Obtenir mon financement maintenant !</a>
-      <a class="btn email" href="#" id="ctaEmail_footer">Obtenir mon financement maintenant !</a>
+    <!-- Getuigenissen -->
+    <h3 class="testi-title">Wat zeggen onze klanten over ons?</h3>
+    <div class="testi-viewport" aria-label="Klantgetuigenissen">
+      <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
+        <!-- 1 -->
+        <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
+        <!-- 2 -->
+        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik via WhatsApp snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
+        <!-- 3 -->
+        <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
+        <!-- 4 -->
+        <div class="slide"><p>“Ik heb herfinancierd om lagere maandlasten te krijgen. De overstap werd nagenoeg volledig voor me geregeld, inclusief het opvragen van oude stukken. De nieuwe rente en looptijd zijn eerlijk onderbouwd met marktvergelijkingen. Geen kleine lettertjes, wel duidelijkheid.”</p><div class="who">— Julien R.</div><div class="addr">Frederik Hendriklaan 227, 2582 CB Den Haag</div></div>
+        <!-- 5 -->
+        <div class="slide"><p>“De simulatie hielp me beslissen welk bedrag verantwoord was. Na het indienen van mijn loonstrook en bankafschriften was de voorlopige goedkeuring er snel. Betaaldata kon ik zelf kiezen, wat voor mijn salariscyclus ideaal is.”</p><div class="who">— Tom W.</div><div class="addr">KNSM-laan 190, 1019 LC Amsterdam</div></div>
+        <!-- 6 -->
+        <div class="slide"><p>“Als starter had ik weinig tijd voor papierwerk. Ik kreeg een checklist met exacte documenten en voorbeelden, waardoor ik alles in één keer goed kon aanleveren. De communicatie was vriendelijk en to the point. Aanrader.”</p><div class="who">— Iris D.</div><div class="addr">Stationsstraat 5, 6211 BP Maastricht</div></div>
+        <!-- 7 -->
+        <div class="slide"><p>“Voor de aankoop van een bestelbus kreeg ik meerdere opties: variabele of vaste rente, en uitleg over de impact op de totale kosten. Ik koos vast, omdat ik rust wilde. De totale TAEG werd netjes voorgetoond en klopte bij het contract.”</p><div class="who">— Ahmed K.</div><div class="addr">Europalaan 60, 3526 KS Utrecht</div></div>
+        <!-- 8 -->
+        <div class="slide"><p>“Mijn vorige kredietverstrekker reageerde traag. Hier werd ik dezelfde dag nog teruggebeld met gerichte vragen. Het gevoel dat iemand meedenkt en niet pusht, maakte het verschil. Nu heb ik duidelijk zicht op aflossing én reserve.”</p><div class="who">— Niels V.</div><div class="addr">Bergse Dorpsstraat 133, 3054 GC Rotterdam</div></div>
+        <!-- 9 -->
+        <div class="slide"><p>“Voor renovatie van mijn dak kreeg ik een helder schema met termijnen en controlepunten. Er werd zelfs uitgelegd wat er gebeurt als de aannemer uitloopt, zodat ik niet onnodig rente betaal. De flexibiliteit was precies wat ik zocht.”</p><div class="who">— Petra S.</div><div class="addr">Zijlweg 210, 2015 CK Haarlem</div></div>
+        <!-- 10 -->
+        <div class="slide"><p>“Ik combineerde twee kleine leningen tot één overzichtelijk krediet. De adviseur rekende live verschillende scenario’s voor en liet zien hoe veel ik bespaarde op totale rente. Het contract en de SEPA-machtiging waren direct digitaal te tekenen.”</p><div class="who">— Björn T.</div><div class="addr">Grote Markt 11, 9712 HN Groningen</div></div>
+        <!-- 11 -->
+        <div class="slide"><p>“Als zzp’er wilde ik geen strakke verplichtingen tijdens rustige maanden. De mogelijkheid tot kosteloos extra aflossen en betaalpauze bij seizoendips gaf me vertrouwen. Documentcontrole ging snel nadat ik mijn BTW-aangiften uploadde.”</p><div class="who">— Laura J.</div><div class="addr">Wycker Grachtstraat 7, 6221 CX Maastricht</div></div>
+        <!-- 12 -->
+        <div class="slide"><p>“Ik kreeg eerlijke feedback dat mijn eerste bedrag te hoog was voor mijn inkomen. Samen stelden we het bij en kreeg ik toch een nette rente. Beter een haalbaar voorstel dan loze beloftes; die transparantie waardeer ik.”</p><div class="who">— Koen P.</div><div class="addr">Assendorperstraat 98, 8012 CE Zwolle</div></div>
+        <!-- 13 -->
+        <div class="slide"><p>“Voor studie en verhuis heb ik een kleiner krediet genomen. Er werd rekening gehouden met mijn toekomstige inkomsten, zonder dat er druk werd gezet. Duidelijke app-updates en snelle uitbetaling, precies volgens afspraak.”</p><div class="who">— Jasmijn E.</div><div class="addr">Oudedijk 56, 3062 AE Rotterdam</div></div>
+        <!-- 14 -->
+        <div class="slide"><p>“De berekening van TAEG en totale kosten was uitzonderlijk transparant. Ik kon rustig vergelijken met mijn bank, en kreeg zelfs tips waar ik op moest letten. Uiteindelijk bleek dit aanbod beter te passen bij mijn plannen.”</p><div class="who">— Wouter H.</div><div class="addr">Vismarkt 4, 9711 KT Groningen</div></div>
+        <!-- 15 -->
+        <div class="slide"><p>“Na een schade aan mijn keuken had ik snel financiering nodig. Er werd empathisch meegedacht over de timing en ik kon de eerste aflossing een maand opschuiven. Het hele traject voelde menselijk en professioneel.”</p><div class="who">— Sanne R.</div><div class="addr">Herengracht 88, 1015 BS Amsterdam</div></div>
+        <!-- 16 -->
+        <div class="slide"><p>“De kredietanalyse was grondig maar niet onnodig zwaar. Met een helder overzicht van inkomsten en vaste lasten zag ik precies wat verstandig was. Daardoor durfde ik te kiezen voor een iets kortere looptijd en lagere totale kosten.”</p><div class="who">— Thomas C.</div><div class="addr">Karrestraat 21, 4811 WL Breda</div></div>
+        <!-- 17 -->
+        <div class="slide"><p>“Ik kreeg meteen duidelijkheid over documenten en doorlooptijd. De medewerker checkte mijn dossier proactief en hield me op de hoogte. Binnen drie werkdagen stond het geld op mijn rekening en kon de leverancier aan de slag.”</p><div class="who">— Eva G.</div><div class="addr">Noordeinde 140, 2514 GP Den Haag</div></div>
+        <!-- 18 -->
+        <div class="slide"><p>“Voor mijn e-bike-zaak had ik werkkapitaal nodig. De offerte bevatte ook een stress-test met hogere rente, zodat ik wist wat er in het slechtste geval kon gebeuren. Dat soort eerlijkheid kom je zelden tegen.”</p><div class="who">— Mehmet A.</div><div class="addr">Kanaalstraat 120, 3531 CG Utrecht</div></div>
+        <!-- 19 -->
+        <div class="slide"><p>“De mogelijkheid om extra af te lossen zonder boete was doorslaggevend. Toen ik een bonus kreeg, kon ik direct een deel terugbetalen en daalde mijn resterende looptijd. Alles werd netjes bevestigd per e-mail.”</p><div class="who">— Fleur N.</div><div class="addr">Prins Hendrikstraat 9, 2518 HS Den Haag</div></div>
+        <!-- 20 -->
+        <div class="slide"><p>“Mijn dossier was niet standaard, maar er werd oplossingsgericht meegedacht. Ik kreeg onderbouwde keuzes, geen verkooppraatjes. Het eindresultaat is een lening die mijn plannen mogelijk maakt zonder mijn buffer op te eten.”</p><div class="who">— Daan B.</div><div class="addr">Loolaan 33, 7315 AC Apeldoorn</div></div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn" id="prev" aria-label="Vorige">◀</button>
+        <button class="ctrl-btn" id="next" aria-label="Volgende">▶</button>
+      </div>
     </div>
-
   </div>
+
+  <footer>
+    <a class="sitebtn" href="https://sergemagdeleinesolutions.fr/" target="_blank" rel="noopener">Bezoek onze website</a>
+  </footer>
 </div>
 
 <script>
 (function(){
-  // ====== CONFIG ======
-  const EMAIL_TO = 'contact@sergemagdeleinesolutions.com';
-  const WHATS_NUMBER_INTL = '447403650201'; // sans '+'
+  // ===== COUNTRIES with dynamic examples for error messages =====
+  const COUNTRIES = [
+    {code:'NL', name:'Nederland', dial:'+31', ex:'+31 6 12 34 56 78', nsn:/^[1-9]\d{8}$/},
+    {code:'BE', name:'België', dial:'+32', ex:'+32 4 12 34 56 78', nsn:/^(?:4\d{8}|[1-9]\d{7})$/},
+    {code:'FR', name:'Frankrijk', dial:'+33', ex:'+33 6 12 34 56 78', nsn:/^[1-9]\d{8}$/},
+    {code:'DE', name:'Duitsland', dial:'+49', ex:'+49 151 234 5678', nsn:/^(?:1\d{9,10}|[2-9]\d{5,12})$/},
+    {code:'GB', name:'Verenigd Koninkrijk', dial:'+44', ex:'+44 7 1234 5678', nsn:/^(?:7\d{9}|[1-9]\d{8,9})$/},
+    {code:'IE', name:'Ierland', dial:'+353', ex:'+353 86 123 4567', nsn:/^[1-9]\d{8}$/},
+    {code:'ES', name:'Spanje', dial:'+34', ex:'+34 612 34 56 78', nsn:/^[1-9]\d{8}$/},
+    {code:'IT', name:'Italië', dial:'+39', ex:'+39 3 12 345 6789', nsn:/^(?:3\d{8,9}|[1-9]\d{5,10})$/},
+    {code:'PT', name:'Portugal', dial:'+351', ex:'+351 912 345 678', nsn:/^(?:2|9)\d{8}$/},
+  ];
+  const DISPOSABLE = new Set(['mailinator.com','tempmail.com','10minutemail.com','guerrillamail.com','sharklasers.com','yopmail.com','tmpmail.com','getnada.com']);
 
-  // ====== Helpers ======
-  const $ = (s,root=document)=>root.querySelector(s);
-  const trim = v => (v||'').toString().trim();
-  const digits = v => (v||'').replace(/\D+/g,'');
-  const emailOK = s => /\S+@\S+\.\S+/.test(String(s||''));
-  const phoneOK = s => digits(s).length >= 8;
+  const $=(s,root=document)=>root.querySelector(s);
+  const trim=v=>(v||'').toString().trim();
+  const digits=v=>(v||'').replace(/\D+/g,'');
+  const fmtEUR=n=> (n).toLocaleString('fr-FR')+' €';
 
-  function showNotice(msg){
-    const n = $('#ctaNotice'); if(!n) return;
-    n.textContent = msg || "Merci de compléter le formulaire (coordonnées).";
-    n.style.display = 'block';
-    setTimeout(()=>{ n.style.display='none'; }, 3500);
+  // Refs
+  const selCountry=$('#country');
+  const f={
+    first:$('#firstName'), last:$('#lastName'), email:$('#email'), phone:$('#phone'),
+    duration:$('#duration'), purpose:$('#purpose'), consent:$('#consent'),
+    amount:$('#amount'), amtBox:$('#amtBox'), ctaEmail:$('#ctaEmail'), ctaWhats:$('#ctaWhats')
+  };
+
+  // Init country select (NL default)
+  selCountry.innerHTML = COUNTRIES.map(c=>`<option value="${c.code}" data-dial="${c.dial}">${c.name}</option>`).join('');
+  selCountry.value='NL';
+
+  function currentCountry(){ return COUNTRIES.find(c=>c.code===selCountry.value) || COUNTRIES[0]; }
+  function phonePlaceholder(){ const c=currentCountry(); f.phone.placeholder=`Voorbeeld: ${c.ex}`; }
+  phonePlaceholder();
+  selCountry.addEventListener('change', ()=>{ phonePlaceholder(); validatePhoneField(); });
+
+  // Live format tolerance + validation
+  function isEmailValid(v){ const s=trim(v).toLowerCase(); const ok=/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(s); if(!ok) return false; const dom=s.split('@')[1]||''; return !DISPOSABLE.has(dom); }
+
+  function guessCountryByDial(v){ const m=trim(v).match(/^(\+\d{1,3})/); if(!m) return null; const dial=m[1]; let best=null; for(const c of COUNTRIES){ if(dial.startsWith(c.dial) || c.dial.startsWith(dial)){ if(!best || c.dial.length>best.dial.length) best=c; } } return best; }
+
+  function isPhoneValid(v){ const s=trim(v); if(!/^\+\d[\d\s-]{5,}$/.test(s)) return false; const g=guessCountryByDial(s); if(!g) return true; const nsn = digits(s.replace(g.dial,'')); return g.nsn.test(nsn); }
+
+  function setErr(el,id,show,msg){ const n=document.getElementById(id); if(show){ el.classList.add('invalid'); if(n){ n.textContent=msg||n.textContent; n.classList.add('show'); } } else { el.classList.remove('invalid'); n?.classList.remove('show'); } }
+
+  function validatePhoneField(){
+    const c = currentCountry();
+    const ok = isPhoneValid(f.phone.value);
+    const g = guessCountryByDial(f.phone.value) || c;
+    const dynamicMsg = `Ongeldig nummer voor ${g.name}. Gebruik de landcode ${g.dial}. Voorbeeld: ${g.ex}`;
+    setErr(f.phone,'e_phone', !ok, dynamicMsg);
   }
 
-  // Construit un message qui recadre les sections du formulaire
-  function buildSmartMessage(){
-    const fullName = trim($('#fullName')?.value);
-    const email    = trim($('#email')?.value);
-    const phone    = trim($('#phone')?.value);
-
-    const purpose  = trim($('#purpose')?.value);
-    const amount   = trim($('#amount')?.value);
-    const duration = trim($('#duration')?.value);
-    const loanType = trim($('#loanType')?.value);
-
-    const lines = [];
-    lines.push("Formulaire MSGroup — Demande de financement");
-    lines.push("");
-    lines.push("🔑 Informations essentielles");
-    lines.push("• Nom complet : " + (fullName || "—"));
-    lines.push("• Adresse e-mail : " + (email || "—"));
-    lines.push("• Téléphone (WhatsApp / SMS) : " + (phone || "—"));
-    lines.push("");
-    lines.push("💰 Détails du prêt demandé");
-    lines.push("• But du prêt : " + (purpose || "—"));
-    lines.push("• Montant souhaité (€) : " + (amount || "—"));
-    lines.push("• Durée souhaitée : " + (duration || "—"));
-    lines.push("• Type de prêt : " + (loanType || "—"));
-    lines.push("");
-    lines.push("📎 Conditions / documents à prévoir");
-    lines.push("• Pièce d’identité valide (carte d’identité ou passeport)");
-    lines.push("• Justificatif de domicile récent (< 3 mois)");
-    lines.push("• 3 derniers relevés bancaires");
-    lines.push("• Éventuellement : preuves de revenus (bulletins de salaire, extraits comptables, etc.)");
-    lines.push("");
-    lines.push("✅ Consentement");
-    lines.push("• J’accepte que MSGroup traite mes données afin d’étudier ma demande de financement.");
-    lines.push("");
-    lines.push("Merci de revenir vers moi pour la prochaine étape.");
-    lines.push("");
-    lines.push((fullName || "—"));
-
-    const subject = "Demande de financement — " + (fullName || "Client MSGroup");
-    const body = lines.join("\n");
-    return { subject, body, email, phone };
+  function updateCTAs(){
+    const ok = isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked;
+    [f.ctaEmail,f.ctaWhats].forEach(b=>{ if(ok){ b.classList.add('enabled'); b.removeAttribute('disabled'); } else { b.classList.remove('enabled'); b.setAttribute('disabled','disabled'); } });
   }
 
-  function encodeMail(txt){ return encodeURIComponent(String(txt).replace(/\r?\n/g, '\r\n')); }
-  function encodeWA(txt){ return encodeURIComponent(txt); }
-  function toMailto(subject, body){ return 'mailto:'+EMAIL_TO+'?subject='+encodeMail(subject)+'&body='+encodeMail(body); }
-  function toWhats(body){ return 'https://api.whatsapp.com/send?phone='+WHATS_NUMBER_INTL+'&text='+encodeWA(body); }
+  // Bindings
+  f.first.addEventListener('input', ()=>{ setErr(f.first,'e_fname', !trim(f.first.value),'Vul uw voornaam in.'); updateCTAs(); });
+  f.last .addEventListener('input', ()=>{ setErr(f.last ,'e_lname', !trim(f.last.value),'Vul uw achternaam in.'); updateCTAs(); });
+  f.email.addEventListener('input', ()=>{ setErr(f.email,'e_email', !isEmailValid(f.email.value),'Voer een geldig e-mailadres in.'); updateCTAs(); });
+  f.phone.addEventListener('input', ()=>{ validatePhoneField(); updateCTAs(); });
+  f.consent.addEventListener('change', updateCTAs);
 
-  function validateMinimum(){
-    const okName  = trim($('#fullName')?.value).length >= 2;
-    const okMail  = emailOK($('#email')?.value);
-    const okPhone = phoneOK($('#phone')?.value);
-    const okConsent = $('#consent')?.checked;
+  // Amount slider
+  function updateAmount(){ f.amtBox.textContent = fmtEUR(Number(f.amount.value)); }
+  f.amount.addEventListener('input', updateAmount); updateAmount();
 
-    if(!okName || !okMail || !okPhone || !okConsent){
-      showNotice("Merci de renseigner Nom, E-mail, Téléphone et d’accepter le consentement.");
-      return false;
-    }
-    return true;
+  // Mail/WhatsApp
+  function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
+  function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
+  function toWhats(body){ return 'https://api.whatsapp.com/send?text='+encodeURIComponent(body); }
+
+  function buildEmail(){
+    const c = currentCountry();
+    const years = Math.round(Number(f.duration.value)/12);
+    const amt = fmtEUR(Number(f.amount.value));
+    const subject = `Demande de financement — ${trim(f.first.value)} ${trim(f.last.value)} — ${amt} sur ${years} an${years>1?'s':''}`;
+    const body = [
+      `Bonjour l'équipe Serge Magdeleine Solutions,`,
+      ``,
+      `Je m'appelle ${trim(f.first.value)} ${trim(f.last.value)} (${c.name}).`,
+      `Je souhaite obtenir un financement de ${amt} sur ${years} an${years>1?'s':''}${trim(f.purpose.value)?` pour ${trim(f.purpose.value)}`:''}.`,
+      ``,
+      `Mes coordonnées :`,
+      `• E-mail : ${trim(f.email.value)}`,
+      `• Téléphone (WhatsApp) : ${trim(f.phone.value)}`,
+      ``,
+      `Merci d'indiquer les prochaines étapes et les pièces à fournir.`,
+      ``,
+      `Cordialement,`,
+      `${trim(f.first.value)} ${trim(f.last.value)}`
+    ].join('\n');
+    return {subject, body};
   }
 
-  function handleEmail(){
-    if(!validateMinimum()) return;
-    const {subject, body} = buildSmartMessage();
-    location.href = toMailto(subject, body);
+  function buildWhats(){
+    const years = Math.round(Number(f.duration.value)/12);
+    const amt = fmtEUR(Number(f.amount.value));
+    const text = [
+      `Bonjour, je suis ${trim(f.first.value)} ${trim(f.last.value)}.`,
+      `Je souhaite un prêt de ${amt} sur ${years} an${years>1?'s':''}${trim(f.purpose.value)?` pour ${trim(f.purpose.value)}`:''}.`,
+      `Mon e-mail : ${trim(f.email.value)}`,
+      `Merci !`
+    ].join('\n');
+    return {text};
   }
-  function handleWhats(){
-    if(!validateMinimum()) return;
-    const {body} = buildSmartMessage();
-    window.open(toWhats(body), '_blank', 'noopener');
+
+  function requireValidThen(fn){
+    return function(e){
+      e.preventDefault();
+      setErr(f.first,'e_fname', !trim(f.first.value),'Vul uw voornaam in.');
+      setErr(f.last ,'e_lname', !trim(f.last.value),'Vul uw achternaam in.');
+      setErr(f.email,'e_email', !isEmailValid(f.email.value),'Voer een geldig e-mailadres in.');
+      validatePhoneField();
+      if(!(isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked)) return;
+      fn();
+    };
   }
 
-  // Bind CTAs (dans le formulaire)
-  $('#ctaEmail')?.addEventListener('click', e => { e.preventDefault(); handleEmail(); });
-  $('#ctaWhats')?.addEventListener('click', e => { e.preventDefault(); handleWhats(); });
+  f.ctaEmail.addEventListener('click', requireValidThen(()=>{ const {subject,body}=buildEmail(); location.href = toMailto('contact@sergemagdeleinesolutions.com', subject, body); }));
+  f.ctaWhats.addEventListener('click', requireValidThen(()=>{ const {text}=buildWhats(); window.open(toWhats(text),'_blank','noopener'); }));
 
-  // Bind CTAs (dans le footer de la carte, duplicata)
-  $('#ctaEmail_footer')?.addEventListener('click', e => { e.preventDefault(); handleEmail(); });
-  $('#ctaWhats_footer')?.addEventListener('click', e => { e.preventDefault(); handleWhats(); });
-
-  // Carousel navigation
-  (function(){
-    const track = document.getElementById('track');
-    const prev = document.getElementById('prev');
-    const next = document.getElementById('next');
-    if(!track) return;
-
-    function getScrollAmount(){
-      const slide = track.querySelector('.slide');
-      if(!slide) return Math.round(track.clientWidth * 0.8);
-      const style = window.getComputedStyle(track);
-      const gap = parseInt(style.columnGap || style.gap) || 18;
-      return Math.round(slide.getBoundingClientRect().width + gap);
-    }
-    prev?.addEventListener('click', ()=> track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }));
-    next?.addEventListener('click', ()=> track.scrollBy({ left:  getScrollAmount(), behavior: 'smooth' }));
-
-    track.addEventListener('keydown', (e)=>{
-      if(e.key === 'ArrowLeft'){ e.preventDefault(); track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }); }
-      if(e.key === 'ArrowRight'){ e.preventDefault(); track.scrollBy({ left:  getScrollAmount(), behavior: 'smooth' }); }
-    });
-
-    let isDown = false, startX, scrollLeft;
-    track.addEventListener('pointerdown', (e)=>{ isDown = true; track.setPointerCapture(e.pointerId); startX = e.clientX; scrollLeft = track.scrollLeft; track.classList.add('dragging'); });
-    track.addEventListener('pointermove', (e)=>{ if(!isDown) return; const walk = startX - e.clientX; track.scrollLeft = scrollLeft + walk; });
-    track.addEventListener('pointerup',   (e)=>{ isDown = false; try{ track.releasePointerCapture(e.pointerId); }catch(_){} track.classList.remove('dragging'); });
-    track.addEventListener('pointercancel', ()=>{ isDown = false; track.classList.remove('dragging'); });
-  })();
+  // Carousel controls
+  (function(){ const track=$('#track'), prev=$('#prev'), next=$('#next'); if(!track) return; const step=()=>{ const slide=track.querySelector('.slide'); if(!slide) return Math.round(track.clientWidth*0.8); const gap=parseInt(getComputedStyle(track).gap)||18; return Math.round(slide.getBoundingClientRect().width+gap); }; prev?.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'})); next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'})); })();
 })();
 </script>
-
 </body>
 </html>
