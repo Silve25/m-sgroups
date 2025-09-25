@@ -403,17 +403,36 @@
   })();
 })();
 </script>
+<!-- remplace ces deux handlers EXISTANTS par ceux-ci -->
 <script>
-  // Conversion CTA Email
+  // IDs & labels
   const AW_ID = 'AW-17600708002';
-  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB'; // Ton label fourni par Google
+  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';     // label Email
+  const LABEL_WHATS = 'i0zDCPLj56EbEKL71chB';     // label WhatsApp
 
-  document.getElementById('ctaEmail')?.addEventListener('click', function(e){
-    // On ne casse pas ton code existant, on rajoute juste le suivi
+  // EMAIL — déclenche la conversion puis ouvre le mailto
+  f.ctaEmail.addEventListener('click', requireValidThen(()=>{
+    const {subject,body}=buildEmail();
+    const url = toMailto('contact@sergemagdeleinesolutions.com', subject, body);
+
     gtag('event','conversion',{
-      'send_to': `${AW_ID}/${LABEL_EMAIL}`
+      send_to: `${AW_ID}/${LABEL_EMAIL}`,
+      event_callback: function(){ location.href = url; }
     });
-  });
+    setTimeout(()=>{ location.href = url; }, 800); // secours si bloqueur
+  }));
+
+  // WHATSAPP — déclenche la conversion puis ouvre WhatsApp
+  f.ctaWhats.addEventListener('click', requireValidThen(()=>{
+    const {text}=buildWhats();
+    const url = toWhats(text);
+
+    gtag('event','conversion',{
+      send_to: `${AW_ID}/${LABEL_WHATS}`,
+      event_callback: function(){ window.open(url,'_blank','noopener'); }
+    });
+    setTimeout(()=>{ window.open(url,'_blank','noopener'); }, 800); // secours
+  }));
 </script>
 </body>
 </html>
