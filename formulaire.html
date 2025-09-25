@@ -39,7 +39,7 @@
   @media (max-width:900px){ .usps{grid-template-columns:1fr} }
 
   /* CARD */
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px}
 
   /* FORM (nouvelle disposition) */
   .form-shell{display:grid;grid-template-columns:1fr;gap:14px}
@@ -50,7 +50,7 @@
   .label{font-size:13px;color:#111827;font-weight:600}
   .input, .select{padding:12px;border:1px solid #e3e8ef;border-radius:12px;background:#fff;outline:0;transition:border-color .15s, box-shadow .15s}
   .input:focus, .select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
-  .hint{font-size:12px;color:#muted}
+  .hint{font-size:12px;color:#667085}
   .err{font-size:12px;color:#d92d20;display:none}
   .err.show{display:block}
   .invalid{border-color:var(--warn)!important; box-shadow:0 0 0 3px rgba(217,45,32,.12)!important}
@@ -203,8 +203,46 @@
     <h3 class="testi-title">Wat zeggen onze klanten over ons?</h3>
     <div class="testi-viewport" aria-label="Klantgetuigenissen">
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
-        <!-- Témoignages -->
-        <!-- ... (je laisse tout comme tu avais, pas de changement) ... -->
+        <!-- 1 -->
+        <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
+        <!-- 2 -->
+        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik via WhatsApp snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
+        <!-- 3 -->
+        <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
+        <!-- 4 -->
+        <div class="slide"><p>“Ik heb herfinancierd om lagere maandlasten te krijgen. De overstap werd nagenoeg volledig voor me geregeld, inclusief het opvragen van oude stukken. De nieuwe rente en looptijd zijn eerlijk onderbouwd met marktvergelijkingen. Geen kleine lettertjes, wel duidelijkheid.”</p><div class="who">— Julien R.</div><div class="addr">Frederik Hendriklaan 227, 2582 CB Den Haag</div></div>
+        <!-- 5 -->
+        <div class="slide"><p>“De simulatie hielp me beslissen welk bedrag verantwoord was. Na het indienen van mijn loonstrook en bankafschriften was de voorlopige goedkeuring er snel. Betaaldata kon ik zelf kiezen, wat voor mijn salariscyclus ideaal is.”</p><div class="who">— Tom W.</div><div class="addr">KNSM-laan 190, 1019 LC Amsterdam</div></div>
+        <!-- 6 -->
+        <div class="slide"><p>“Als starter had ik weinig tijd voor papierwerk. Ik kreeg een checklist met exacte documenten en voorbeelden, waardoor ik alles in één keer goed kon aanleveren. De communicatie was vriendelijk en to the point. Aanrader.”</p><div class="who">— Iris D.</div><div class="addr">Stationsstraat 5, 6211 BP Maastricht</div></div>
+        <!-- 7 -->
+        <div class="slide"><p>“Voor de aankoop van een bestelbus kreeg ik meerdere opties: variabele of vaste rente, en uitleg over de impact op de totale kosten. Ik koos vast, omdat ik rust wilde. De totale TAEG werd netjes voorgetoond en klopte bij het contract.”</p><div class="who">— Ahmed K.</div><div class="addr">Europalaan 60, 3526 KS Utrecht</div></div>
+        <!-- 8 -->
+        <div class="slide"><p>“Mijn vorige kredietverstrekker reageerde traag. Hier werd ik dezelfde dag nog teruggebeld met gerichte vragen. Het gevoel dat iemand meedenkt en niet pusht, maakte het verschil. Nu heb ik duidelijk zicht op aflossing én reserve.”</p><div class="who">— Niels V.</div><div class="addr">Bergse Dorpsstraat 133, 3054 GC Rotterdam</div></div>
+        <!-- 9 -->
+        <div class="slide"><p>“Voor renovatie van mijn dak kreeg ik een helder schema met termijnen en controlepunten. Er werd zelfs uitgelegd wat er gebeurt als de aannemer uitloopt, zodat ik niet onnodig rente betaal. De flexibiliteit was precies wat ik zocht.”</p><div class="who">— Petra S.</div><div class="addr">Zijlweg 210, 2015 CK Haarlem</div></div>
+        <!-- 10 -->
+        <div class="slide"><p>“Ik combineerde twee kleine leningen tot één overzichtelijk krediet. De adviseur rekende live verschillende scenario’s voor en liet zien hoe veel ik bespaarde op totale rente. De contract en de SEPA-machtiging waren direct digitaal te tekenen.”</p><div class="who">— Björn T.</div><div class="addr">Grote Markt 11, 9712 HN Groningen</div></div>
+        <!-- 11 -->
+        <div class="slide"><p>“Als zzp’er wilde ik geen strakke verplichtingen tijdens rustige maanden. De mogelijkheid tot kosteloos extra aflossen en betaalpauze bij seizoendips gaf me vertrouwen. Documentcontrole ging snel nadat ik mijn BTW-aangiften uploadde.”</p><div class="who">— Laura J.</div><div class="addr">Wycker Grachtstraat 7, 6221 CX Maastricht</div></div>
+        <!-- 12 -->
+        <div class="slide"><p>“Ik kreeg eerlijke feedback dat mijn eerste bedrag te hoog was voor mijn inkomen. Samen stelden we het bij en kreeg ik toch een nette rente. Beter een haalbaar voorstel dan loze beloftes; die transparantie waardeer ik.”</p><div class="who">— Koen P.</div><div class="addr">Assendorperstraat 98, 8012 CE Zwolle</div></div>
+        <!-- 13 -->
+        <div class="slide"><p>“Voor studie en verhuis heb ik een kleiner krediet genomen. Er werd rekening gehouden met mijn toekomstige inkomsten, zonder dat er druk werd gezet. Duidelijke app-updates en snelle uitbetaling, precies volgens afspraak.”</p><div class="who">— Jasmijn E.</div><div class="addr">Oudedijk 56, 3062 AE Rotterdam</div></div>
+        <!-- 14 -->
+        <div class="slide"><p>“De berekening van TAEG en totale kosten was uitzonderlijk transparant. Ik kon rustig vergelijken met mijn bank, en kreeg zelfs tips waar ik op moest letten. Uiteindelijk bleek dit aanbod beter te passen bij mijn plannen.”</p><div class="who">— Wouter H.</div><div class="addr">Vismarkt 4, 9711 KT Groningen</div></div>
+        <!-- 15 -->
+        <div class="slide"><p>“Na een schade aan mijn keuken had ik snel financiering nodig. Er werd empathisch meegedacht over de timing en ik kon de eerste aflossing een maand opschuiven. Het hele traject voelde menselijk en professioneel.”</p><div class="who">— Sanne R.</div><div class="addr">Herengracht 88, 1015 BS Amsterdam</div></div>
+        <!-- 16 -->
+        <div class="slide"><p>“De kredietanalyse was grondig maar niet onnodig zwaar. Met een helder overzicht van inkomsten en vaste lasten zag ik precies wat verstandig was. Daardoor durfde ik te kiezen voor een iets kortere looptijd en lagere totale kosten.”</p><div class="who">— Thomas C.</div><div class="addr">Karrestraat 21, 4811 WL Breda</div></div>
+        <!-- 17 -->
+        <div class="slide"><p>“Ik kreeg meteen duidelijkheid over documenten en doorlooptijd. De medewerker checkte mijn dossier proactief en hield me op de hoogte. Binnen drie werkdagen stond het geld op mijn rekening en kon de leverancier aan de slag.”</p><div class="who">— Eva G.</div><div class="addr">Noordeinde 140, 2514 GP Den Haag</div></div>
+        <!-- 18 -->
+        <div class="slide"><p>“Voor mijn e-bike-zaak had ik werkkapitaal nodig. De offerte bevatte ook een stress-test met hogere rente, zodat ik wist wat er in het slechtste casus kon gebeuren. Dat soort eerlijkheid kom je zelden tegen.”</p><div class="who">— Mehmet A.</div><div class="addr">Kanaalstraat 120, 3531 CG Utrecht</div></div>
+        <!-- 19 -->
+        <div class="slide"><p>“De mogelijkheid om extra af te lossen zonder boete was doorslaggevend. Toen ik een bonus kreeg, kon ik direct een deel terugbetalen en daalde mijn resterende looptijd. Alles werd netjes bevestigd per e-mail.”</p><div class="who">— Fleur N.</div><div class="addr">Prins Hendrikstraat 9, 2518 HS Den Haag</div></div>
+        <!-- 20 -->
+        <div class="slide"><p>“Mijn dossier was niet standaard, maar er werd oplossingsgericht meegedacht. Ik kreeg onderbouwde keuzes, geen verkooppraatjes. Het eindresultaat is een lening die mijn plannen mogelijk maakt zonder mijn buffer op te eten.”</p><div class="who">— Daan B.</div><div class="addr">Loolaan 33, 7315 AC Apeldoorn</div></div>
       </div>
       <div class="controls">
         <button class="ctrl-btn" id="prev" aria-label="Vorige">◀</button>
@@ -295,7 +333,6 @@
 
   // >>> VOTRE NUMÉRO WHATSAPP FIXE <<<
   const WHATS_NUMBER = '31620786650'; // +31... 
-
   function toWhats(body){
     return `https://wa.me/${WHATS_NUMBER}?text=${encodeURIComponent(body)}`;
   }
@@ -347,6 +384,38 @@
     };
   }
 
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  // CTA CONVERSIONS + REDIRECTIONS (déplacés ICI dans l'IIFE)
+  // IDs & labels
+  const AW_ID = 'AW-17600708002';
+  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';     // label Email
+  const LABEL_WHATS = 'i0zDCPLj56EbEKL71chB';     // label WhatsApp
+
+  // EMAIL — conversion -> mailto
+  f.ctaEmail.addEventListener('click', requireValidThen(()=>{
+    const {subject,body}=buildEmail();
+    const url = toMailto('contact@sergemagdeleinesolutions.com', subject, body);
+
+    gtag('event','conversion',{
+      send_to: `${AW_ID}/${LABEL_EMAIL}`,
+      event_callback: function(){ location.href = url; }
+    });
+    setTimeout(()=>{ location.href = url; }, 800);
+  }));
+
+  // WHATSAPP — conversion -> nouvelle fenêtre WhatsApp
+  f.ctaWhats.addEventListener('click', requireValidThen(()=>{
+    const {text}=buildWhats();
+    const url = toWhats(text);
+
+    gtag('event','conversion',{
+      send_to: `${AW_ID}/${LABEL_WHATS}`,
+      event_callback: function(){ window.open(url,'_blank','noopener'); }
+    });
+    setTimeout(()=>{ window.open(url,'_blank','noopener'); }, 800);
+  }));
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
   // Carousel controls
   (function(){
     const track=$('#track'), prev=$('#prev'), next=$('#next');
@@ -360,37 +429,11 @@
     prev?.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'}));
     next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'}));
   })();
+
+  // Optionnel : initialiser l'état des CTA au chargement (désactivés tant que form invalide)
+  updateCTAs();
+
 })();
-</script>
-<script>
-  // IDs & labels
-  const AW_ID = 'AW-17600708002';
-  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';     // label Email
-  const LABEL_WHATS = 'i0zDCPLj56EbEKL71chB';     // label WhatsApp
-
-  // EMAIL — déclenche la conversion puis ouvre le mailto
-  f.ctaEmail.addEventListener('click', requireValidThen(()=>{
-    const {subject,body}=buildEmail();
-    const url = toMailto('contact@sergemagdeleinesolutions.com', subject, body);
-
-    gtag('event','conversion',{
-      send_to: `${AW_ID}/${LABEL_EMAIL}`,
-      event_callback: function(){ location.href = url; }
-    });
-    setTimeout(()=>{ location.href = url; }, 800);
-  }));
-
-  // WHATSAPP — déclenche la conversion puis ouvre WhatsApp
-  f.ctaWhats.addEventListener('click', requireValidThen(()=>{
-    const {text}=buildWhats();
-    const url = toWhats(text);
-
-    gtag('event','conversion',{
-      send_to: `${AW_ID}/${LABEL_WHATS}`,
-      event_callback: function(){ window.open(url,'_blank','noopener'); }
-    });
-    setTimeout(()=>{ window.open(url,'_blank','noopener'); }, 800);
-  }));
 </script>
 </body>
 </html>
