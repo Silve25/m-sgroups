@@ -403,5 +403,17 @@
   })();
 })();
 </script>
+<script>
+  // Conversion CTA Email
+  const AW_ID = 'AW-17600708002';
+  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB'; // Ton label fourni par Google
+
+  document.getElementById('ctaEmail')?.addEventListener('click', function(e){
+    // On ne casse pas ton code existant, on rajoute juste le suivi
+    gtag('event','conversion',{
+      'send_to': `${AW_ID}/${LABEL_EMAIL}`
+    });
+  });
+</script>
 </body>
 </html>
