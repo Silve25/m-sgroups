@@ -341,20 +341,20 @@
     const c = currentCountry();
     const years = Math.round(Number(f.duration.value)/12);
     const amt = fmtEUR(Number(f.amount.value));
-    const subject = `Demande de financement — ${trim(f.first.value)} ${trim(f.last.value)} — ${amt} sur ${years} an${years>1?'s':''}`;
+    const subject = `Financieringsaanvraag — ${trim(f.first.value)} ${trim(f.last.value)} — ${amt} over ${years} jaar`;
     const body = [
-      `Bonjour l'équipe Serge Magdeleine Solutions,`,
+      `Beste team van Serge Magdeleine Solutions,`,
       ``,
-      `Je m'appelle ${trim(f.first.value)} ${trim(f.last.value)} (${c.name}).`,
-      `Je souhaite obtenir un financement de ${amt} sur ${years} an${years>1?'s':''}${trim(f.purpose.value)?` pour ${trim(f.purpose.value)}`:''}.`,
+      `Mijn naam is ${trim(f.first.value)} ${trim(f.last.value)} (${c.name}).`,
+      `Ik wil graag een financiering van ${amt} over ${years} jaar${trim(f.purpose.value)?` voor ${trim(f.purpose.value)}`:''}.`,
       ``,
-      `Mes coordonnées :`,
-      `• E-mail : ${trim(f.email.value)}`,
-      `• Téléphone (WhatsApp) : ${trim(f.phone.value)}`,
+      `Mijn contactgegevens:`,
+      `• E‑mail: ${trim(f.email.value)}`,
+      `• Telefoon (WhatsApp): ${trim(f.phone.value)}`,
       ``,
-      `Merci d'indiquer les prochaines étapes et les pièces à fournir.`,
+      `Graag hoor ik wat de volgende stappen zijn en welke documenten nodig zijn.`,
       ``,
-      `Cordialement,`,
+      `Met vriendelijke groet,`,
       `${trim(f.first.value)} ${trim(f.last.value)}`
     ].join('\n');
     return {subject, body};
@@ -364,10 +364,10 @@
     const years = Math.round(Number(f.duration.value)/12);
     const amt = fmtEUR(Number(f.amount.value));
     const text = [
-      `Bonjour, je suis ${trim(f.first.value)} ${trim(f.last.value)}.`,
-      `Je souhaite un prêt de ${amt} sur ${years} an${years>1?'s':''}${trim(f.purpose.value)?` pour ${trim(f.purpose.value)}`:''}.`,
-      `Mon e-mail : ${trim(f.email.value)}`,
-      `Merci !`
+      `Hallo, ik ben ${trim(f.first.value)} ${trim(f.last.value)}.`,
+      `Ik wil graag een lening van ${amt} over ${years} jaar${trim(f.purpose.value)?` voor ${trim(f.purpose.value)}`:''}.`,
+      `Mijn e‑mail: ${trim(f.email.value)}`,
+      `Bedankt!`
     ].join('\n');
     return {text};
   }
