@@ -1,39 +1,30 @@
-/* formulaire.js — 3 triggers → Google Apps Script (anti-CORS, robuste)
+/* formulaire.js — événements uniques → Apps Script
  * Evénements (1x / session) :
- * 1) page_loaded : ping GET immédiat + enrichi (IP/ville/pays) ensuite
- * 2) form_full   : dès que les CTA deviennent "enabled" (form OK)
+ * 1) page_loaded : envoi enrichi (IP/ville/pays) via pixel GET
+ * 2) form_full   : quand les CTA deviennent "enabled"
  * 3) cta_click   : au premier clic (email OU whatsapp)
  *
- * HTML attendu (site NL) :
- *  - <form id="leadForm"> … </form>
- *  - #firstName #lastName #email #phone #country #duration #purpose #amount #consent
- *  - CTAs : #ctaEmail #ctaWhats (vos handlers restent inchangés)
- *
- * Test : ajouter ?axdebug=1 dans l’URL → nouveau SID + pas de dédup client.
+ * Test: ajouter ?axdebug=1 à l’URL pour ignorer la dédup client.
  */
 (function(){
   'use strict';
 
-  /* ===== CONFIG ===== */
   var TG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx3az1IwYpwlllXMaNz7C6vW8X4R9BCgq0zewmtXxF0ZsN79aOZWhfdgDyXbhGrzJlEgA/exec';
   var DEBUG = /\baxdebug=1\b/i.test(location.search);
-
-  // Dédup client
   var SS = { SID:'ax_sid', OPEN:'ax_sent_open', FORM:'ax_sent_form', CTA:'ax_sent_cta' };
 
-  /* ===== UTILS ===== */
   var $  = function(s,root){ return (root||document).querySelector(s); };
   var trim = function(v){ return (v||'').toString().trim(); };
   var now  = function(){ return Date.now(); };
 
   function ssGet(k){ try{return sessionStorage.getItem(k);}catch(_){return null;} }
   function ssSet(k,v){ try{sessionStorage.setItem(k,v);}catch(_){ } }
-  function ssHas(k){ return DEBUG ? false : !!ssGet(k); } // en debug, ignore la dédup
+  function ssHas(k){ return DEBUG ? false : !!ssGet(k); }
 
   function getSID(){
     var sid = ssGet(SS.SID);
     if(!sid){ sid = (Date.now().toString(36)+Math.random().toString(36).slice(2,10)); ssSet(SS.SID, sid); }
-    if (DEBUG) sid = sid + '-d' + Math.floor(Math.random()*1e6); // nouveau SID à chaque page en debug
+    if (DEBUG) sid = sid + '-d' + Math.floor(Math.random()*1e6);
     return sid;
   }
   var SID = getSID();
@@ -43,44 +34,10 @@
     return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
 
-  // Transport anti-CORS : sendBeacon + fetch(no-cors) + pixel GET
+  // Transport: pixel GET unique (évite les courses et CORS)
   function sendEvent(event, payload){
     var bodyStr = JSON.stringify(Object.assign({ event: event, ts: now(), sid: SID }, payload||{}));
-
-    // 1) sendBeacon (text/plain)
-    try{
-      if(navigator.sendBeacon){
-        navigator.sendBeacon(TG_ENDPOINT, new Blob([bodyStr], {type:'text/plain'}));
-      }
-    }catch(_){}
-
-    // 2) fetch simple (no-cors)
-    try{
-      fetch(TG_ENDPOINT, { method:'POST', mode:'no-cors', keepalive:true, body: bodyStr });
-    }catch(_){}
-
-    // 3) GET pixel (fallback ultime)
     try{ new Image().src = TG_ENDPOINT + '?data=' + b64url(bodyStr) + '&_t=' + now(); }catch(_){}
-  }
-
-  // GET “ping” ultra-simple (aucun parsing JSON nécessaire côté serveur)
-  function pingOpenGET(){
-    try{
-      var url = TG_ENDPOINT
-        + '?event=page_open'
-        + '&sid=' + encodeURIComponent(SID)
-        + '&href=' + encodeURIComponent(location.href)
-        + '&ref='  + encodeURIComponent(document.referrer || '')
-        + '&lang=' + encodeURIComponent(navigator.language || '')
-        + '&tz='   + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || '')
-        + '&ua='   + encodeURIComponent(navigator.userAgent || '')
-        + '&w='    + (screen && screen.width  || 0)
-        + '&h='    + (screen && screen.height || 0)
-        + '&dpr='  + (window.devicePixelRatio || 1)
-        + (DEBUG ? '&debug=1' : '')
-        + '&_t='   + now();
-      new Image().src = url; // envoie immédiatement un message côté .gs
-    }catch(_){}
   }
 
   // IP enrichie
@@ -111,50 +68,7 @@
       .catch(function(){ clearTimeout(to); return { ip:'', loc:null }; });
   }
 
-  /* ===== PAGE LOADED ===== */
-  function sendPageLoadedOnce(){
-    if (ssHas(SS.OPEN)) return;
-
-    // 0) PING immédiat (GET simple) pour garantir un message instantané
-    pingOpenGET();
-
-    // 1) Puis envoi “enrichi” (JSON) avec IP/geo ; watchdog au cas où
-    var sent = false;
-    var meta = {
-      href: location.href,
-      ref: document.referrer || '',
-      ua: navigator.userAgent,
-      lang: navigator.language,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      screen: { w: screen.width, h: screen.height, dpr: window.devicePixelRatio||1 }
-    };
-
-    var watchdog = setTimeout(function(){
-      if (sent) return;
-      sendEvent('page_loaded', meta);
-      ssSet(SS.OPEN,'1');
-      sent = true;
-    }, 1200);
-
-    fetchIpInfo(1800).then(function(info){
-      if (sent) return;
-      clearTimeout(watchdog);
-      sendEvent('page_loaded', Object.assign({}, meta, {
-        ip: (info && info.ip) || undefined,
-        geo: (info && info.loc) || undefined
-      }));
-      ssSet(SS.OPEN,'1');
-      sent = true;
-    }).catch(function(){
-      if (sent) return;
-      clearTimeout(watchdog);
-      sendEvent('page_loaded', meta);
-      ssSet(SS.OPEN,'1');
-      sent = true;
-    });
-  }
-
-  /* ===== FORM & CTAS ===== */
+  // ===== DOM =====
   var fFirst   = $('#firstName');
   var fLast    = $('#lastName');
   var fEmail   = $('#email');
@@ -193,6 +107,46 @@
     };
   }
 
+  // Trigger #1 — page_loaded (enrichi, 1 seul envoi)
+  function sendPageLoadedOnce(){
+    if (ssHas(SS.OPEN)) return;
+
+    var sent = false;
+    var meta = {
+      href: location.href,
+      ref: document.referrer || '',
+      ua: navigator.userAgent,
+      lang: navigator.language,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screen: { w: screen.width, h: screen.height, dpr: window.devicePixelRatio||1 }
+    };
+
+    var watchdog = setTimeout(function(){
+      if (sent) return;
+      sendEvent('page_loaded', meta);
+      ssSet(SS.OPEN,'1');
+      sent = true;
+    }, 1200);
+
+    fetchIpInfo(1800).then(function(info){
+      if (sent) return;
+      clearTimeout(watchdog);
+      sendEvent('page_loaded', Object.assign({}, meta, {
+        ip: (info && info.ip) || undefined,
+        geo: (info && info.loc) || undefined
+      }));
+      ssSet(SS.OPEN,'1');
+      sent = true;
+    }).catch(function(){
+      if (sent) return;
+      clearTimeout(watchdog);
+      sendEvent('page_loaded', meta);
+      ssSet(SS.OPEN,'1');
+      sent = true;
+    });
+  }
+
+  // Trigger #2 — form_full
   function maybeSendFormFull(){
     if (ssHas(SS.FORM)) return;
     if (!ctasEnabled()) return;
@@ -207,7 +161,6 @@
   }
 
   function bindFormWatchers(){
-    // Observe l’état des CTA (aligné sur ta logique d’activation)
     if (ctaEmail || ctaWhats){
       var observer = new MutationObserver(function(muts){
         for (var i=0;i<muts.length;i++){
@@ -219,20 +172,18 @@
       if (ctaEmail) observer.observe(ctaEmail, {attributes:true});
       if (ctaWhats) observer.observe(ctaWhats, {attributes:true});
     }
-
-    // Filets de sécurité : input/change + load/pageshow (autofill/bfcache)
     [fFirst,fLast,fEmail,fPhone,fCountry,fDur,fPurpose,fAmount,fConsent].forEach(function(el){
       if(!el) return;
       var evt = (el && (el.type==='checkbox' || (el.tagName||'').toUpperCase()==='SELECT')) ? 'change' : 'input';
       el.addEventListener(evt, maybeSendFormFull);
       el.addEventListener('change', maybeSendFormFull);
     });
-
     setTimeout(maybeSendFormFull, 0);
     window.addEventListener('load',      maybeSendFormFull);
     window.addEventListener('pageshow',  maybeSendFormFull);
   }
 
+  // Trigger #3 — cta_click
   function sendCTAOnce(kind){
     if (ssHas(SS.CTA)) return;
     if (!ctasEnabled()) return;
@@ -252,16 +203,7 @@
     }
   }
 
-  /* ===== INIT ===== */
-  function init(){
-    // 1) page_loaded : ping immédiat + enrichi
-    sendPageLoadedOnce();
-
-    // 2) form watchers + CTA click
-    bindFormWatchers();
-    bindCTAs();
-  }
-
+  function init(){ sendPageLoadedOnce(); bindFormWatchers(); bindCTAs(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
