@@ -1,32 +1,22 @@
-/* formulaire.js — 3 triggers → Google Apps Script (anti-CORS, robuste)
- * Événements (1x / session) :
- * 1) page_loaded : IP + ville/pays (best-effort)
- * 2) form_full   : dès que tes CTA passent en "enabled" (form OK)
- * 3) cta_click   : au premier clic (email OU whatsapp)
- *
- * HTML attendu (site NL) :
- *  - <form id="leadForm"> … </form>
- *  - #firstName #lastName #email #phone #country #duration #purpose #amount #consent
- *  - CTAs : #ctaEmail #ctaWhats (tes handlers restent intacts)
+/* formulaire.js — NL site → Apps Script (4 transports, CSP-safe)
+ * Événements (1x / session) : page_loaded, form_full, cta_click
+ * Debug: ajouter ?axdebug=1 à l’URL (nouveau SID + logs console + pas de dédup)
  */
 (function(){
   'use strict';
 
   /* ===== CONFIG ===== */
-  // Nouvel Apps Script (fourni)
   var TG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyY-E0u153av5YoypMl-GW5mxkW62lhwmooQGI0HRfy-7Uh0Ia6yk4IvuNmWsprQvjpqA/exec';
-
-  // Ajoute ?axdebug=1 à l’URL pour forcer un nouveau SID et ignorer la dédup (utile en test)
   var DEBUG = /\baxdebug=1\b/i.test(location.search);
 
   var SS = { SID:'ax_sid', OPEN:'ax_sent_open', FORM:'ax_sent_form', CTA:'ax_sent_cta' };
 
   /* ===== UTILS ===== */
   var $  = function(s,root){ return (root||document).querySelector(s); };
-  var $$ = function(s,root){ return Array.prototype.slice.call((root||document).querySelectorAll(s)); };
   var trim   = function(v){ return (v||'').toString().trim(); };
-  var digits = function(v){ return (v||'').replace(/\D+/g,''); };
   var now    = function(){ return Date.now(); };
+
+  function log(){ if(DEBUG) try{ console.log.apply(console, ['[ax]'].concat([].slice.call(arguments))); }catch(_){} }
 
   function ssGet(k){ try{return sessionStorage.getItem(k);}catch(_){return null;} }
   function ssSet(k,v){ try{sessionStorage.setItem(k,v);}catch(_){ } }
@@ -35,37 +25,70 @@
   function getSID(){
     var sid = ssGet(SS.SID);
     if(!sid){ sid = (Date.now().toString(36)+Math.random().toString(36).slice(2,10)); ssSet(SS.SID, sid); }
-    if (DEBUG) sid = sid + '-d' + Math.floor(Math.random()*1e6); // nouveau SID à chaque page en debug
+    if (DEBUG) sid = sid + '-d' + Math.floor(Math.random()*1e6);
     return sid;
   }
   var SID = getSID();
 
   function b64url(utf8){
-    var b64 = btoa(unescape(encodeURIComponent(utf8)));
-    return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    try{
+      var b64 = btoa(unescape(encodeURIComponent(utf8)));
+      return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    }catch(e){ return ''; }
   }
 
-  // Transport anti-CORS : sendBeacon + fetch(no-cors) + pixel GET (triple envoi résilient)
+  // 4 transports en chaîne : beacon → fetch → pixel ?data= → GET “plat”
   function sendEvent(event, payload){
-    var bodyStr = JSON.stringify(Object.assign({ event: event, ts: now(), sid: SID }, payload||{}));
+    var bodyObj = Object.assign({ event:event, ts: now(), sid: SID }, payload||{});
+    var bodyStr = JSON.stringify(bodyObj);
+    var sent = false;
 
-    // 1) sendBeacon (text/plain)
+    // #1 sendBeacon (text/plain)
     try{
       if(navigator.sendBeacon){
-        navigator.sendBeacon(TG_ENDPOINT, new Blob([bodyStr], {type:'text/plain'}));
+        var ok = navigator.sendBeacon(TG_ENDPOINT, new Blob([bodyStr], {type:'text/plain'}));
+        if (ok){ sent = true; log('beacon ok', event); }
       }
-    }catch(_){}
+    }catch(e){ log('beacon err', e); }
 
-    // 2) fetch simple (no-cors)
+    // #2 fetch no-cors
+    if(!sent){
+      try{
+        fetch(TG_ENDPOINT, { method:'POST', mode:'no-cors', keepalive:true, body: bodyStr });
+        sent = true; log('fetch no-cors fired', event);
+      }catch(e){ log('fetch err', e); }
+    }
+
+    // #3 GET pixel (data base64url)
     try{
-      fetch(TG_ENDPOINT, { method:'POST', mode:'no-cors', keepalive:true, body: bodyStr });
-    }catch(_){}
+      var img1 = new Image();
+      img1.referrerPolicy = 'no-referrer-when-downgrade';
+      img1.src = TG_ENDPOINT + '?data=' + b64url(bodyStr);
+      log('pixel ?data= fired', event);
+    }catch(e){ log('pixel data err', e); }
 
-    // 3) GET pixel (fallback ultime)
-    try{ new Image().src = TG_ENDPOINT + '?data=' + b64url(bodyStr); }catch(_){}
+    // #4 GET “plat” (paramètres simples — utile si ?data= bloqué/CSP)
+    try{
+      var q = new URLSearchParams();
+      q.set('event', event);
+      q.set('sid', SID);
+      // on passe quelques champs simples lisibles par parsePayload_
+      if (payload && payload.href) q.set('href', String(payload.href));
+      if (payload && payload.lang) q.set('lang', String(payload.lang));
+      if (payload && payload.tz)   q.set('tz',   String(payload.tz));
+      if (payload && payload.ip)   q.set('ip',   String(payload.ip));
+      // si data existe, on l’envoie JSON-stringifié à minima
+      if (payload && payload.data){
+        try{ q.set('data', JSON.stringify(payload.data)); }catch(_){}
+      }
+      var img2 = new Image();
+      img2.referrerPolicy = 'no-referrer-when-downgrade';
+      img2.src = TG_ENDPOINT + '?' + q.toString();
+      log('pixel flat GET fired', event);
+    }catch(e){ log('pixel flat err', e); }
   }
 
-  // IP only + enrichissement ville/pays (best-effort, timeouts inclus)
+  // IP + ville/pays (best-effort, timeout)
   function fetchIpInfo(timeoutMs){
     timeoutMs = timeoutMs || 1800;
     var ctrl = new AbortController();
@@ -95,7 +118,7 @@
 
   /* ===== DOM ===== */
   var form = $('#leadForm');
-  if(!form){ console.warn('[formulaire.js] #leadForm introuvable'); return; }
+  if(!form){ console.warn('[ax] #leadForm introuvable'); return; }
 
   var fFirst   = $('#firstName');
   var fLast    = $('#lastName');
@@ -110,27 +133,25 @@
   var ctaEmail = $('#ctaEmail');
   var ctaWhats = $('#ctaWhats');
 
-  // État "form OK" = quand tes CTA sont activés (class "enabled")
   function ctasEnabled(){
     return !!(ctaEmail && ctaEmail.classList.contains('enabled')) ||
            !!(ctaWhats && ctaWhats.classList.contains('enabled'));
   }
 
-  // Snapshot des données (clé/labels NL → FR pour Telegram)
   function snapshotLead(){
-    var countryCode = fCountry ? String(fCountry.value||'') : '';
-    var countryName = '';
+    var code = fCountry ? String(fCountry.value||'') : '';
+    var label = '';
     if(fCountry){
       var opt = fCountry.options[fCountry.selectedIndex];
-      countryName = opt ? trim(opt.textContent||opt.innerText||'') : '';
+      label = opt ? trim(opt.textContent||opt.innerText||'') : '';
     }
     return {
       prenom:      trim(fFirst && fFirst.value),
       nom:         trim(fLast  && fLast.value),
       email:       trim(fEmail && fEmail.value),
       telephone:   trim(fPhone && fPhone.value),
-      pays:        countryCode || countryName || '',
-      pays_label:  countryName || '',
+      pays:        code || label || '',
+      pays_label:  label || '',
       montant_eur: fAmount ? Number(fAmount.value) : null,
       duree_mois:  fDur ? Number(fDur.value) : null,
       objet:       trim(fPurpose && fPurpose.value),
@@ -138,11 +159,10 @@
     };
   }
 
-  /* ===== Trigger #1 — page_loaded (watchdog inclus) ===== */
+  /* ===== #1 page_loaded ===== */
   function sendPageLoadedOnce(){
     if (ssHas(SS.OPEN)) return;
 
-    var sent = false;
     var meta = {
       href: location.href,
       ref: document.referrer || '',
@@ -152,36 +172,36 @@
       screen: { w: screen.width, h: screen.height, dpr: window.devicePixelRatio||1 }
     };
 
-    // Si IP tarde > 1s, on envoie quand même
+    // Watchdog: on envoie en <1s, puis on renvoie enrichi si IP arrive à temps
     var watchdog = setTimeout(function(){
-      if (sent) return;
-      sendEvent('page_loaded', meta);
-      ssSet(SS.OPEN,'1');
-      sent = true;
-    }, 1000);
+      if (!ssHas(SS.OPEN)){
+        sendEvent('page_loaded', meta);
+        ssSet(SS.OPEN,'1');
+        log('page_loaded watchdog');
+      }
+    }, 900);
 
-    fetchIpInfo(1800).then(function(info){
-      if (sent) return;
+    fetchIpInfo(1500).then(function(info){
       clearTimeout(watchdog);
-      sendEvent('page_loaded', Object.assign({}, meta, {
+      var enriched = Object.assign({}, meta, {
         ip: (info && info.ip) || undefined,
         geo: (info && info.loc) || undefined
-      }));
+      });
+      // si on a déjà envoyé, on renvoie quand même (même SID → Apps Script dédupe)
+      sendEvent('page_loaded', enriched);
       ssSet(SS.OPEN,'1');
-      sent = true;
-    }).catch(function(){
-      if (sent) return;
+      log('page_loaded enriched');
+    }).catch(function(err){
       clearTimeout(watchdog);
-      sendEvent('page_loaded', meta);
-      ssSet(SS.OPEN,'1');
-      sent = true;
+      if (!ssHas(SS.OPEN)){
+        sendEvent('page_loaded', meta);
+        ssSet(SS.OPEN,'1');
+        log('page_loaded fallback', err);
+      }
     });
   }
 
-  /* ===== Trigger #2 — form_full =====
-   * Déclenché dès que tes CTA deviennent "enabled" (donc même logique que ton UI).
-   * Gère autofill + bfcache.
-   */
+  /* ===== #2 form_full ===== */
   function maybeSendFormFull(){
     if (ssHas(SS.FORM)) return;
     if (!ctasEnabled()) return;
@@ -193,15 +213,15 @@
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone
     });
     ssSet(SS.FORM,'1');
+    log('form_full sent');
   }
 
   function bindFormWatchers(){
-    // 1) Observe l’état des CTA (le plus fiable car calé sur ta logique)
+    // Observer l’état des CTA (changement de class → enabled)
     if (ctaEmail || ctaWhats){
       var observer = new MutationObserver(function(muts){
         for (var i=0;i<muts.length;i++){
-          var m = muts[i];
-          if (m.type === 'attributes' && m.attributeName === 'class'){
+          if (muts[i].type === 'attributes' && muts[i].attributeName === 'class'){
             maybeSendFormFull();
           }
         }
@@ -209,36 +229,32 @@
       if (ctaEmail) observer.observe(ctaEmail, {attributes:true});
       if (ctaWhats) observer.observe(ctaWhats, {attributes:true});
     }
-
-    // 2) Filets de sécurité : input/change + load/pageshow (autofill)
+    // Filets de sécu
     [fFirst,fLast,fEmail,fPhone,fCountry,fDur,fPurpose,fAmount,fConsent].forEach(function(el){
       if(!el) return;
       var evt = (el.type==='checkbox' || el.tagName==='SELECT') ? 'change' : 'input';
       el.addEventListener(evt, maybeSendFormFull);
       el.addEventListener('change', maybeSendFormFull);
     });
-
     setTimeout(maybeSendFormFull, 0);
     window.addEventListener('load',      maybeSendFormFull);
     window.addEventListener('pageshow',  maybeSendFormFull);
   }
 
-  /* ===== Trigger #3 — cta_click =====
-   * Envoi au 1er clic (email/whatsapp) AVANT la redirection.
-   * Aucun preventDefault : tes conversions/redirects restent inchangées.
-   */
+  /* ===== #3 cta_click ===== */
   function sendCTAOnce(kind){
     if (ssHas(SS.CTA)) return;
-    if (!ctasEnabled()) return; // respecte ta logique : clic pris en compte seulement si form OK
+    if (!ctasEnabled()) return;
     var snap = snapshotLead();
+
+    // On envoie via 4 transports, et on laisse ta redirection faire sa vie.
     sendEvent('cta_click', { which: kind, data: snap, href: location.href });
     ssSet(SS.CTA,'1');
+    log('cta_click', kind);
   }
 
   function bindCTAs(){
     if (ctaEmail){
-      // capture:false pour passer après tes autres listeners si besoin,
-      // mais on envoie via sendBeacon/GET pixel (résilient avant navigation)
       ctaEmail.addEventListener('click', function(){ sendCTAOnce('email'); }, {capture:false});
       ctaEmail.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ sendCTAOnce('email'); } });
     }
