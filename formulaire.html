@@ -17,18 +17,39 @@
   <style>
     :root{ --bg:#f7f8fb; --fg:#0f1724; --muted:#667085; --line:#e6e9f2; --brand:#1a56db; --ok:#12b76a; --warn:#d92d20; --card:#fff; --radius:16px; --shadow:0 10px 28px rgba(2,6,23,.06); }
     *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
     body{background:var(--bg);color:var(--fg);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial}
     strong,b{font-weight:600}
     a{color:inherit;text-decoration:none}
     img{display:block;max-width:100%}
     .wrap{max-width:1040px;margin:34px auto;padding:0 18px}
 
-    header{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:14px}
-    header img{height:56px;border-radius:12px}
-    header h1{font-weight:600;font-size:22px;color:var(--brand)}
+    /* NEW: Top Header */
+    .topbar{
+      position:sticky;top:0;z-index:50;background:#ffffffcc;backdrop-filter:saturate(140%) blur(8px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1120px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:14px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .brand img{height:36px;width:36px;border-radius:10px}
+    .brand h1{font-weight:700;font-size:18px;color:var(--brand);white-space:nowrap}
+    .nav{margin-left:auto;margin-right:12px;display:flex;gap:14px;align-items:center}
+    .nav a{padding:8px 10px;border-radius:10px;color:#0f1724}
+    .nav a:hover{background:#eef2ff}
+    .nav a.cta{
+      background:var(--brand);color:#fff;font-weight:700;padding:10px 14px;border-radius:12px;border:0;display:inline-flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(26,86,219,.18)
+    }
+    .nav a.cta:active{transform:translateY(1px)}
+    @media (max-width:760px){
+      .nav{gap:10px}
+      .nav a span{display:none}
+    }
 
     /* HERO */
-    .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+    .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:18px 0}
     .kicker{display:inline-flex;gap:8px;align-items:center;background:#eef4ff;color:#3538CD;border:1px solid #d9e0ff;border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px}
     .hero h2{font-size:22px;margin:10px 0 6px;font-weight:600}
     .hero p{color:#475467}
@@ -77,7 +98,7 @@
     .ctrl-btn{background:#eef2f7;border:1px solid #dde3ee;padding:8px 10px;border-radius:10px;cursor:pointer}
     .ctrl-btn:hover{background:#e7edf7}
 
-    /* CTA */
+    /* CTA (in-card) */
     .btns{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;margin-top:14px}
     .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;font-weight:600;color:#fff;min-width:260px;border:0;opacity:.6;pointer-events:none}
     .btn.enabled{opacity:1;pointer-events:auto}
@@ -85,20 +106,28 @@
     .cta-note{font-size:13px;color:#475467;text-align:center}
     .cta-note b{color:#1a56db}
 
-    footer{margin:22px 0 8px;text-align:center}
-    .sitebtn{display:inline-block;background:#1a56db;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
-
     /* Small print */
     .disclaimer{margin-top:10px;color:#64748b;font-size:12px}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <img src="logoMsg.png" alt="MSGROUP">
-    <h1>MSGROUP</h1>
-  </header>
 
+<!-- Sticky header with nav + CTA -->
+<div class="topbar" role="navigation" aria-label="Hoofdnavigatie">
+  <div class="topbar-inner">
+    <a href="#" class="brand" aria-label="MSGROUP home">
+      <img src="logoMsg.png" alt="MSGROUP logo">
+      <h1>MSGROUP</h1>
+    </a>
+    <nav class="nav">
+      <a href="#formSection" aria-label="Ga naar het formulier">Formulier</a>
+      <a href="https://sergemagdeleinesolutions.fr/" target="_blank" rel="noopener" aria-label="Bezoek onze website">Website</a>
+      <a href="#!" id="navCta" class="cta" aria-label="Lening aanvragen">Lening aanvragen</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
   <!-- HERO -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="kicker">Beperkte aanbieding — geldig tot <strong>30 september</strong></div>
@@ -111,7 +140,7 @@
     </div>
   </section>
 
-  <div class="card">
+  <div class="card" id="formSection">
     <!-- FORM -->
     <div class="form-shell">
       <div class="form-title">Aanvraagformulier</div>
@@ -194,9 +223,9 @@
 
       <!-- CTA (alleen e-mail) -->
       <div class="btns">
-        <button id="ctaEmail" class="btn email" type="button" disabled>E-mail versturen</button>
+        <button id="ctaEmail" class="btn email" type="button" disabled>Lening aanvragen per e-mail</button>
         <div class="cta-note">Tip: <b>e-mail is de snelste route</b> naar een voorstel. Wij reageren doorgaans binnen <b>24 uur</b>.</div>
-        <div class="cta-note">Stuur ons uw aanvraag per e-mail om <b>snel uw lening te verkrijgen</b>—volledig transparant en zonder kleine lettertjes.</div>
+        <div class="cta-note">Stuur uw gegevens per e-mail om <b>snel uw lening aan te vragen</b> — transparant en zonder kleine lettertjes.</div>
       </div>
     </div>
 
@@ -206,7 +235,7 @@
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
         <!-- 1 -->
         <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
-        <!-- 2 (zin zonder WhatsApp) -->
+        <!-- 2 -->
         <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
         <!-- 3 -->
         <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
@@ -251,10 +280,6 @@
       </div>
     </div>
   </div>
-
-  <footer>
-    <a class="sitebtn" href="https://sergemagdeleinesolutions.fr/" target="_blank" rel="noopener">Bezoek onze website</a>
-  </footer>
 </div>
 
 <!-- Script: VALIDATIE + CTA + CAROUSEL (WhatsApp verwijderd) -->
@@ -286,6 +311,9 @@
       duration:$('#duration'), purpose:$('#purpose'), consent:$('#consent'),
       amount:$('#amount'), amtBox:$('#amtBox'), ctaEmail:$('#ctaEmail')
     };
+    const navCta = document.getElementById('navCta');
+    const formEl = document.getElementById('leadForm');
+    const formCard = document.getElementById('formSection');
 
     // Init country select (NL default)
     selCountry.innerHTML = COUNTRIES.map(c=>`<option value="${c.code}" data-dial="${c.dial}">${c.name}</option>`).join('');
@@ -346,8 +374,12 @@
       setErr(f.phone,'e_phone', !ok, dynamicMsg);
     }
 
+    function isFormOk(){
+      return isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked;
+    }
+
     function updateCTAs(){
-      const ok = isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked;
+      const ok = isFormOk();
       [f.ctaEmail].forEach(b=>{
         if(ok){ b.classList.add('enabled'); b.removeAttribute('disabled'); }
         else { b.classList.remove('enabled'); b.setAttribute('disabled','disabled'); }
@@ -365,7 +397,7 @@
     function updateAmount(){ f.amtBox.textContent = fmtEUR(Number(f.amount.value)); }
     f.amount.addEventListener('input', updateAmount); updateAmount();
 
-    // Mail
+    // Mail helpers
     function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
     function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
 
@@ -392,14 +424,14 @@
       return {subject, body};
     }
 
-    function requireValidThen(fn){
+    function requireValidThen(fn, onInvalid){
       return function(e){
         e.preventDefault();
         setErr(f.first,'e_fname', !trim(f.first.value),'Vul uw voornaam in.');
         setErr(f.last ,'e_lname', !trim(f.last.value),'Vul uw achternaam in.');
         setErr(f.email,'e_email', !isEmailValid(f.email.value),'Voer een geldig e-mailadres in.');
         validatePhoneField();
-        if(!(isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked)) return;
+        if(!isFormOk()){ onInvalid?.(); return; }
         fn();
       };
     }
@@ -409,16 +441,28 @@
     const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';
 
     // EMAIL — conversion -> mailto
-    f.ctaEmail.addEventListener('click', requireValidThen(()=>{
+    const triggerEmail = ()=>{
       const {subject,body}=buildEmail();
       const url = toMailto('contact@sergemagdeleinesolutions.com', subject, body);
-
       gtag('event','conversion',{
         send_to: `${AW_ID}/${LABEL_EMAIL}`,
         event_callback: function(){ location.href = url; }
       });
       setTimeout(()=>{ location.href = url; }, 800);
-    }));
+    };
+
+    // In-card CTA
+    f.ctaEmail.addEventListener('click', requireValidThen(triggerEmail));
+
+    // Header CTA: scroll to form if invalid; else same as email CTA
+    function scrollToFormFocus(){
+      formCard?.scrollIntoView({behavior:'smooth', block:'start'});
+      setTimeout(()=>{
+        const firstInvalid = formEl.querySelector('.invalid, input:invalid, select:invalid') || f.first;
+        firstInvalid?.focus();
+      }, 400);
+    }
+    navCta?.addEventListener('click', requireValidThen(triggerEmail, scrollToFormFocus));
 
     // Carousel controls
     (function(){
@@ -439,7 +483,7 @@
   })();
 </script>
 
-<!-- Télémétrie (on garde le fichier, pas de WhatsApp) -->
+<!-- Télémétrie (behouden; geen WhatsApp) -->
 <script src="formulaire.js"></script>
 
 </body>
