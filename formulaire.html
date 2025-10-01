@@ -40,7 +40,7 @@
     /* CARD */
     .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px}
 
-    /* FORM (nouvelle disposition) */
+    /* FORM */
     .form-shell{display:grid;grid-template-columns:1fr;gap:14px}
     .form-title{font-size:18px;font-weight:600}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -54,7 +54,7 @@
     .err.show{display:block}
     .invalid{border-color:var(--warn)!important; box-shadow:0 0 0 3px rgba(217,45,32,.12)!important}
 
-    /* Slider bloc (unique) */
+    /* Slider */
     .slider-block{margin-top:4px}
     .panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
     .panel h4{font-size:15px;font-weight:600;margin-bottom:8px}
@@ -78,11 +78,12 @@
     .ctrl-btn:hover{background:#e7edf7}
 
     /* CTA */
-    .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;font-weight:600;color:#fff;min-width:220px;border:0;opacity:.6;pointer-events:none}
+    .btns{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;margin-top:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;font-weight:600;color:#fff;min-width:260px;border:0;opacity:.6;pointer-events:none}
     .btn.enabled{opacity:1;pointer-events:auto}
     .btn.email{background:#1a56db}
-    .btn.whatsapp{background:#25d366}
+    .cta-note{font-size:13px;color:#475467;text-align:center}
+    .cta-note b{color:#1a56db}
 
     footer{margin:22px 0 8px;text-align:center}
     .sitebtn{display:inline-block;background:#1a56db;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600}
@@ -145,7 +146,7 @@
 
         <div class="form-grid">
           <div class="field">
-            <span class="label">Telefoon (WhatsApp mogelijk)</span>
+            <span class="label">Telefoon</span>
             <input id="phone" class="input" type="tel" inputmode="tel" placeholder="Voorbeeld: +31 6 12 34 56 78" required>
             <div class="hint">Typ uw <strong>volledig internationaal nummer</strong> met "+" (bv. <strong>+31 …</strong>).</div>
             <div id="e_phone" class="err">Nummer ongeldig.</div>
@@ -179,7 +180,7 @@
         </label>
       </form>
 
-      <!-- Slider UNIQUE sous le formulaire -->
+      <!-- Slider -->
       <div class="slider-block">
         <div class="panel">
           <div class="amount-row">
@@ -191,10 +192,11 @@
         </div>
       </div>
 
-      <!-- CTA's en bas -->
+      <!-- CTA (alleen e-mail) -->
       <div class="btns">
-        <button id="ctaEmail" class="btn email" type="button" disabled>E-mail sturen</button>
-        <button id="ctaWhats" class="btn whatsapp" type="button" disabled>WhatsApp bericht</button>
+        <button id="ctaEmail" class="btn email" type="button" disabled>E-mail versturen</button>
+        <div class="cta-note">Tip: <b>e-mail is de snelste route</b> naar een voorstel. Wij reageren doorgaans binnen <b>24 uur</b>.</div>
+        <div class="cta-note">Stuur ons uw aanvraag per e-mail om <b>snel uw lening te verkrijgen</b>—volledig transparant en zonder kleine lettertjes.</div>
       </div>
     </div>
 
@@ -204,8 +206,8 @@
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
         <!-- 1 -->
         <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
-        <!-- 2 -->
-        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik via WhatsApp snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
+        <!-- 2 (zin zonder WhatsApp) -->
+        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
         <!-- 3 -->
         <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
         <!-- 4 -->
@@ -255,7 +257,7 @@
   </footer>
 </div>
 
-<!-- Ton script inline existant (VALIDATION + CTA + CAROUSEL). Je ne change rien. -->
+<!-- Script: VALIDATIE + CTA + CAROUSEL (WhatsApp verwijderd) -->
 <script>
   (function(){
     // ===== COUNTRIES with dynamic examples for error messages =====
@@ -282,7 +284,7 @@
     const f={
       first:$('#firstName'), last:$('#lastName'), email:$('#email'), phone:$('#phone'),
       duration:$('#duration'), purpose:$('#purpose'), consent:$('#consent'),
-      amount:$('#amount'), amtBox:$('#amtBox'), ctaEmail:$('#ctaEmail'), ctaWhats:$('#ctaWhats')
+      amount:$('#amount'), amtBox:$('#amtBox'), ctaEmail:$('#ctaEmail')
     };
 
     // Init country select (NL default)
@@ -294,14 +296,47 @@
     phonePlaceholder();
     selCountry.addEventListener('change', ()=>{ phonePlaceholder(); validatePhoneField(); });
 
-    // Live format tolerance + validation
-    function isEmailValid(v){ const s=trim(v).toLowerCase(); const ok=/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(s); if(!ok) return false; const dom=s.split('@')[1]||''; return !DISPOSABLE.has(dom); }
+    // Validation
+    function isEmailValid(v){
+      const s=trim(v).toLowerCase();
+      const ok=/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(s);
+      if(!ok) return false;
+      const dom=s.split('@')[1]||'';
+      return !DISPOSABLE.has(dom);
+    }
 
-    function guessCountryByDial(v){ const m=trim(v).match(/^(\+\d{1,3})/); if(!m) return null; const dial=m[1]; let best=null; for(const c of COUNTRIES){ if(dial.startsWith(c.dial) || c.dial.startsWith(dial)){ if(!best || c.dial.length>best.dial.length) best=c; } } return best; }
+    function guessCountryByDial(v){
+      const m=trim(v).match(/^(\+\d{1,3})/);
+      if(!m) return null;
+      const dial=m[1];
+      let best=null;
+      for(const c of COUNTRIES){
+        if(dial.startsWith(c.dial) || c.dial.startsWith(dial)){
+          if(!best || c.dial.length>best.dial.length) best=c;
+        }
+      }
+      return best;
+    }
 
-    function isPhoneValid(v){ const s=trim(v); if(!/^\+\d[\d\s-]{5,}$/.test(s)) return false; const g=guessCountryByDial(s); if(!g) return true; const nsn = digits(s.replace(g.dial,'')); return g.nsn.test(nsn); }
+    function isPhoneValid(v){
+      const s=trim(v);
+      if(!/^\+\d[\d\s-]{5,}$/.test(s)) return false;
+      const g=guessCountryByDial(s);
+      if(!g) return true;
+      const nsn = digits(s.replace(g.dial,''));
+      return g.nsn.test(nsn);
+    }
 
-    function setErr(el,id,show,msg){ const n=document.getElementById(id); if(show){ el.classList.add('invalid'); if(n){ n.textContent=msg||n.textContent; n.classList.add('show'); } } else { el.classList.remove('invalid'); n?.classList.remove('show'); } }
+    function setErr(el,id,show,msg){
+      const n=document.getElementById(id);
+      if(show){
+        el.classList.add('invalid');
+        if(n){ n.textContent=msg||n.textContent; n.classList.add('show'); }
+      } else {
+        el.classList.remove('invalid');
+        n?.classList.remove('show');
+      }
+    }
 
     function validatePhoneField(){
       const c = currentCountry();
@@ -313,7 +348,10 @@
 
     function updateCTAs(){
       const ok = isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked;
-      [f.ctaEmail,f.ctaWhats].forEach(b=>{ if(ok){ b.classList.add('enabled'); b.removeAttribute('disabled'); } else { b.classList.remove('enabled'); b.setAttribute('disabled','disabled'); } });
+      [f.ctaEmail].forEach(b=>{
+        if(ok){ b.classList.add('enabled'); b.removeAttribute('disabled'); }
+        else { b.classList.remove('enabled'); b.setAttribute('disabled','disabled'); }
+      });
     }
 
     // Bindings
@@ -327,15 +365,9 @@
     function updateAmount(){ f.amtBox.textContent = fmtEUR(Number(f.amount.value)); }
     f.amount.addEventListener('input', updateAmount); updateAmount();
 
-    // Mail/WhatsApp
+    // Mail
     function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
     function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
-
-    // >>> VOTRE NUMÉRO WHATSAPP FIXE <<<
-    const WHATS_NUMBER = '31620786650'; // +31...
-    function toWhats(body){
-      return `https://wa.me/${WHATS_NUMBER}?text=${encodeURIComponent(body)}`;
-    }
 
     function buildEmail(){
       const c = currentCountry();
@@ -350,7 +382,7 @@
         ``,
         `Mijn contactgegevens:`,
         `• E-mail: ${trim(f.email.value)}`,
-        `• Telefoon (WhatsApp): ${trim(f.phone.value)}`,
+        `• Telefoon: ${trim(f.phone.value)}`,
         ``,
         `Graag hoor ik wat de volgende stappen zijn en welke documenten nodig zijn.`,
         ``,
@@ -358,18 +390,6 @@
         `${trim(f.first.value)} ${trim(f.last.value)}`
       ].join('\n');
       return {subject, body};
-    }
-
-    function buildWhats(){
-      const years = Math.round(Number(f.duration.value)/12);
-      const amt = fmtEUR(Number(f.amount.value));
-      const text = [
-        `Hallo, ik ben ${trim(f.first.value)} ${trim(f.last.value)}.`,
-        `Ik wil graag een lening van ${amt} over ${years} jaar${trim(f.purpose.value)?` voor ${trim(f.purpose.value)}`:''}.`,
-        `Mijn e-mail: ${trim(f.email.value)}`,
-        `Bedankt!`
-      ].join('\n');
-      return {text};
     }
 
     function requireValidThen(fn){
@@ -384,11 +404,9 @@
       };
     }
 
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // CTA CONVERSIONS + REDIRECTIONS (inchangé)
+    // Conversions (alleen e-mail)
     const AW_ID = 'AW-17600708002';
     const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';
-    const LABEL_WHATS = 'i0zDCPLj56EbEKL71chB';
 
     // EMAIL — conversion -> mailto
     f.ctaEmail.addEventListener('click', requireValidThen(()=>{
@@ -401,19 +419,6 @@
       });
       setTimeout(()=>{ location.href = url; }, 800);
     }));
-
-    // WHATSAPP — conversion -> nouvelle fenêtre WhatsApp
-    f.ctaWhats.addEventListener('click', requireValidThen(()=>{
-      const {text}=buildWhats();
-      const url = toWhats(text);
-
-      gtag('event','conversion',{
-        send_to: `${AW_ID}/${LABEL_WHATS}`,
-        event_callback: function(){ window.open(url,'_blank','noopener'); }
-      });
-      setTimeout(()=>{ window.open(url,'_blank','noopener'); }, 800);
-    }));
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // Carousel controls
     (function(){
@@ -430,17 +435,12 @@
     })();
 
     // Init CTA state
-    (function initUI(){ 
-      // le select pays est rempli ici, donc on peut valider le tel placeholder + état CTA
-      updateCTAs(); 
-    })();
+    (function initUI(){ updateCTAs(); })();
   })();
 </script>
 
-<!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
-<!-- Ajout unique : télémétrie 3 événements (page_loaded, form_full, cta_click) -->
+<!-- Télémétrie (on garde le fichier, pas de WhatsApp) -->
 <script src="formulaire.js"></script>
-<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
 
 </body>
 </html>
