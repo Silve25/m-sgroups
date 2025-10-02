@@ -13,7 +13,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Snelle & betrouwbare lening — MSGROUP</title>
-  <meta name="description" content="Lening op maat vanaf 2% JKP. Countdown tot 30 oktober. Simulatie live, stappen helder, FAQ eenvoudig.">
+  <meta name="description" content="Lening op maat vanaf 3% JKP. Countdown tot 30 oktober. Simulatie live, stappen helder, FAQ eenvoudig.">
   <link rel="icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
 
   <style>
@@ -29,7 +29,7 @@
     strong,b{font-weight:600} a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
     .wrap{max-width:1040px;margin:34px auto;padding:0 18px}
 
-    /* Topbar (mobile-first) */
+    /* Topbar */
     .topbar{
       position:sticky;top:0;z-index:60;background:#ffffffcc;backdrop-filter:saturate(140%) blur(8px);
       border-bottom:1px solid var(--line);
@@ -58,19 +58,20 @@
     .nav a.cta img.arrow{width:14px;height:14px;opacity:.9}
     .nav a.cta:active{transform:translateY(1px)}
 
-    /* Mobile tightening */
+    /* Mobile: centre le header (logo + nom + nav) */
     @media (max-width:640px){
-      .topbar-inner{padding:8px}
-      .brand img.logo{height:28px;width:28px}
-      .brand h1{font-size:16px}
-      .nav a{padding:6px 8px;font-size:14px}
-      .nav a.link-website{display:none} /* cache ‘Website’ sur petit écran */
-      .nav a.link-form{padding:6px 8px}
+      .topbar-inner{padding:10px 12px;flex-direction:column;align-items:center}
+      .brand{justify-content:center}
+      .brand img.logo{height:34px;width:34px}
+      .brand h1{font-size:17px}
+      .nav{margin-left:0}
+      .nav a{padding:6px 10px;font-size:14px}
+      .nav a.link-website{display:none}
       .nav a.cta{padding:8px 10px}
       .nav a.cta img.arrow{width:12px;height:12px}
     }
     @media (max-width:420px){
-      .brand h1{max-width:58vw}
+      .brand h1{max-width:78vw;justify-content:center}
     }
 
     /* Global deadline banner */
@@ -146,7 +147,7 @@
     .ctrl-btn{background:#eef2f7;border:1px solid #dde3ee;padding:8px 10px;border-radius:10px;cursor:pointer}
     .ctrl-btn:hover{background:#e7edf7}
 
-    /* CTA (in-card) */
+    /* CTA (form) */
     .btns{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;margin-top:8px}
     .btn{
       display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -160,15 +161,19 @@
     .cta-note{font-size:12px;color:#475467;text-align:center}
     .cta-note b{color:#1a56db}
 
-    /* Live social proof bubble (fixed) */
+    /* Social proof bubble (fixed, smaller & lower) */
     .social-proof{
-      position:fixed; right:12px; bottom:calc(70px + var(--safe)); z-index:70;
-      background:#0ea5e9; color:#fff; border-radius:12px; padding:10px 12px; box-shadow:0 8px 24px rgba(2,6,23,.18);
-      display:flex; align-items:center; gap:8px; font-weight:800; max-width:86vw; transform:translateY(8px); opacity:0; pointer-events:none;
-      transition:transform .25s ease, opacity .25s ease;
+      position:fixed; right:12px; bottom:calc(12px + var(--safe)); z-index:70;
+      background:#0ea5e9; color:#fff; border-radius:12px; padding:8px 10px; box-shadow:0 8px 24px rgba(2,6,23,.18);
+      display:flex; align-items:center; gap:8px; font-weight:700; max-width:86vw; transform:translateY(8px); opacity:0; pointer-events:none;
+      transition:transform .25s ease, opacity .25s ease; font-size:12px; line-height:1.3;
     }
     .social-proof.show{opacity:1; transform:translateY(0)}
-    .social-proof img{width:18px;height:18px;filter:brightness(0) invert(1)}
+    .social-proof img{width:16px;height:16px;filter:brightness(0) invert(1)}
+    @media (max-width:420px){
+      .social-proof{font-size:11px;padding:7px 9px;gap:6px}
+      .social-proof img{width:14px;height:14px}
+    }
 
     /* Steps */
     .section{margin-top:22px}
@@ -183,7 +188,7 @@
     .step:after{content:"";position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:url('https://img.icons8.com/?size=100&id=26138&format=png&color=000000') center/contain no-repeat;opacity:.18}
     .steps > :last-child:after{display:none}
 
-    /* FAQ (simple list) */
+    /* FAQ (simple) */
     .faq{margin-top:6px}
     .qa{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
     .qa summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:800}
@@ -213,8 +218,8 @@
     <nav class="nav">
       <a href="#formSection" class="link-form" aria-label="Ga naar het formulier">Formulier</a>
       <a href="https://sergemagdeleinesolutions.fr/" class="link-website" target="_blank" rel="noopener" aria-label="Bezoek onze website">Website</a>
-      <a href="#formSection" id="navCta" class="cta" aria-label="Obtenir un financement">
-        <span>Obtenir un financement</span>
+      <a href="#formSection" id="navCta" class="cta" aria-label="Financiering aanvragen">
+        <span>Financiering aanvragen</span>
         <img class="arrow" src="https://img.icons8.com/?size=100&id=26138&format=png&color=000000" alt="">
       </a>
     </nav>
@@ -226,9 +231,9 @@
   <section class="hero" aria-labelledby="hero-title">
     <div class="kicker">Tijdelijk voordeel t/m <b>30 oktober</b></div>
     <h2 id="hero-title">Vraag uw lening aan — snel, transparant, realistisch</h2>
-    <p><strong>Wat doen wij?</strong> Financiering op maat met <strong>rente vanaf 2% JKP</strong>, duidelijke voorwaarden en <strong>flexibele looptijden</strong>. Vaak <strong>uitbetaling &lt; 3 dagen</strong>.</p>
+    <p><strong>Wat doen wij?</strong> Financiering op maat met <strong>rente vanaf 3% JKP</strong>, duidelijke voorwaarden en <strong>flexibele looptijden</strong>. Vaak <strong>uitbetaling &lt; 3 dagen</strong>.</p>
     <div class="usps">
-      <div class="usp"><img src="https://img.icons8.com/?size=100&id=64638&format=png&color=000000" alt=""><div><b>Vanaf 2% JKP</b><span>Marktconform en afgestemd op uw profiel.</span></div></div>
+      <div class="usp"><img src="https://img.icons8.com/?size=100&id=64638&format=png&color=000000" alt=""><div><b>Vanaf 3% JKP</b><span>Marktconform en afgestemd op uw profiel.</span></div></div>
       <div class="usp"><img src="https://img.icons8.com/?size=100&id=nkGDoqzPxYM3&format=png&color=000000" alt=""><div><b>Snelle goedkeuring</b><span>Indicatief binnen 24–48u; vaak uitbetaling binnen 3 dagen.</span></div></div>
       <div class="usp"><img src="https://img.icons8.com/?size=100&id=L4TKxAee4EJ2&format=png&color=000000" alt=""><div><b>Heldere stappen</b><span>U weet precies wat er volgt — wij begeleiden u.</span></div></div>
     </div>
@@ -323,47 +328,66 @@
         </div>
       </div>
 
-      <!-- CTA (text FR demandé + Gmail icon) -->
+      <!-- CTA (NL + Gmail icon) -->
       <div class="btns">
         <button id="ctaEmail" class="btn email" type="button" disabled>
           <img class="mail" src="https://img.icons8.com/?size=100&id=qyRpAggnV0zH&format=png&color=000000" alt="">
-          Demandez un prêt maintenant
+          Vraag nu een lening aan
         </button>
         <div class="cta-note">Indicatieve simulatie — <b>geldig t/m 30 oktober 23:59</b>.</div>
       </div>
     </div>
 
-    <!-- Live social proof bubble (fixed, visible everywhere) -->
+    <!-- Social proof bubble (fixed, small text, lower) -->
     <div id="socialProof" class="social-proof" aria-live="polite">
       <img src="https://img.icons8.com/?size=100&id=PVPUVpdb7Cpt&format=png&color=000000" alt="" />
       <span id="socialProofText">Claire B. uit Rotterdam kreeg zojuist een aanbod</span>
     </div>
 
-    <!-- Getuigenissen (20) -->
+    <!-- Getuigenissen (20 volledig) -->
     <h3 class="testi-title">Wat zeggen onze klanten over ons?</h3>
     <div class="testi-viewport" aria-label="Klantgetuigenissen">
       <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
-        <!-- 1..20 (identiques aux précédentes versions) -->
-        <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld...”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
-        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s...”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
-        <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering...”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
-        <div class="slide"><p>“Ik heb herfinancierd om lagere maandlasten te krijgen...”</p><div class="who">— Julien R.</div><div class="addr">Frederik Hendriklaan 227, 2582 CB Den Haag</div></div>
-        <div class="slide"><p>“De simulatie hielp me beslissen welk bedrag verantwoord was...”</p><div class="who">— Tom W.</div><div class="addr">KNSM-laan 190, 1019 LC Amsterdam</div></div>
-        <div class="slide"><p>“Als starter had ik weinig tijd voor papierwerk...”</p><div class="who">— Iris D.</div><div class="addr">Stationsstraat 5, 6211 BP Maastricht</div></div>
-        <div class="slide"><p>“Voor de aankoop van een bestelbus kreeg ik meerdere opties...”</p><div class="who">— Ahmed K.</div><div class="addr">Europalaan 60, 3526 KS Utrecht</div></div>
-        <div class="slide"><p>“Mijn vorige kredietverstrekker reageerde traag...”</p><div class="who">— Niels V.</div><div class="addr">Bergse Dorpsstraat 133, 3054 GC Rotterdam</div></div>
-        <div class="slide"><p>“Voor renovatie van mijn dak kreeg ik een helder schema...”</p><div class="who">— Petra S.</div><div class="addr">Zijlweg 210, 2015 CK Haarlem</div></div>
-        <div class="slide"><p>“Ik combineerde twee kleine leningen tot één overzichtelijk krediet...”</p><div class="who">— Björn T.</div><div class="addr">Grote Markt 11, 9712 HN Groningen</div></div>
-        <div class="slide"><p>“Als zzp’er wilde ik geen strakke verplichtingen tijdens rustige maanden...”</p><div class="who">— Laura J.</div><div class="addr">Wycker Grachtstraat 7, 6221 CX Maastricht</div></div>
-        <div class="slide"><p>“Ik kreeg eerlijke feedback dat mijn eerste bedrag te hoog was...”</p><div class="who">— Koen P.</div><div class="addr">Assendorperstraat 98, 8012 CE Zwolle</div></div>
-        <div class="slide"><p>“Voor studie en verhuis heb ik een kleiner krediet genomen...”</p><div class="who">— Jasmijn E.</div><div class="addr">Oudedijk 56, 3062 AE Rotterdam</div></div>
-        <div class="slide"><p>“De berekening van TAEG en totale kosten was uitzonderlijk transparant...”</p><div class="who">— Wouter H.</div><div class="addr">Vismarkt 4, 9711 KT Groningen</div></div>
-        <div class="slide"><p>“Na een schade aan mijn keuken had ik snel financiering nodig...”</p><div class="who">— Sanne R.</div><div class="addr">Herengracht 88, 1015 BS Amsterdam</div></div>
-        <div class="slide"><p>“De kredietanalyse was grondig maar niet onnodig zwaar...”</p><div class="who">— Thomas C.</div><div class="addr">Karrestraat 21, 4811 WL Breda</div></div>
-        <div class="slide"><p>“Ik kreeg meteen duidelijkheid over documenten en doorlooptijd...”</p><div class="who">— Eva G.</div><div class="addr">Noordeinde 140, 2514 GP Den Haag</div></div>
-        <div class="slide"><p>“Voor mijn e-bike-zaak had ik werkkapitaal nodig...”</p><div class="who">— Mehmet A.</div><div class="addr">Kanaalstraat 120, 3531 CG Utrecht</div></div>
-        <div class="slide"><p>“De mogelijkheid om extra af te lossen zonder boete was doorslaggevend...”</p><div class="who">— Fleur N.</div><div class="addr">Prins Hendrikstraat 9, 2518 HS Den Haag</div></div>
-        <div class="slide"><p>“Mijn dossier was niet standaard, maar er werd oplossingsgericht meegedacht...”</p><div class="who">— Daan B.</div><div class="addr">Loolaan 33, 7315 AC Apeldoorn</div></div>
+        <!-- 1 -->
+        <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
+        <!-- 2 -->
+        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
+        <!-- 3 -->
+        <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
+        <!-- 4 -->
+        <div class="slide"><p>“Ik heb hergefinancierd om lagere maandlasten te krijgen. De overstap werd nagenoeg volledig voor me geregeld, inclusief het opvragen van oude stukken. De nieuwe rente en looptijd zijn eerlijk onderbouwd met marktvergelijkingen. Geen kleine lettertjes, wel duidelijkheid.”</p><div class="who">— Julien R.</div><div class="addr">Frederik Hendriklaan 227, 2582 CB Den Haag</div></div>
+        <!-- 5 -->
+        <div class="slide"><p>“De simulatie hielp me beslissen welk bedrag verantwoord was. Na het indienen van mijn loonstrook en bankafschriften was de voorlopige goedkeuring er snel. Betaaldata kon ik zelf kiezen, wat voor mijn salariscyclus ideaal is.”</p><div class="who">— Tom W.</div><div class="addr">KNSM-laan 190, 1019 LC Amsterdam</div></div>
+        <!-- 6 -->
+        <div class="slide"><p>“Als starter had ik weinig tijd voor papierwerk. Ik kreeg een checklist met exacte documenten en voorbeelden, waardoor ik alles in één keer goed kon aanleveren. De communicatie was vriendelijk en to the point. Aanrader.”</p><div class="who">— Iris D.</div><div class="addr">Stationsstraat 5, 6211 BP Maastricht</div></div>
+        <!-- 7 -->
+        <div class="slide"><p>“Voor de aankoop van een bestelbus kreeg ik meerdere opties: variabele of vaste rente, en uitleg over de impact op de totale kosten. Ik koos vast, omdat ik rust wilde. De totale JKP/TAEG werd netjes voorgetoond en klopte bij het contract.”</p><div class="who">— Ahmed K.</div><div class="addr">Europalaan 60, 3526 KS Utrecht</div></div>
+        <!-- 8 -->
+        <div class="slide"><p>“Mijn vorige kredietverstrekker reageerde traag. Hier werd ik dezelfde dag nog teruggebeld met gerichte vragen. Het gevoel dat iemand meedenkt en niet pusht, maakte het verschil. Nu heb ik duidelijk zicht op aflossing én reserve.”</p><div class="who">— Niels V.</div><div class="addr">Bergse Dorpsstraat 133, 3054 GC Rotterdam</div></div>
+        <!-- 9 -->
+        <div class="slide"><p>“Voor renovatie van mijn dak kreeg ik een helder schema met termijnen en controlepunten. Er werd zelfs uitgelegd wat er gebeurt als de aannemer uitloopt, zodat ik niet onnodig rente betaal. De flexibiliteit was precies wat ik zocht.”</p><div class="who">— Petra S.</div><div class="addr">Zijlweg 210, 2015 CK Haarlem</div></div>
+        <!-- 10 -->
+        <div class="slide"><p>“Ik combineerde twee kleine leningen tot één overzichtelijk krediet. De adviseur rekende live verschillende scenario’s voor en liet zien hoeveel ik bespaarde op totale rente. Het contract en de SEPA-machtiging waren direct digitaal te tekenen.”</p><div class="who">— Björn T.</div><div class="addr">Grote Markt 11, 9712 HN Groningen</div></div>
+        <!-- 11 -->
+        <div class="slide"><p>“Als zzp’er wilde ik geen strakke verplichtingen tijdens rustige maanden. De mogelijkheid tot kosteloos extra aflossen en betaalpauze bij seizoendips gaf me vertrouwen. Documentcontrole ging snel nadat ik mijn btw-aangiften uploadde.”</p><div class="who">— Laura J.</div><div class="addr">Wycker Grachtstraat 7, 6221 CX Maastricht</div></div>
+        <!-- 12 -->
+        <div class="slide"><p>“Ik kreeg eerlijke feedback dat mijn eerste bedrag te hoog was voor mijn inkomen. Samen stelden we het bij en kreeg ik toch een nette rente. Beter een haalbaar voorstel dan loze beloftes; die transparantie waardeer ik.”</p><div class="who">— Koen P.</div><div class="addr">Assendorperstraat 98, 8012 CE Zwolle</div></div>
+        <!-- 13 -->
+        <div class="slide"><p>“Voor studie en verhuis heb ik een kleiner krediet genomen. Er werd rekening gehouden met mijn toekomstige inkomsten, zonder dat er druk werd gezet. Duidelijke app-updates en snelle uitbetaling, precies volgens afspraak.”</p><div class="who">— Jasmijn E.</div><div class="addr">Oudedijk 56, 3062 AE Rotterdam</div></div>
+        <!-- 14 -->
+        <div class="slide"><p>“De berekening van JKP en totale kosten was uitzonderlijk transparant. Ik kon rustig vergelijken met mijn bank, en kreeg zelfs tips waar ik op moest letten. Uiteindelijk bleek dit aanbod beter te passen bij mijn plannen.”</p><div class="who">— Wouter H.</div><div class="addr">Vismarkt 4, 9711 KT Groningen</div></div>
+        <!-- 15 -->
+        <div class="slide"><p>“Na een schade aan mijn keuken had ik snel financiering nodig. Er werd empathisch meegedacht over de timing en ik kon de eerste aflossing een maand opschuiven. Het hele traject voelde menselijk en professioneel.”</p><div class="who">— Sanne R.</div><div class="addr">Herengracht 88, 1015 BS Amsterdam</div></div>
+        <!-- 16 -->
+        <div class="slide"><p>“De kredietanalyse was grondig maar niet onnodig zwaar. Met een helder overzicht van inkomsten en vaste lasten zag ik precies wat verstandig was. Daardoor durfde ik te kiezen voor een iets kortere looptijd en lagere totale kosten.”</p><div class="who">— Thomas C.</div><div class="addr">Karrestraat 21, 4811 WL Breda</div></div>
+        <!-- 17 -->
+        <div class="slide"><p>“Ik kreeg meteen duidelijkheid over documenten en doorlooptijd. De medewerker checkte mijn dossier proactief en hield me op de hoogte. Binnen drie werkdagen stond het geld op mijn rekening en kon de leverancier aan de slag.”</p><div class="who">— Eva G.</div><div class="addr">Noordeinde 140, 2514 GP Den Haag</div></div>
+        <!-- 18 -->
+        <div class="slide"><p>“Voor mijn e-bike-zaak had ik werkkapitaal nodig. De offerte bevatte ook een stresstest met hogere rente, zodat ik wist wat er in het slechtste geval kon gebeuren. Dat soort eerlijkheid kom je zelden tegen.”</p><div class="who">— Mehmet A.</div><div class="addr">Kanaalstraat 120, 3531 CG Utrecht</div></div>
+        <!-- 19 -->
+        <div class="slide"><p>“De mogelijkheid om extra af te lossen zonder boete was doorslaggevend. Toen ik een bonus kreeg, kon ik direct een deel terugbetalen en daalde mijn resterende looptijd. Alles werd netjes bevestigd per e-mail.”</p><div class="who">— Fleur N.</div><div class="addr">Prins Hendrikstraat 9, 2518 HS Den Haag</div></div>
+        <!-- 20 -->
+        <div class="slide"><p>“Mijn dossier was niet standaard, maar er werd oplossingsgericht meegedacht. Ik kreeg onderbouwde keuzes, geen verkooppraatjes. Het eindresultaat is een lening die mijn plannen mogelijk maakt zonder mijn buffer op te eten.”</p><div class="who">— Daan B.</div><div class="addr">Loolaan 33, 7315 AC Apeldoorn</div></div>
       </div>
       <div class="controls">
         <button class="ctrl-btn" id="prev" aria-label="Vorige">◀</button>
@@ -376,20 +400,20 @@
       <h3><img src="https://img.icons8.com/?size=100&id=L4TKxAee4EJ2&format=png&color=000000" alt="">Hoe werkt het?</h3>
       <div class="steps">
         <div class="step"><img src="https://img.icons8.com/?size=100&id=S1RK2Nhn2FC5&format=png&color=000000" alt=""><div><b>1) Vul kort het formulier in</b><span>Naam, e-mail, telefoon en gewenst bedrag.</span></div></div>
-        <div class="step"><img src="https://img.icons8.com/?size=100&id=qyRpAggnV0zH&format=png&color=000000" alt=""><div><b>2) Verstuur per e-mail</b><span>1 klik: uw aanvraag komt direct bij ons binnen.</span></div></div>
+        <div class="step"><img src="https://img.icons8.com/?size=100&id=qyRpAggnV0zH&format=png&color=000000" alt=""><div><b>2) Verstuur per e-mail</b><span>Met 1 klik komt uw aanvraag direct bij ons binnen.</span></div></div>
         <div class="step"><img src="https://img.icons8.com/?size=100&id=nkGDoqzPxYM3&format=png&color=000000" alt=""><div><b>3) Indicatief voorstel</b><span>Gewoonlijk binnen 24–48u.</span></div></div>
         <div class="step"><img src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt=""><div><b>4) Duidelijk & digitaal</b><span>Onderteken digitaal; uitbetaling volgt vlot.</span></div></div>
       </div>
     </div>
 
-    <!-- FAQ simple -->
+    <!-- FAQ -->
     <div class="section" id="faq">
       <h3>FAQ</h3>
       <div class="faq">
-        <details class="qa"><summary>Is de simulatie bindend?</summary><div>Nee — het is een indicatie op basis van 2% JKP (minimum) en uw looptijd. Het definitieve aanbod hangt af van uw dossier.</div></details>
-        <details class="qa"><summary>Welk bedrag/looptijd is verstandig?</summary><div>Gebruik de schuif voor een indicatieve maandlast. Wij sturen daarna opties die passen bij uw budget.</div></details>
+        <details class="qa"><summary>Is de simulatie bindend?</summary><div>Nee — het is een indicatie op basis van 3% JKP (minimum) en uw looptijd. Het definitieve aanbod hangt af van uw dossier.</div></details>
+        <details class="qa"><summary>Welk bedrag/looptijd is verstandig?</summary><div>Gebruik de schuif voor een indicatieve maandlast. Daarna sturen we opties die passen bij uw budget.</div></details>
         <details class="qa"><summary>Hoe snel is de uitbetaling?</summary><div>Na volledige goedkeuring en ondertekening is uitbetaling vaak binnen 3 werkdagen.</div></details>
-        <details class="qa"><summary>Welke documenten heb ik nodig?</summary><div>Meestal: ID, recente loonstrook of BTW-/inkomensgegevens (zzp) en bankoverzicht. U krijgt een korte checklist.</div></details>
+        <details class="qa"><summary>Welke documenten heb ik nodig?</summary><div>Meestal: ID, recente loonstrook of btw-/inkomensgegevens (zzp) en bankoverzicht. U krijgt een korte checklist.</div></details>
         <details class="qa"><summary>Wat gebeurt er na mijn e-mail?</summary><div>We bevestigen ontvangst, vragen ontbrekende info en sturen een voorstel met duidelijke scenario’s.</div></details>
         <details class="qa"><summary>Kan ik extra aflossen?</summary><div>Vaak wel. Uw voorstel vermeldt of en hoe boetevrij extra aflossen kan, en het effect op looptijd en kosten.</div></details>
       </div>
@@ -508,7 +532,7 @@
   amountEl.addEventListener('input', ()=>{ updateAmount(); showMicroSim(); });
   updateAmount();
 
-  // ===== Countdown to 30 October 23:59 (local) =====
+  // Countdown to 30 October 23:59 (local)
   const timerEl = document.getElementById('timer');
   function deadline(){
     const d = new Date();
@@ -531,7 +555,7 @@
   }
   setInterval(tick, 500); tick();
 
-  // ===== Micro-simulation (2% APR indicative) =====
+  // Micro-simulation (3% APR indicative)
   function monthlyPayment(amount, months, apr=0.02){
     const r = apr/12;
     if(!months || months<=0) return 0;
@@ -541,14 +565,14 @@
   function showMicroSim(){
     const amt = Number(amountEl.value||0);
     const months = Number(f.duration.value||60);
-    const pmt = Math.round(monthlyPayment(amt, months, 0.02)); // 2% JKP minimum
+    const pmt = Math.round(monthlyPayment(amt, months, 0.02)); // 3% JKP minimum
     microSim.classList.add('show');
     microSimText.innerHTML =
       `Met <b>${fmtEUR(amt)}</b> over <b>${months} mnd</b> is de indicatieve last circa <b>€${pmt}/maand</b> — <b>geldig t/m 30/10 23:59</b>.`;
   }
   showMicroSim();
 
-  // ===== Mail helpers (mailto backend) =====
+  // Mail helpers (mailto)
   function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
   function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
 
@@ -625,7 +649,7 @@
     next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'}));
   })();
 
-  // Social Proof rotating (fixed, many messages)
+  // Social Proof rotating (more messages, small text)
   const proof = $('#socialProof'); const proofText = $('#socialProofText');
   const events = [
     'Claire B. uit Rotterdam kreeg zojuist een aanbod',
@@ -649,7 +673,7 @@
     'Jasmijn E. uit Rotterdam kreeg studentenscenario',
     'Koen P. uit Zwolle ontving aangepast bedrag',
     'Marc L. uit Amsterdam bevestigde de SEPA-machtiging',
-    'Claire B. uit Rotterdam vergeleek 2 looptijden',
+    'Claire B. uit Rotterdam vergeleek twee looptijden',
     'Iris D. uit Maastricht kreeg checklist-documenten',
     'Ahmed K. uit Utrecht koos vaste rente',
     'Sanne R. uit Amsterdam verschoof eerste aflossing',
@@ -666,7 +690,6 @@
     proof.classList.add('show');
     setTimeout(()=>proof.classList.remove('show'), 5200);
   }
-  // démarre après 3s, puis toutes les 7s
   setTimeout(()=>{ cycleProof(); setInterval(cycleProof, 7000); }, 3000);
 
   // Init CTA state
