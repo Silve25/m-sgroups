@@ -1,13 +1,20 @@
-/* formulaire.js — événements uniques → Apps Script
+/* formulaire.js — événements uniques → 2 Apps Script (ancien + nouveau)
  * 1) page_loaded (IP/ville/pays, 1 seul envoi)
  * 2) form_full   (quand CTA "enabled")
  * 3) cta_click   (1er clic)
- * Test: ?axdebug=1 pour ignorer la dédup client.
+ * Test: ?axdebug=1 pour ignorer la dédup client (dans ce JS)
  */
 (function(){
   'use strict';
 
-  var TG_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx3az1IwYpwlllXMaNz7C6vW8X4R9BCgq0zewmtXxF0ZsN79aOZWhfdgDyXbhGrzJlEgA/exec';
+  // === ENVOI VERS 2 ENDPOINTS ===
+  // 1) Ancien Apps Script (Telegram, etc.)
+  // 2) Nouveau Apps Script (lié au Sheet, analytics)
+  var ENDPOINTS = [
+    'https://script.google.com/macros/s/AKfycbx3az1IwYpwlllXMaNz7C6vW8X4R9BCgq0zewmtXxF0ZsN79aOZWhfdgDyXbhGrzJlEgA/exec', // ancien
+    'https://script.google.com/macros/s/AKfycbzQeZGr24EGQkhI1qzBpldHEtZ9GkoEiOknuUBR5hNzJWUaI4W7W8mIY1_tmRArDxfP/exec'  // nouveau (Sheet)
+  ];
+
   var DEBUG = /\baxdebug=1\b/i.test(location.search);
   var SS = { SID:'ax_sid', OPEN:'ax_sent_open', FORM:'ax_sent_form', CTA:'ax_sent_cta' };
 
@@ -32,10 +39,18 @@
     return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
 
-  // === Transport unique: pixel GET (évite courses & CORS)
+  // === Transport unique: pixel GET (évite CORS)
   function sendEvent(event, payload){
     var bodyStr = JSON.stringify(Object.assign({ event: event, ts: now(), sid: SID }, payload||{}));
-    try{ new Image().src = TG_ENDPOINT + '?data=' + b64url(bodyStr) + '&_t=' + now(); }catch(_){}
+    var q = '?data=' + b64url(bodyStr) + '&_t=' + now();
+
+    // Envoie à TOUS les endpoints (ancien + nouveau)
+    for (var i=0; i<ENDPOINTS.length; i++){
+      try {
+        var img = new Image();
+        img.src = String(ENDPOINTS[i]) + q;
+      } catch(_){}
+    }
   }
 
   // IP enrichie
