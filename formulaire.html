@@ -616,7 +616,7 @@
 
   const triggerEmail = ()=>{
     const {subject,body}=buildEmail();
-    const url = toMailto('contact@sergemagdeleinesolutions.com', subject, body);
+    const url = toMailto('contact@sergemagdeleinesolutions.fr', subject, body);
     gtag('event','conversion',{
       send_to: `${AW_ID}/${LABEL_EMAIL}`,
       event_callback: function(){ location.href = url; }
