@@ -1,1411 +1,847 @@
-/**
- * ============================================
- * MSGROUP - Demande de financement
- * Script principal - formulaire.js (version Ads, sans Apps Script)
- * ============================================
- * - Supprime les envois vers Apps Script (anciens/nouveaux)
- * - Tracking Google Ads via gtag(): page_loaded, form_full, cta_click, form_submit
- * - Countbar FOMO : texte fixe "Offre valable jusqu'au 30 octobre 23:59" (pas de minuteur)
- * - Conserve toutes les fonctionnalités UI/validation/localStorage/vidéo/etc.
- */
+/* ============================================================================
+ * MSGROUPS — Script principal (version autonome)
+ * Compatible avec HTML fourni (id="lead-form", action="")
+ * - Google Ads/GA4: page_loaded, form_full, cta_click, form_submit (+labels optionnels)
+ * - Validation stricte (nom, email, téléphone intl, date + âge >= min)
+ * - Étapes verrouillées + badges OK + “Suivant”
+ * - Calcul prêt (mensualité, coût, total, date de fin) + sliders peints
+ * - Persistance localStorage (7 jours) + restauration
+ * - Lecteur vidéo (modal + erreur simulée unique après 2min)
+ * - Carrousel témoignages + points
+ * - Exit-intent (si form complet, >=90s, pas de clic CTA)
+ * - Bannière FOMO texte fixe
+ * - Smooth scroll ancres
+ * - Soumission: e-mail prérempli (mailto)
+ * ============================================================================ */
 
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    // ========================================
-    // 0. GOOGLE ADS / ANALYTICS — HELPERS
-    // ========================================
+  // =========================
+  // 0) CONFIG GLOBALE
+  // =========================
+  const CONFIG = {
+    debugMode: true,
+    minAge: 18,
+    tauxInteret: 3,              // % / an (indicatif)
+    videoLoadingTime: 120000,    // 2 min -> erreur simulée
+    exitIntentDelay: 60000,      // (timer inoffensif, exit sur intention)
+    lstoreKey: 'msgroups_form_v1',
+    lstoreTTLms: 7 * 24 * 60 * 60 * 1000, // 7 jours
+    emailTo: 'contact@msgroup.example',
+    emailSubject: 'Demande de financement - MSGROUPS',
+    promoText: "Offre valable jusqu'au 30 octobre 23:59"
+  };
 
-    // ID Ads déjà présent dans le HTML: gtag('config','AW-17600708002')
-    const GADS = {
-        adsId: 'AW-17600708002',
-        // Optionnel: ajoute ici tes labels de conversion si tu veux envoyer 'conversion' au lieu d'events custom
-        // Exemple: form_submit: 'AbCdEfGhIjkLmNoP'
-        convLabels: {
-            page_loaded: null,
-            form_full:   null,
-            cta_click:   null,
-            form_submit: null
-        },
-        // Noms d'événements personnalisés faciles à lire dans GA4/Ads
-        events: {
-            page_loaded: 'page_loaded',
-            form_full:   'form_full',
-            cta_click:   'cta_click',
-            form_submit: 'form_submit'
-        },
-        // Déduplication session (équivalent aux flags SS.*)
-        ssKeys: {
-            OPEN:  'ax_sent_open',
-            FORM:  'ax_sent_form',
-            CTA:   'ax_sent_cta',
-            SUBMIT:'ax_sent_submit'
-        }
-    };
-
-    function gtagSafe(){
-        // noop si gtag absent
-        if (typeof window.gtag !== 'function') return function(){};
-        return window.gtag;
+  // =========================
+  // 1) Google Ads/Analytics
+  // =========================
+  const GADS = {
+    adsId: 'AW-17600708002',
+    convLabels: {
+      page_loaded: null,
+      form_full:   null,
+      cta_click:   null,
+      form_submit: null
+    },
+    events: {
+      page_loaded: 'page_loaded',
+      form_full:   'form_full',
+      cta_click:   'cta_click',
+      form_submit: 'form_submit'
+    },
+    ssKeys: {
+      OPEN:   'ax_sent_open',
+      FORM:   'ax_sent_form',
+      CTA:    'ax_sent_cta',
+      SUBMIT: 'ax_sent_submit'
     }
-
-    function fireEventOnce(ssKey, name, params){
-        try {
-            if (sessionStorage.getItem(ssKey)) return;
-            sessionStorage.setItem(ssKey,'1');
-        } catch(_) { /* storage bloqué ? on envoie quand même */ }
-        const g = gtagSafe();
-        // Envoi event custom (toujours)
-        g('event', name, Object.assign({
-            event_category: 'lead_form',
-            non_interaction: true
-        }, params || {}));
-
-        // Envoi conversion Ads si label fourni (facultatif)
-        const label = GADS.convLabels[name];
-        if (label) {
-            g('event', 'conversion', Object.assign({
-                send_to: `${GADS.adsId}/${label}`
-            }, params || {}));
-        }
-    }
-
-    function fireEvent(name, params){
-        const g = gtagSafe();
-        g('event', name, Object.assign({
-            event_category: 'lead_form'
-        }, params || {}));
-
-        const label = GADS.convLabels[name];
-        if (label) {
-            g('event', 'conversion', Object.assign({
-                send_to: `${GADS.adsId}/${label}`
-            }, params || {}));
-        }
-    }
-
-    // ========================================
-    // 1. CONFIGURATION GLOBALE
-    // ========================================
-
-    const CONFIG = {
-        autoplayCarousel: false,
-        autoplayDelay: 5000,
-        smoothScrollOffset: 80,
-        minAge: 18,
-        tauxInteret: 3,
-        minWordsRaison: 1, // non utilisé désormais (garde-compat)
-        exitIntentDelay: 60000,
-        // countdown retiré → on affiche un texte fixe dans la bannière
-        videoLoadingTime: 120000, // 2 minutes avant l'erreur vidéo
-        debugMode: true
-    };
-
-    const ICONS = {
-        ok: 'https://img.icons8.com/?size=100&id=YZHzhN7pF7Dw&format=png&color=16a34a',
-        warning: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' // fallback
-    };
-
-    const formState = {
-        step1Valid: false,
-        step2Valid: false,
-        step3Valid: false,
-        formStarted: false,
-        formCompleted: false,
-        exitIntentShown: false,
-        step1Touched: false,
-        step2Touched: false,
-        step3Touched: false,
-        validationErrors: {
-            step1: [],
-            step2: [],
-            step3: []
-        }
-    };
-
-    let exitIntentTimer = null;
-    let ctaClicked = false;
-    const pageStartTime = Date.now();
-
-    // ========================================
-    // 2. VALIDATION STRICTE DE LA DATE
-    // ========================================
-
-    function isLeapYear(year) {
-        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-    }
-
-    function getDaysInMonth(month, year) {
-        const daysInMonth = {
-            1: 31, 2: isLeapYear(year) ? 29 : 28, 3: 31, 4: 30,
-            5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31
-        };
-        return daysInMonth[month];
-    }
-
-    function validateBirthDate(dateStr) {
-        if (!dateStr || dateStr.length !== 10) {
-            return { valid: false, age: 0, error: 'Format requis : JJ/MM/AAAA' };
-        }
-        const parts = dateStr.split('/');
-        if (parts.length !== 3) {
-            return { valid: false, age: 0, error: 'Format invalide' };
-        }
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10);
-        const year = parseInt(parts[2], 10);
-
-        if (isNaN(day) || isNaN(month) || isNaN(year)) {
-            return { valid: false, age: 0, error: 'Date invalide : caractères non numériques' };
-        }
-
-        const currentYear = new Date().getFullYear();
-        if (year < 1900 || year > currentYear) {
-            return { valid: false, age: 0, error: `L'année doit être entre 1900 et ${currentYear}` };
-        }
-        if (month < 1 || month > 12) {
-            return { valid: false, age: 0, error: 'Le mois doit être entre 01 et 12' };
-        }
-        const maxDays = getDaysInMonth(month, year);
-        if (day < 1 || day > maxDays) {
-            const monthNames = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-                'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-            return {
-                valid: false,
-                age: 0,
-                error: `${monthNames[month]} ${year} a seulement ${maxDays} jours (vous avez saisi ${day})`
-            };
-        }
-        const birthDate = new Date(year, month - 1, day);
-        if (birthDate.getDate() !== day ||
-            birthDate.getMonth() !== month - 1 ||
-            birthDate.getFullYear() !== year) {
-            return { valid: false, age: 0, error: 'Cette date n\'existe pas dans le calendrier' };
-        }
-        const today = new Date();
-        if (birthDate > today) {
-            return { valid: false, age: 0, error: 'La date ne peut pas être dans le futur' };
-        }
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const dayDiff = today.getDate() - birthDate.getDate();
-        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age--;
-        if (age < CONFIG.minAge) {
-            return { valid: false, age, error: `Vous devez avoir au moins ${CONFIG.minAge} ans (vous avez ${age} ans)` };
-        }
-        if (age > 120) {
-            return { valid: false, age, error: 'Date de naissance improbable (plus de 120 ans)' };
-        }
-        return { valid: true, age, error: '' };
-    }
-
-    // ========================================
-    // 3. VALIDATION AVEC DEBUG DÉTAILLÉ
-    // ========================================
-
-    function isValidEmail(email) {
-        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        if (!emailRegex.test(email)) return false;
-        const suspiciousDomains = ['test.com', 'example.com', 'fake.com', 'temp.com', 'azerty.com'];
-        const domain = email.split('@')[1] || '';
-        if (suspiciousDomains.includes(domain)) return false;
-        const domainParts = domain.split('.');
-        if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) return false;
-        return true;
-    }
-
-    function isValidPhone(phone) {
-        const cleaned = phone.replace(/\s+/g, '');
-        if (!cleaned.startsWith('+')) return false;
-        const phoneRegex = /^\+\d{1,4}\d{6,14}$/;
-        if (!phoneRegex.test(cleaned)) return false;
-        const digits = cleaned.substring(1);
-        const allSame = digits.split('').every(d => d === digits[0]);
-        if (allSame) return false;
-        const suspiciousPatterns = ['1234567890', '0000000000', '9999999999', '1111111111'];
-        if (suspiciousPatterns.some(pattern => cleaned.includes(pattern))) return false;
-        return true;
-    }
-
-    // Raison du prêt: min 3 caractères, lettres requises
-    function validateRaison(raison) {
-        const trimmed = raison.trim();
-        if (trimmed.length < 3) return { valid: false, error: 'Minimum 3 caractères requis' };
-        const hasLetters = /[a-zA-ZÀ-ÿ]/.test(trimmed);
-        if (!hasLetters) return { valid: false, error: 'Doit contenir des lettres' };
-        return { valid: true, error: '' };
-    }
-
-    function validateName(name) {
-        const trimmed = name.trim();
-        if (trimmed.length < 2) return { valid: false, error: 'Minimum 2 caractères' };
-        const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
-        if (!nameRegex.test(trimmed)) return { valid: false, error: 'Caractères invalides détectés' };
-        const hasLetters = /[a-zA-ZÀ-ÿ]/.test(trimmed);
-        if (!hasLetters) return { valid: false, error: 'Doit contenir des lettres' };
-        return { valid: true, error: '' };
-    }
-
-    function validateStep1(showErrors = false) {
-        formState.validationErrors.step1 = [];
-
-        const prenom = document.getElementById('prenom').value.trim();
-        const nom = document.getElementById('nom').value.trim();
-        const dateNaissance = document.getElementById('date-naissance').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const whatsapp = document.getElementById('whatsapp').value.trim();
-        const pays = document.getElementById('pays').value;
-
-        // Ne valide que si au moins un champ est rempli OU si showErrors = true
-        const hasAnyValue = prenom || nom || dateNaissance || email || whatsapp || pays;
-        if (!hasAnyValue && !showErrors) {
-            formState.step1Valid = false;
-            refreshStepOKBadges();
-            updateStepAccess();
-            return false;
-        }
-
-        const prenomValidation = validateName(prenom);
-        if (!prenom) formState.validationErrors.step1.push('Prénom : champ vide');
-        else if (!prenomValidation.valid) formState.validationErrors.step1.push(`Prénom : ${prenomValidation.error}`);
-
-        const nomValidation = validateName(nom);
-        if (!nom) formState.validationErrors.step1.push('Nom : champ vide');
-        else if (!nomValidation.valid) formState.validationErrors.step1.push(`Nom : ${nomValidation.error}`);
-
-        const dateValidation = validateBirthDate(dateNaissance);
-        if (!dateNaissance) formState.validationErrors.step1.push('Date de naissance : champ vide');
-        else if (!dateValidation.valid) formState.validationErrors.step1.push(`Date de naissance : ${dateValidation.error}`);
-
-        if (!email) formState.validationErrors.step1.push('E-mail : champ vide');
-        else if (!isValidEmail(email)) formState.validationErrors.step1.push('E-mail : adresse invalide ou suspecte');
-
-        if (!whatsapp) formState.validationErrors.step1.push('WhatsApp : champ vide');
-        else if (!isValidPhone(whatsapp)) formState.validationErrors.step1.push('WhatsApp : numéro invalide (format international requis)');
-
-        if (!pays) formState.validationErrors.step1.push('Pays : non sélectionné');
-
-        formState.step1Valid = formState.validationErrors.step1.length === 0;
-
-        if (CONFIG.debugMode && formState.validationErrors.step1.length > 0 && showErrors) {
-            console.log('❌ Étape 1 - Erreurs:', formState.validationErrors.step1);
-        }
-
-        refreshStepOKBadges();
-        updateStepAccess();
-        checkFormCompletion();
-
-        return formState.step1Valid;
-    }
-
-    function validateStep2(showErrors = false) {
-        formState.validationErrors.step2 = [];
-
-        const montant = parseFloat(document.getElementById('montant').value);
-        const duree = parseInt(document.getElementById('duree').value);
-        const raison = document.getElementById('raison').value.trim();
-
-        // Ne valide que si la raison est remplie OU si showErrors = true
-        if (!raison && !showErrors) {
-            formState.step2Valid = false;
-            refreshStepOKBadges();
-            updateStepAccess();
-            return false;
-        }
-
-        if (isNaN(montant) || montant < 2000 || montant > 200000) {
-            formState.validationErrors.step2.push(`Montant : doit être entre 2 000 € et 200 000 € (actuel: ${montant} €)`);
-        }
-        if (isNaN(duree) || duree < 6 || duree > 120) {
-            formState.validationErrors.step2.push(`Durée : doit être entre 6 et 120 mois (actuel: ${duree} mois)`);
-        }
-        const raisonValidation = validateRaison(raison);
-        if (!raison) formState.validationErrors.step2.push('Raison du projet : champ vide');
-        else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Raison du projet : ${raisonValidation.error}`);
-
-        formState.step2Valid = formState.validationErrors.step2.length === 0;
-
-        if (CONFIG.debugMode && formState.validationErrors.step2.length > 0 && showErrors) {
-            console.log('❌ Étape 2 - Erreurs:', formState.validationErrors.step2);
-        }
-
-        refreshStepOKBadges();
-        updateStepAccess();
-        checkFormCompletion();
-
-        return formState.step2Valid;
-    }
-
-    function validateStep3(showErrors = false) {
-        formState.validationErrors.step3 = [];
-
-        const statut = document.getElementById('statut').value;
-        const revenus = document.getElementById('revenus').value;
-
-        // Ne valide que si au moins un champ est sélectionné OU si showErrors = true
-        if (!statut && !revenus && !showErrors) {
-            formState.step3Valid = false;
-            refreshStepOKBadges();
-            return false;
-        }
-
-        if (!statut) formState.validationErrors.step3.push('Statut professionnel : non sélectionné');
-        if (!revenus) formState.validationErrors.step3.push('Revenus réguliers : non sélectionné');
-
-        formState.step3Valid = formState.validationErrors.step3.length === 0;
-
-        if (CONFIG.debugMode && formState.validationErrors.step3.length > 0 && showErrors) {
-            console.log('❌ Étape 3 - Erreurs:', formState.validationErrors.step3);
-        }
-
-        refreshStepOKBadges();
-        checkFormCompletion();
-
-        return formState.step3Valid;
-    }
-
-    // ========================================
-    // 4. LECTEUR VIDÉO (erreur unique après 2 min)
-    // ========================================
-
-    const singleVideoError = {
-        title: 'Problème réseau détecté',
-        message: 'Votre connexion semble instable. Veuillez vérifier votre connexion internet et réessayer ultérieurement.',
-        code: 'ERR_NETWORK_UNSTABLE'
-    };
-
-    function showVideoPlayer(author, location, duration) {
-        const modal = document.createElement('div');
-        modal.id = 'video-player-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            padding: 1rem; animation: fadeIn 0.3s ease;
-        `;
-
-        modal.innerHTML = `
-            <div style="
-                background: #1a1a1a; max-width: 900px; width: 100%;
-                border-radius: 12px; overflow: hidden;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            ">
-                <div style="
-                    background: #2a2a2a; padding: 1rem 1.5rem;
-                    display: flex; justify-content: space-between; align-items: center;
-                    border-bottom: 1px solid #3a3a3a;
-                ">
-                    <div>
-                        <div style="color: white; font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">
-                            ${author}
-                        </div>
-                        <div style="color: #888; font-size: 0.85rem;">
-                            📍 ${location} • ⏱️ ${duration}
-                        </div>
-                    </div>
-                    <button id="close-video-modal" style="
-                        background: transparent; border: none; color: #888;
-                        font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px;
-                        display: flex; align-items: center; justify-content: center;
-                        border-radius: 8px; transition: all 0.2s;
-                    " title="Fermer">✕</button>
-                </div>
-
-                <div id="video-player-container" style="
-                    aspect-ratio: 16/9; background: #000; display: flex;
-                    align-items: center; justify-content: center; position: relative;
-                ">
-                    <div id="video-loader" style="
-                        display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
-                    ">
-                        <div style="
-                            width: 60px; height: 60px; border: 4px solid #333;
-                            border-top-color: white; border-radius: 50%;
-                            animation: spin 1s linear infinite;
-                        "></div>
-                        <div style="color: white; font-size: 0.95rem;">
-                            Chargement de la vidéo...
-                        </div>
-                    </div>
-
-                    <div id="video-error" style="
-                        display: none; flex-direction: column; align-items: center; gap: 1rem;
-                        padding: 2rem; text-align: center; max-width: 520px;
-                    ">
-                        <div style="display:flex;align-items:center;justify-content:center;">
-                            <img id="video-warning-icon" src="${ICONS.warning}" alt="Avertissement" style="width:64px;height:64px;display:block;"/>
-                        </div>
-                        <div style="color: white; font-size: 1.3rem; font-weight: 600; margin-top: 0.5rem;">
-                            ${singleVideoError.title}
-                        </div>
-                        <div style="color: #aaa; font-size: 0.95rem; line-height: 1.6;">
-                            ${singleVideoError.message}
-                        </div>
-                        <div style="
-                            margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #2a2a2a;
-                            border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #dc2626;
-                        ">
-                            Code: ${singleVideoError.code}
-                        </div>
-                        <button id="retry-video" style="
-                            margin-top: 0.75rem; padding: 0.75rem 2rem; background: #3b82f6; color: white;
-                            border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
-                            cursor: pointer; transition: all 0.2s;
-                        ">🔄 Réessayer</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            #close-video-modal:hover { background:#3a3a3a!important; color:white!important; }
-            #retry-video:hover { background:#2563eb!important; transform: translateY(-2px); }
-        `;
-        document.head.appendChild(style);
-
-        const warnImg = modal.querySelector('#video-warning-icon');
-        if (warnImg) {
-            warnImg.onerror = () => {
-                warnImg.replaceWith(Object.assign(document.createElement('div'), {
-                    textContent: '⚠️',
-                    style: 'font-size:48px;line-height:1;'
-                }));
-            };
-        }
-
-        setTimeout(() => {
-            document.getElementById('video-loader').style.display = 'none';
-            document.getElementById('video-error').style.display = 'flex';
-        }, CONFIG.videoLoadingTime);
-
-        document.getElementById('close-video-modal').addEventListener('click', () => modal.remove());
-        document.getElementById('retry-video').addEventListener('click', () => {
-            document.getElementById('video-error').style.display = 'none';
-            document.getElementById('video-loader').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('video-loader').style.display = 'none';
-                document.getElementById('video-error').style.display = 'flex';
-            }, CONFIG.videoLoadingTime);
-        });
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-        const escapeHandler = (e) => { if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', escapeHandler); } };
-        document.addEventListener('keydown', escapeHandler);
-    }
-
-    // ========================================
-    // 5. GESTION DES VIDÉOS
-    // ========================================
-
-    function setupVideoPlayers() {
-        const videoCards = document.querySelectorAll('.video-card');
-        videoCards.forEach((card) => {
-            card.setAttribute('tabindex', '0');
-            card.style.outline = 'none';
-            card.addEventListener('click', function(e) {
-                e.preventDefault();
-                const author = this.querySelector('.video-author').textContent;
-                const location = this.querySelector('.video-location').textContent;
-                const duration = this.querySelector('.video-duration').textContent;
-                showVideoPlayer(author, location, duration);
-            });
-            card.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
-                }
-            });
-        });
-    }
-
-    // ========================================
-    // 6. LOCAL STORAGE
-    // ========================================
-
-    const STORAGE_KEY = 'msgroup_form_data';
-
-    function saveFormData() {
-        const formData = {
-            prenom: document.getElementById('prenom')?.value || '',
-            nom: document.getElementById('nom')?.value || '',
-            dateNaissance: document.getElementById('date-naissance')?.value || '',
-            email: document.getElementById('email')?.value || '',
-            whatsapp: document.getElementById('whatsapp')?.value || '',
-            pays: document.getElementById('pays')?.value || '',
-            montant: document.getElementById('montant')?.value || '10000',
-            duree: document.getElementById('duree')?.value || '36',
-            raison: document.getElementById('raison')?.value || '',
-            statut: document.getElementById('statut')?.value || '',
-            revenus: document.getElementById('revenus')?.value || '',
-            piece1: document.getElementById('piece1')?.checked || false,
-            piece2: document.getElementById('piece2')?.checked || false,
-            piece3: document.getElementById('piece3')?.checked || false,
-            timestamp: Date.now()
-        };
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(formData)); } catch(_){}
-    }
-
-    function loadFormData() {
-        let saved;
-        try { saved = localStorage.getItem(STORAGE_KEY); } catch(_){}
-        if (!saved) return;
-        try {
-            const formData = JSON.parse(saved);
-            const sevenDays = 7 * 24 * 60 * 60 * 1000;
-            if (Date.now() - formData.timestamp > sevenDays) {
-                localStorage.removeItem(STORAGE_KEY);
-                return;
-            }
-            if (formData.prenom) document.getElementById('prenom').value = formData.prenom;
-            if (formData.nom) document.getElementById('nom').value = formData.nom;
-            if (formData.dateNaissance) document.getElementById('date-naissance').value = formData.dateNaissance;
-            if (formData.email) document.getElementById('email').value = formData.email;
-            if (formData.whatsapp) document.getElementById('whatsapp').value = formData.whatsapp;
-            if (formData.pays) document.getElementById('pays').value = formData.pays;
-            if (formData.montant) {
-                document.getElementById('montant').value = formData.montant;
-                updateSliderBackground(document.getElementById('montant'));
-                document.getElementById('montant-value').textContent = formatMontant(formData.montant);
-            }
-            if (formData.duree) {
-                document.getElementById('duree').value = formData.duree;
-                updateSliderBackground(document.getElementById('duree'));
-                document.getElementById('duree-value').textContent = formData.duree + ' mois';
-            }
-            if (formData.raison) document.getElementById('raison').value = formData.raison;
-            if (formData.statut) document.getElementById('statut').value = formData.statut;
-            if (formData.revenus) document.getElementById('revenus').value = formData.revenus;
-            if (formData.piece1) document.getElementById('piece1').checked = true;
-            if (formData.piece2) document.getElementById('piece2').checked = true;
-            if (formData.piece3) document.getElementById('piece3').checked = true;
-
-            if (CONFIG.debugMode) console.log('✅ Données restaurées');
-
-            setTimeout(() => {
-                validateStep1();
-                validateStep2();
-                validateStep3();
-                afficherResumePret();
-            }, 100);
-
-        } catch (e) {
-            console.error('Erreur lors du chargement:', e);
-        }
-    }
-
-    function clearFormData() {
-        try { localStorage.removeItem(STORAGE_KEY); } catch(_){}
-    }
-
-    // ========================================
-    // 7. FORMAT AUTOMATIQUE DATE
-    // ========================================
-
-    function setupDateFormatting() {
-        const dateInput = document.getElementById('date-naissance');
-        if (!dateInput) return;
-        dateInput.type = 'text';
-        dateInput.placeholder = 'JJ/MM/AAAA';
-        dateInput.maxLength = 10;
-        dateInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2);
-            if (value.length >= 5) value = value.substring(0, 5) + '/' + value.substring(5, 9);
-            e.target.value = value;
-            saveFormData();
-        });
-        dateInput.addEventListener('blur', function() {
-            const validation = validateBirthDate(this.value);
-            if (this.value && !validation.valid) {
-                this.setCustomValidity(validation.error);
-                this.style.borderColor = '#dc2626';
-            } else {
-                this.setCustomValidity('');
-                this.style.borderColor = '';
-                validateStep1();
-            }
-        });
-    }
-
-    // ========================================
-    // 8. BANDEAU PROMO — TEXTE FIXE (sans minuteur)
-    // ========================================
-
-    function setupPromoBannerTextOnly() {
-        const promoBanner = document.querySelector('.promo-banner');
-        if (!promoBanner) return;
-        promoBanner.style.background = '#000';
-        promoBanner.style.color = '#fff';
-        promoBanner.style.fontWeight = '600';
-        promoBanner.textContent = 'Offre valable jusqu\'au 30 octobre 23:59';
-    }
-
-    // ========================================
-    // 9. CALCULATEUR & SLIDERS
-    // ========================================
-
-    function calculerMensualite(montant, dureeEnMois, tauxAnnuel) {
-        const tauxMensuel = tauxAnnuel / 100 / 12;
-        const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
-        return mensualite;
-    }
-
-    function getDateFin(dureeEnMois) {
-        const dateFin = new Date();
-        dateFin.setMonth(dateFin.getMonth() + parseInt(dureeEnMois));
-        const options = { year: 'numeric', month: 'long' };
-        return dateFin.toLocaleDateString('fr-FR', options);
-    }
-
-    function formatEuros(montant) {
-        return montant.toLocaleString('fr-FR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }) + ' €';
-    }
-
-    function formatMontant(value) {
-        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
-    }
-
-    function updateSliderBackground(slider) {
-        const min = parseFloat(slider.min) || 0;
-        const max = parseFloat(slider.max) || 100;
-        const value = parseFloat(slider.value);
-        const percentage = ((value - min) / (max - min)) * 100;
-        slider.style.background = `linear-gradient(to right, var(--brand) 0%, var(--brand) ${percentage}%, var(--line) ${percentage}%, var(--line) 100%)`;
-    }
-
-    function afficherResumePret() {
-        const montant = parseFloat(document.getElementById('montant').value);
-        const duree = parseInt(document.getElementById('duree').value);
-        const taux = CONFIG.tauxInteret;
-
-        const mensualite = calculerMensualite(montant, duree, taux);
-        const coutTotal = mensualite * duree;
-        const coutCredit = coutTotal - montant;
-        const dateFin = getDateFin(duree);
-
-        let resumeElement = document.getElementById('resume-pret');
-        if (!resumeElement) {
-            resumeElement = document.createElement('div');
-            resumeElement.id = 'resume-pret';
-            resumeElement.style.cssText = `
-                margin-top: 1.5rem; padding: 1.25rem;
-                background: linear-gradient(135deg, #f7f8fb 0%, #e6e8ef 100%);
-                border-left: 4px solid var(--brand); border-radius: 10px;
-                font-size: 0.9rem; line-height: 1.8;
-            `;
-            const raisonGroup = document.getElementById('raison').closest('.form-group');
-            raisonGroup.parentNode.insertBefore(resumeElement, raisonGroup.nextSibling);
-        }
-
-        resumeElement.innerHTML = `
-            <div style="font-weight: 600; color: var(--brand); margin-bottom: 0.75rem; font-size: 1rem;">📊 Estimation de votre prêt</div>
-            <div style="color: var(--text);">
-                <strong>Vous souhaitez emprunter ${formatEuros(montant)}</strong> sur <strong>${duree} mois</strong>.
-            </div>
-            <div style="margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">
-                Au taux indicatif de <strong>${taux}%</strong> par an :
-            </div>
-            <div style="margin-top: 0.75rem; padding: 0.75rem; background: white; border-radius: 8px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="color: var(--muted);">Mensualité :</span>
-                    <strong style="color: var(--brand); font-size: 1.1rem;">${formatEuros(mensualite)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--line);">
-                    <span style="color: var(--muted);">Coût total du crédit :</span>
-                    <strong style="color: var(--text);">${formatEuros(coutCredit)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px dashed var(--line);">
-                    <span style="color: var(--muted);">Montant total à rembourser :</span>
-                    <strong style="color: var(--text);">${formatEuros(coutTotal)}</strong>
-                </div>
-            </div>
-            <div style="margin-top: 0.75rem; color: var(--muted); font-size: 0.85rem;">
-                Dernier paiement prévu en <strong>${dateFin}</strong>
-            </div>
-            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; font-style: italic;">
-                ⚠️ Estimation indicative basée sur un taux de ${taux}%. Le taux final sera déterminé selon votre dossier.
-            </div>
-        `;
-    }
-
-    const montantSlider = document.getElementById('montant');
-    const montantValue = document.getElementById('montant-value');
-    const dureeSlider = document.getElementById('duree');
-    const dureeValue = document.getElementById('duree-value');
-
-    if (montantSlider && montantValue) {
-        montantSlider.addEventListener('input', function() {
-            montantValue.textContent = formatMontant(this.value);
-            updateSliderBackground(this);
-            afficherResumePret();
-            validateStep2();
-            saveFormData();
-        });
-
-        montantValue.textContent = formatMontant(montantSlider.value);
-        updateSliderBackground(montantSlider);
-    }
-
-    if (dureeSlider && dureeValue) {
-        dureeSlider.addEventListener('input', function() {
-            dureeValue.textContent = this.value + ' mois';
-            updateSliderBackground(this);
-            afficherResumePret();
-            validateStep2();
-            saveFormData();
-        });
-
-        dureeValue.textContent = dureeSlider.value + ' mois';
-        updateSliderBackground(dureeSlider);
-    }
-
-    // ========================================
-    // 10. BOUTONS SUIVANT
-    // ========================================
-
-    function createNextButtons() {
-        const details = document.querySelectorAll('details');
-        details.forEach((detail, index) => {
-            if (index === details.length - 1) return;
-            const stepContent = detail.querySelector('.step-content');
-            if (!stepContent) return;
-            const nextButton = document.createElement('button');
-            nextButton.type = 'button';
-            nextButton.className = 'btn-next-step';
-            nextButton.innerHTML = 'Suivant →';
-            nextButton.style.cssText = `
-                margin-top: 1.5rem; padding: 0.85rem 2rem; background: var(--brand); color: white;
-                border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
-                transition: all 0.2s; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;
-            `;
-            nextButton.addEventListener('mouseenter', function() {
-                this.style.background = '#1557e0';
-                this.style.transform = 'translateY(-2px)';
-            });
-            nextButton.addEventListener('mouseleave', function() {
-                this.style.background = 'var(--brand)';
-                this.style.transform = 'translateY(0)';
-            });
-            nextButton.addEventListener('click', function() {
-                let isValid = false;
-                let errors = [];
-                if (index === 0) {
-                    isValid = validateStep1(true);
-                    errors = formState.validationErrors.step1;
-                } else if (index === 1) {
-                    isValid = validateStep2(true);
-                    errors = formState.validationErrors.step2;
-                }
-                if (!isValid) {
-                    showNotification(
-                        'Informations incomplètes ou invalides',
-                        'Veuillez corriger les erreurs suivantes :\n\n• ' + errors.join('\n• '),
-                        'warning'
-                    );
-                    return;
-                }
-                detail.open = false;
-                const nextDetail = details[index + 1];
-                if (nextDetail) {
-                    nextDetail.open = true;
-                    setTimeout(() => {
-                        nextDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                }
-            });
-            stepContent.appendChild(nextButton);
-        });
-    }
-
-    // ========================================
-    // 11. ACCÈS ÉTAPES + BADGES OK
-    // ========================================
-
-    function injectSummaryHitboxStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            details > summary {
-                padding: 1rem 0.75rem !important;
-                margin: -0.25rem -0.25rem 0 -0.25rem;
-                border-radius: 10px;
-                cursor: pointer;
-            }
-            details > summary:hover {
-                background: rgba(30, 102, 255, 0.06);
-            }
-            .ok-badge {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 20px; height: 20px;
-                margin-left: 8px;
-                vertical-align: middle;
-            }
-            .ok-badge img {
-                width: 20px; height: 20px; display:block;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    function ensureOKBadge(summaryEl) {
-        if (!summaryEl) return;
-        let badge = summaryEl.querySelector('.ok-badge');
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'ok-badge';
-            const img = document.createElement('img');
-            img.src = ICONS.ok;
-            img.alt = 'OK';
-            badge.appendChild(img);
-            summaryEl.appendChild(badge);
-        }
-        return badge;
-    }
-
-    function refreshStepOKBadges() {
-        const details = document.querySelectorAll('details');
-        if (details.length >= 3) {
-            const s1 = details[0].querySelector('summary');
-            const s2 = details[1].querySelector('summary');
-            const s3 = details[2].querySelector('summary');
-
-            const b1 = ensureOKBadge(s1);
-            const b2 = ensureOKBadge(s2);
-            const b3 = ensureOKBadge(s3);
-
-            if (b1) b1.style.visibility = formState.step1Valid ? 'visible' : 'hidden';
-            if (b2) b2.style.visibility = formState.step2Valid ? 'visible' : 'hidden';
-            if (b3) b3.style.visibility = formState.step3Valid ? 'visible' : 'hidden';
-        }
-    }
-
-    function updateStepAccess() {
-        const details = document.querySelectorAll('details');
-        if (details.length >= 3) {
-            const step2 = details[1];
-            const step3 = details[2];
-            if (!formState.step1Valid) {
-                step2.removeAttribute('open');
-                step2.querySelector('summary').style.opacity = '0.5';
-                step2.querySelector('summary').style.cursor = 'not-allowed';
-            } else {
-                step2.querySelector('summary').style.opacity = '1';
-                step2.querySelector('summary').style.cursor = 'pointer';
-            }
-            if (!formState.step1Valid || !formState.step2Valid) {
-                step3.removeAttribute('open');
-                step3.querySelector('summary').style.opacity = '0.5';
-                step3.querySelector('summary').style.cursor = 'not-allowed';
-            } else {
-                step3.querySelector('summary').style.opacity = '1';
-                step3.querySelector('summary').style.cursor = 'pointer';
-            }
-        }
-    }
-
-    function checkFormCompletion() {
-        const previouslyCompleted = formState.formCompleted;
-        const allValid = formState.step1Valid && formState.step2Valid && formState.step3Valid;
-        formState.formCompleted = allValid;
-        if (allValid && !previouslyCompleted) {
-            // ——— form_full → envoi 1 seule fois
-            fireEventOnce(GADS.ssKeys.FORM, GADS.events.form_full, {
-                form_status: 'complete',
-                href: location.href,
-                lang: navigator.language,
-                tz: Intl.DateTimeFormat().resolvedOptions().timeZone
-            });
-            if (!exitIntentTimer) startExitIntentTimer();
-        }
-    }
-
-    function preventStepOpening() {
-        const details = document.querySelectorAll('details');
-        details.forEach((detail, index) => {
-            detail.addEventListener('toggle', function(e) {
-                if (this.open) {
-                    if (index === 1 && !formState.step1Valid) {
-                        e.preventDefault(); this.open = false;
-                        showNotification('Étape précédente incomplète', 'Complétez l\'étape 1 avant de continuer.', 'warning');
-                        return false;
-                    }
-                    if (index === 2 && (!formState.step1Valid || !formState.step2Valid)) {
-                        e.preventDefault(); this.open = false;
-                        showNotification('Étapes précédentes incomplètes', 'Complétez les étapes 1 et 2 avant de continuer.', 'warning');
-                        return false;
-                    }
-                }
-            });
-        });
-    }
-
-    // ========================================
-    // 12. EXIT INTENT (si > 1m30 & pas de clic CTA)
-    // ========================================
-
-    function startExitIntentTimer() {
-        exitIntentTimer = setTimeout(() => {}, CONFIG.exitIntentDelay);
-    }
-
-    function showExitIntentPopup() {
-        if (formState.exitIntentShown || !formState.formCompleted) return;
-        const elapsed = (Date.now() - pageStartTime) / 1000;
-        if (elapsed < 90 || ctaClicked) return;
-
-        formState.exitIntentShown = true;
-
-        const montant = formatMontant(document.getElementById('montant').value);
-        const duree = document.getElementById('duree').value;
-
-        const deadline = new Date();
-        deadline.setHours(deadline.getHours() + 72);
-        const deadlineStr = deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-
-        const popup = document.createElement('div');
-        popup.id = 'exit-intent-popup';
-        popup.style.cssText = `
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7); z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            padding: 1rem; animation: fadeIn 0.3s ease;
-        `;
-
-        popup.innerHTML = `
-            <div style="
-                background: white; max-width: 500px; width: 100%;
-                border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                animation: slideUp 0.4s ease; text-align: center;
-            ">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🤭</div>
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 1rem;">Oups ! Vous partez déjà ?</h2>
-                <p style="color: var(--muted); margin-bottom: 1.5rem; line-height: 1.6;">
-                    Vous avez presque terminé ! Votre demande de <strong style="color: var(--brand);">${montant}</strong> 
-                    sur <strong>${duree} mois</strong> est prête.
-                </p>
-                <p style="color: var(--text); font-weight: 600; margin-bottom: 2rem; padding: 1rem; background: var(--bg-soft); border-radius: 10px;">
-                    ⏰ Obtenez vos ${montant} avant le<br>
-                    <span style="color: var(--brand); font-size: 1.1rem;">${deadlineStr}</span>
-                </p>
-                <button id="exit-intent-cta" style="
-                    width: 100%; padding: 1rem 2rem; background: var(--accent); color: white;
-                    border: none; border-radius: 12px; font-size: 1rem; font-weight: 700;
-                    cursor: pointer; margin-bottom: 1rem; transition: all 0.2s;
-                ">📨 Finaliser ma demande maintenant</button>
-                <button id="exit-intent-close" style="
-                    background: transparent; border: none; color: var(--muted);
-                    font-size: 0.9rem; cursor: pointer; text-decoration: underline;
-                ">Non merci, je reviendrai plus tard</button>
-            </div>
-        `;
-
-        document.body.appendChild(popup);
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-            #exit-intent-cta:hover { background: #15a34a !important; transform: translateY(-2px); }
-        `;
-        document.head.appendChild(style);
-
-        document.getElementById('exit-intent-cta').addEventListener('click', () => {
-            popup.remove();
-            const submitBtn = document.querySelector('.cta-submit');
-            if (submitBtn) {
-                ctaClicked = true;
-                submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                submitBtn.style.animation = 'pulse 1s ease 3';
-            }
-        });
-        document.getElementById('exit-intent-close').addEventListener('click', () => popup.remove());
-        popup.addEventListener('click', (e) => { if (e.target === popup) popup.remove(); });
-    }
-
-    document.addEventListener('mouseleave', (e) => {
-        if (e.clientY < 10) showExitIntentPopup();
+  };
+
+  function gtagSafe() {
+    if (typeof window.gtag !== 'function') return function(){};
+    return window.gtag;
+  }
+  function fireEventOnce(ssKey, name, params){
+    try {
+      if (sessionStorage.getItem(ssKey)) return;
+      sessionStorage.setItem(ssKey,'1');
+    } catch(_) {}
+    const g = gtagSafe();
+    g('event', name, Object.assign({event_category:'lead_form', non_interaction:true}, params||{}));
+    const label = GADS.convLabels[name];
+    if (label) g('event','conversion', Object.assign({send_to:`${GADS.adsId}/${label}`}, params||{}));
+  }
+  function fireEvent(name, params){
+    const g = gtagSafe();
+    g('event', name, Object.assign({event_category:'lead_form'}, params||{}));
+    const label = GADS.convLabels[name];
+    if (label) g('event','conversion', Object.assign({send_to:`${GADS.adsId}/${label}`}, params||{}));
+  }
+  function trackPageLoadedOnce(){
+    try {
+      if (sessionStorage.getItem(GADS.ssKeys.OPEN)) return;
+      sessionStorage.setItem(GADS.ssKeys.OPEN,'1');
+    } catch(_){}
+    fireEvent(GADS.events.page_loaded, {
+      href: location.href,
+      ref: document.referrer || '',
+      lang: navigator.language,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screen_w: screen.width, screen_h: screen.height,
+      dpr: window.devicePixelRatio || 1
     });
-    window.addEventListener('beforeunload', (e) => {
-        const elapsed = (Date.now() - pageStartTime) / 1000;
-        if (!formState.exitIntentShown && formState.formCompleted && !ctaClicked && elapsed >= 90) {
-            e.preventDefault();
-            e.returnValue = '';
-            showExitIntentPopup();
+  }
+
+  // =========================
+  // 2) Sélecteurs DOM
+  // =========================
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const form = $('#lead-form');
+
+  // Champs
+  const el = {
+    prenom: $('#prenom'),
+    nom: $('#nom'),
+    dateNaissance: $('#date-naissance'),
+    email: $('#email'),
+    whatsapp: $('#whatsapp'),
+    pays: $('#pays'),
+    montant: $('#montant'),
+    montantValue: $('#montant-value'),
+    duree: $('#duree'),
+    dureeValue: $('#duree-value'),
+    raison: $('#raison'),
+    statut: $('#statut'),
+    revenus: $('#revenus'),
+    piece1: $('#piece1'),
+    piece2: $('#piece2'),
+    piece3: $('#piece3'),
+  };
+
+  // État du formulaire
+  const state = {
+    step1Valid: false,
+    step2Valid: false,
+    step3Valid: false,
+    formCompleted: false,
+    validationErrors: { step1: [], step2: [], step3: [] },
+    exitIntentShown: false,
+    ctaClicked: false,
+    pageStart: Date.now()
+  };
+
+  // =========================
+  // 3) Helpers validation
+  // =========================
+  function isLeapYear(y){ return (y%4===0 && y%100!==0) || (y%400===0); }
+  function getDaysInMonth(m, y){
+    return {1:31,2:isLeapYear(y)?29:28,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}[m] || 31;
+  }
+  function validateBirthDate(str){
+    if (!str || str.length!==10) return {valid:false, age:0, error:'Format requis : JJ/MM/AAAA'};
+    const [d,m,y] = str.split('/').map(n=>parseInt(n,10));
+    if ([d,m,y].some(n=>Number.isNaN(n))) return {valid:false, age:0, error:'Date invalide'};
+    const now = new Date();
+    if (y < 1900 || y > now.getFullYear()) return {valid:false, age:0, error:`L'année doit être entre 1900 et ${now.getFullYear()}`};
+    if (m<1 || m>12) return {valid:false, age:0, error:'Le mois doit être entre 01 et 12'};
+    const maxD = getDaysInMonth(m,y);
+    if (d<1 || d>maxD) return {valid:false, age:0, error:`${d}/${m}/${y} est invalide (max ${maxD})`};
+    const bd = new Date(y, m-1, d);
+    if (bd > now) return {valid:false, age:0, error:'La date ne peut pas être future'};
+    let age = now.getFullYear()-y;
+    const md = now.getMonth() - (m-1);
+    const dd = now.getDate() - d;
+    if (md < 0 || (md===0 && dd<0)) age--;
+    if (age < CONFIG.minAge) return {valid:false, age, error:`Vous devez avoir au moins ${CONFIG.minAge} ans (vous avez ${age} ans)`};
+    if (age > 120) return {valid:false, age, error:'Date de naissance improbable (>120 ans)'};
+    return {valid:true, age, error:''};
+  }
+  function isValidEmail(email){
+    const re=/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if(!re.test(email)) return false;
+    const bad=['test.com','example.com','fake.com','temp.com','azerty.com'];
+    const domain=(email.split('@')[1]||'').toLowerCase();
+    if(bad.includes(domain)) return false;
+    const tld=domain.split('.').pop();
+    if(!tld || tld.length<2) return false;
+    return true;
+  }
+  function isValidPhone(phone){
+    const cleaned = (phone||'').replace(/\s+/g,'');
+    if (!cleaned.startsWith('+')) return false;
+    if (!/^\+\d{1,4}\d{6,14}$/.test(cleaned)) return false;
+    const digits = cleaned.slice(1);
+    if (/^(\d)\1+$/.test(digits)) return false;
+    const bad = ['1234567890','0000000000','9999999999','1111111111'];
+    if (bad.some(p=>cleaned.includes(p))) return false;
+    return true;
+  }
+  function validateRaison(txt){
+    const t=(txt||'').trim();
+    if (t.length < 10) return {valid:false, error:'Minimum 10 caractères'};
+    if (!/[a-zA-ZÀ-ÿ]/.test(t)) return {valid:false, error:'Doit contenir des lettres'};
+    return {valid:true, error:''};
+  }
+  function validateName(n){
+    const t=(n||'').trim();
+    if (t.length<2) return {valid:false, error:'Minimum 2 caractères'};
+    if (!/^[a-zA-ZÀ-ÿ\s\-']+$/.test(t)) return {valid:false, error:'Caractères invalides'};
+    return {valid:true, error:''};
+  }
+
+  // =========================
+  // 4) Validations par étape
+  // =========================
+  function validateStep1(show=false){
+    state.validationErrors.step1 = [];
+    const prenomV = validateName(el.prenom.value);
+    if (!el.prenom.value) state.validationErrors.step1.push('Prénom : champ vide');
+    else if(!prenomV.valid) state.validationErrors.step1.push(`Prénom : ${prenomV.error}`);
+
+    const nomV = validateName(el.nom.value);
+    if (!el.nom.value) state.validationErrors.step1.push('Nom : champ vide');
+    else if(!nomV.valid) state.validationErrors.step1.push(`Nom : ${nomV.error}`);
+
+    const birthV = validateBirthDate(el.dateNaissance.value);
+    if (!el.dateNaissance.value) state.validationErrors.step1.push('Date de naissance : champ vide');
+    else if(!birthV.valid) state.validationErrors.step1.push(`Date de naissance : ${birthV.error}`);
+
+    if (!el.email.value) state.validationErrors.step1.push('E-mail : champ vide');
+    else if(!isValidEmail(el.email.value)) state.validationErrors.step1.push('E-mail : adresse invalide');
+
+    if (!el.whatsapp.value) state.validationErrors.step1.push('WhatsApp : champ vide');
+    else if(!isValidPhone(el.whatsapp.value)) state.validationErrors.step1.push('WhatsApp : numéro invalide (format international)');
+
+    if (!el.pays.value) state.validationErrors.step1.push('Pays : non sélectionné');
+
+    state.step1Valid = state.validationErrors.step1.length===0;
+    if (CONFIG.debugMode && show && !state.step1Valid) console.log('❌ Étape 1', state.validationErrors.step1);
+
+    refreshStepOKBadges();
+    updateStepAccess();
+    checkFormCompletion();
+    return state.step1Valid;
+  }
+
+  function validateStep2(show=false){
+    state.validationErrors.step2 = [];
+
+    const montant = parseFloat(el.montant.value);
+    if (Number.isNaN(montant) || montant<2000 || montant>200000)
+      state.validationErrors.step2.push(`Montant : 2 000–200 000 € (actuel: ${montant||0} €)`);
+
+    const duree = parseInt(el.duree.value,10);
+    if (Number.isNaN(duree) || duree<6 || duree>120)
+      state.validationErrors.step2.push(`Durée : 6–120 mois (actuel: ${duree||0})`);
+
+    const r = validateRaison(el.raison.value);
+    if (!el.raison.value) state.validationErrors.step2.push('Raison du projet : champ vide');
+    else if(!r.valid) state.validationErrors.step2.push(`Raison du projet : ${r.error}`);
+
+    state.step2Valid = state.validationErrors.step2.length===0;
+    if (CONFIG.debugMode && show && !state.step2Valid) console.log('❌ Étape 2', state.validationErrors.step2);
+
+    refreshStepOKBadges();
+    updateStepAccess();
+    checkFormCompletion();
+    return state.step2Valid;
+  }
+
+  function validateStep3(show=false){
+    state.validationErrors.step3 = [];
+    if (!el.statut.value) state.validationErrors.step3.push('Statut professionnel : non sélectionné');
+    if (!el.revenus.value) state.validationErrors.step3.push('Revenus réguliers : non sélectionné');
+    state.step3Valid = state.validationErrors.step3.length===0;
+    if (CONFIG.debugMode && show && !state.step3Valid) console.log('❌ Étape 3', state.validationErrors.step3);
+
+    refreshStepOKBadges();
+    checkFormCompletion();
+    return state.step3Valid;
+  }
+
+  // =========================
+  // 5) Calcul & sliders
+  // =========================
+  function calculerMensualite(montant, dureeMois, tauxAnnuel){
+    const tm = tauxAnnuel/100/12;
+    return (montant*tm)/(1-Math.pow(1+tm, -dureeMois));
+  }
+  function getDateFin(dureeMois){
+    const d=new Date(); d.setMonth(d.getMonth()+parseInt(dureeMois||0,10));
+    return d.toLocaleDateString('fr-FR',{year:'numeric', month:'long'});
+  }
+  const fmtEuro = (n)=> (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2})+' €';
+  const fmtMontant = (v)=> (v||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' €';
+
+  function paintRange(input){
+    if(!input) return;
+    const min=+input.min||0, max=+input.max||100, val=+input.value||0;
+    const pct=((val-min)*100)/(max-min);
+    input.style.background=`linear-gradient(to right, var(--brand) 0%, var(--brand) ${pct}%, var(--line) ${pct}%, var(--line) 100%)`;
+  }
+
+  function afficherResumePret(){
+    const montant = parseFloat(el.montant.value||'0');
+    const duree   = parseInt(el.duree.value||'0',10);
+    const taux    = CONFIG.tauxInteret;
+
+    const mensualite = calculerMensualite(montant, duree, taux);
+    const coutTotal  = mensualite * duree;
+    const coutCredit = coutTotal - montant;
+    const dateFin    = getDateFin(duree);
+
+    let resume = $('#resume-pret');
+    if (!resume){
+      resume = document.createElement('div');
+      resume.id='resume-pret';
+      resume.style.cssText = `
+        margin-top:1.2rem;padding:1rem;background:linear-gradient(135deg,#f7f8fb,#e6e8ef);
+        border-left:4px solid var(--brand);border-radius:10px;font-size:.9rem;line-height:1.8;`;
+      const raisonGroup = el.raison.closest('.form-group');
+      raisonGroup.parentNode.insertBefore(resume, raisonGroup.nextSibling);
+    }
+    resume.innerHTML = `
+      <div style="font-weight:600;color:var(--brand);margin-bottom:.6rem;font-size:1rem;">📊 Estimation de votre prêt</div>
+      <div><strong>Vous souhaitez emprunter ${fmtEuro(montant)}</strong> sur <strong>${duree} mois</strong>.</div>
+      <div style="margin-top:.4rem;color:var(--muted);font-size:.85rem;">Au taux indicatif de <strong>${taux}%</strong> par an :</div>
+      <div style="margin-top:.6rem;padding:.7rem;background:#fff;border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
+          <span style="color:var(--muted);">Mensualité :</span>
+          <strong style="color:var(--brand);font-size:1.05rem;">${fmtEuro(mensualite)}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;padding-top:.5rem;border-top:1px dashed var(--line);">
+          <span style="color:var(--muted);">Coût du crédit :</span>
+          <strong>${fmtEuro(coutCredit)}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:1px dashed var(--line);">
+          <span style="color:var(--muted);">Total à rembourser :</span>
+          <strong>${fmtEuro(coutTotal)}</strong>
+        </div>
+      </div>
+      <div style="margin-top:.6rem;color:var(--muted);font-size:.85rem;">Dernier paiement prévu en <strong>${dateFin}</strong></div>
+      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;font-style:italic;">
+        ⚠️ Estimation indicative basée sur ${taux}%. Le taux final dépendra de votre dossier.
+      </div>
+    `;
+  }
+
+  function bindSliders(){
+    if (el.montant && el.montantValue){
+      el.montantValue.textContent = fmtMontant(+el.montant.value||0);
+      paintRange(el.montant);
+      el.montant.addEventListener('input', ()=>{
+        el.montantValue.textContent = fmtMontant(+el.montant.value||0);
+        paintRange(el.montant);
+        afficherResumePret(); validateStep2(); saveFormData();
+      });
+    }
+    if (el.duree && el.dureeValue){
+      el.dureeValue.textContent = (el.duree.value||0) + ' mois';
+      paintRange(el.duree);
+      el.duree.addEventListener('input', ()=>{
+        el.dureeValue.textContent = (el.duree.value||0) + ' mois';
+        paintRange(el.duree);
+        afficherResumePret(); validateStep2(); saveFormData();
+      });
+    }
+  }
+
+  // =========================
+  // 6) Étapes, badges, “Suivant”
+  // =========================
+  function ensureOKBadge(summaryEl){
+    if (!summaryEl) return null;
+    let badge = summaryEl.querySelector('.ok-badge');
+    if (!badge){
+      badge = document.createElement('span');
+      badge.className='ok-badge';
+      badge.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#16a34a" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>`;
+      badge.style.cssText='display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:8px;vertical-align:middle;';
+      summaryEl.appendChild(badge);
+    }
+    return badge;
+  }
+  function refreshStepOKBadges(){
+    const details = $$('details');
+    if (details.length>=3){
+      const b1=ensureOKBadge(details[0].querySelector('summary'));
+      const b2=ensureOKBadge(details[1].querySelector('summary'));
+      const b3=ensureOKBadge(details[2].querySelector('summary'));
+      if (b1) b1.style.visibility = state.step1Valid?'visible':'hidden';
+      if (b2) b2.style.visibility = state.step2Valid?'visible':'hidden';
+      if (b3) b3.style.visibility = state.step3Valid?'visible':'hidden';
+    }
+  }
+  function updateStepAccess(){
+    const details = $$('details');
+    if (details.length<3) return;
+    const s1=details[0].querySelector('summary');
+    const s2=details[1].querySelector('summary');
+    const s3=details[2].querySelector('summary');
+    if (!state.step1Valid){
+      details[1].removeAttribute('open'); s2.style.opacity='.5'; s2.style.cursor='not-allowed';
+    }else{ s2.style.opacity='1'; s2.style.cursor='pointer'; }
+    if (!state.step1Valid || !state.step2Valid){
+      details[2].removeAttribute('open'); s3.style.opacity='.5'; s3.style.cursor='not-allowed';
+    }else{ s3.style.opacity='1'; s3.style.cursor='pointer'; }
+  }
+  function createNextButtons(){
+    const ds = $$('details');
+    ds.forEach((d, idx)=>{
+      if (idx === ds.length-1) return;
+      const content = d.querySelector('.step-content');
+      if (!content) return;
+      const btn = document.createElement('button');
+      btn.type='button';
+      btn.className='btn-next-step';
+      btn.textContent='Suivant →';
+      btn.style.cssText='margin-top:1rem;padding:.8rem 2rem;background:var(--brand);color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;width:100%;max-width:300px;margin-left:auto;margin-right:auto;';
+      btn.addEventListener('click', ()=>{
+        let ok=false, errs=[];
+        if (idx===0){ ok=validateStep1(true); errs=state.validationErrors.step1; }
+        else if (idx===1){ ok=validateStep2(true); errs=state.validationErrors.step2; }
+        if (!ok){
+          notify('Informations incomplètes', 'Veuillez corriger :\n\n• '+errs.join('\n• '), 'warning');
+          return;
         }
+        d.open=false; const next = ds[idx+1]; if (next){ next.open=true; next.scrollIntoView({behavior:'smooth', block:'start'}); }
+      });
+      content.appendChild(btn);
+    });
+  }
+  function preventStepOpening(){
+    const ds=$$('details');
+    ds.forEach((d, idx)=>{
+      d.addEventListener('toggle', function(e){
+        if (!this.open) return;
+        if (idx===1 && !state.step1Valid){ e.preventDefault(); this.open=false; notify('Étape 1 incomplète','Complétez l’étape 1.','warning'); }
+        if (idx===2 && (!state.step1Valid || !state.step2Valid)){ e.preventDefault(); this.open=false; notify('Étapes incomplètes','Complétez les étapes 1 et 2.','warning'); }
+      });
+    });
+  }
+  function checkFormCompletion(){
+    const prev = state.formCompleted;
+    state.formCompleted = state.step1Valid && state.step2Valid && state.step3Valid;
+    if (state.formCompleted && !prev){
+      fireEventOnce(GADS.ssKeys.FORM, GADS.events.form_full, {
+        form_status:'complete', href: location.href,
+        lang: navigator.language, tz: Intl.DateTimeFormat().resolvedOptions().timeZone
+      });
+      if (!exitIntentTimer) startExitIntentTimer();
+    }
+  }
+
+  // =========================
+  // 7) Vidéos (modal + erreur)
+  // =========================
+  const singleVideoError = {
+    title:'Problème réseau détecté',
+    message:'Votre connexion semble instable. Veuillez vérifier votre connexion internet et réessayer ultérieurement.',
+    code:'ERR_NETWORK_UNSTABLE'
+  };
+  function showVideoPlayer(author, locationTxt, durationTxt){
+    const modal = document.createElement('div');
+    modal.id='video-player-modal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    modal.innerHTML = `
+      <div style="background:#1a1a1a;max-width:900px;width:100%;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+        <div style="background:#2a2a2a;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #3a3a3a;">
+          <div>
+            <div style="color:#fff;font-weight:600">${author||''}</div>
+            <div style="color:#aaa;font-size:.85rem">📍 ${locationTxt||''} • ⏱️ ${durationTxt||''}</div>
+          </div>
+          <button id="close-video-modal" style="background:transparent;border:none;color:#888;font-size:1.5rem;cursor:pointer;width:40px;height:40px;">✕</button>
+        </div>
+        <div id="video-player-container" style="aspect-ratio:16/9;background:#000;display:flex;align-items:center;justify-content:center;position:relative;">
+          <div id="video-loader" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+            <div style="width:60px;height:60px;border:4px solid #333;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;"></div>
+            <div style="color:#fff;font-size:.95rem;">Chargement de la vidéo...</div>
+          </div>
+          <div id="video-error" style="display:none;flex-direction:column;align-items:center;gap:1rem;padding:2rem;text-align:center;max-width:520px;">
+            <div style="font-size:48px;line-height:1;">⚠️</div>
+            <div style="color:#fff;font-size:1.2rem;font-weight:600;">${singleVideoError.title}</div>
+            <div style="color:#aaa;font-size:.95rem;line-height:1.6;">${singleVideoError.message}</div>
+            <div style="margin-top:.5rem;padding:.4rem .6rem;background:#2a2a2a;border-radius:8px;font-family:monospace;font-size:.85rem;color:#dc2626;">Code: ${singleVideoError.code}</div>
+            <button id="retry-video" style="margin-top:.6rem;padding:.7rem 2rem;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">🔄 Réessayer</button>
+          </div>
+        </div>
+      </div>`;
+    const style = document.createElement('style');
+    style.textContent='@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+    setTimeout(()=>{ $('#video-loader').style.display='none'; $('#video-error').style.display='flex'; }, CONFIG.videoLoadingTime);
+    $('#close-video-modal').addEventListener('click', ()=> modal.remove());
+    $('#retry-video').addEventListener('click', ()=>{
+      $('#video-error').style.display='none';
+      $('#video-loader').style.display='flex';
+      setTimeout(()=>{ $('#video-loader').style.display='none'; $('#video-error').style.display='flex'; }, CONFIG.videoLoadingTime);
+    });
+    modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+    const esc=(e)=>{ if(e.key==='Escape'){ modal.remove(); document.removeEventListener('keydown',esc);} };
+    document.addEventListener('keydown', esc);
+  }
+  function setupVideoPlayers(){
+    $$('.video-card').forEach(card=>{
+      card.setAttribute('tabindex','0');
+      card.addEventListener('click', ()=>{
+        const author = card.querySelector('.video-author')?.textContent||'';
+        const locationTxt = card.querySelector('.video-location')?.textContent||'';
+        const durationTxt = card.querySelector('.video-duration')?.textContent||'';
+        showVideoPlayer(author, locationTxt, durationTxt);
+      });
+      card.addEventListener('keypress', (e)=>{ if(e.key==='Enter' || e.key===' ') card.click(); });
+    });
+  }
+
+  // =========================
+  // 8) Carrousel témoignages
+  // =========================
+  function setupCarousel(){
+    const carousel = $('.testimonials-carousel');
+    const dots = $$('.carousel-dot');
+    if (!carousel || dots.length===0) return;
+    let current = 0;
+    function goTo(idx){
+      const slides = $$('.testimonial-slide');
+      if (idx<0 || idx>=slides.length) return;
+      current = idx;
+      const slideWidth = carousel.scrollWidth / slides.length;
+      carousel.scrollTo({left: slideWidth*current, behavior:'smooth'});
+      dots.forEach((d,i)=>{ if(i===current) d.classList.add('active'); else d.classList.remove('active'); });
+    }
+    dots.forEach((d,i)=> d.addEventListener('click', ()=>goTo(i)));
+  }
+
+  // =========================
+  // 9) Persistance
+  // =========================
+  function saveFormData(){
+    if (!form) return;
+    const data = {};
+    Array.from(form.elements).forEach(elm=>{
+      if(!elm.name && !elm.id) return;
+      const key = elm.id || elm.name;
+      if (elm.type==='checkbox') data[key]=!!elm.checked;
+      else if (elm.type==='radio'){ if(elm.checked) data[key]=elm.value; }
+      else data[key]=elm.value;
+    });
+    data.__ts = Date.now();
+    try{ localStorage.setItem(CONFIG.lstoreKey, JSON.stringify(data)); }catch(_){}
+  }
+  function loadFormData(){
+    if (!form) return;
+    let data=null;
+    try { data = JSON.parse(localStorage.getItem(CONFIG.lstoreKey)||'null'); } catch(_){}
+    if (!data) return;
+    if (Date.now() - (data.__ts||0) > CONFIG.lstoreTTLms) { try{localStorage.removeItem(CONFIG.lstoreKey);}catch(_){ } return; }
+    Array.from(form.elements).forEach(elm=>{
+      const key = elm.id || elm.name;
+      if (!(key in data)) return;
+      const val = data[key];
+      if (elm.type==='checkbox') elm.checked=!!val;
+      else if (elm.type==='radio') elm.checked = (elm.value===val);
+      else elm.value = val;
+      elm.dispatchEvent(new Event('input', {bubbles:true}));
+      elm.dispatchEvent(new Event('change', {bubbles:true}));
+    });
+  }
+  function clearFormData(){ try{ localStorage.removeItem(CONFIG.lstoreKey); }catch(_){} }
+
+  // =========================
+  // 10) Date input format JJ/MM/AAAA
+  // =========================
+  function setupDateFormatting(){
+    if (!el.dateNaissance) return;
+    el.dateNaissance.type='text';
+    el.dateNaissance.placeholder='JJ/MM/AAAA';
+    el.dateNaissance.maxLength=10;
+    el.dateNaissance.addEventListener('input', (e)=>{
+      let v=e.target.value.replace(/\D/g,'');
+      if (v.length>=2) v=v.slice(0,2)+'/'+v.slice(2);
+      if (v.length>=5) v=v.slice(0,5)+'/'+v.slice(5,9);
+      e.target.value=v; saveFormData();
+    });
+    el.dateNaissance.addEventListener('blur', function(){
+      const v = validateBirthDate(this.value);
+      if (this.value && !v.valid){ this.setCustomValidity(v.error); this.style.borderColor='#dc2626'; }
+      else { this.setCustomValidity(''); this.style.borderColor=''; validateStep1(); }
+    });
+  }
+
+  // =========================
+  // 11) Bannière promo (texte fixe)
+  // =========================
+  function setupPromoBanner(){
+    const b = $('.promo-banner');
+    if (!b) return;
+    b.textContent = CONFIG.promoText;
+    b.style.background = '#000';
+    b.style.color = '#fff';
+    b.style.fontWeight = '600';
+  }
+
+  // =========================
+  // 12) Notifications
+  // =========================
+  function notify(title, message, type='info'){
+    const icons = {info:'ℹ️', success:'✅', warning:'⚠️', error:'❌'};
+    alert(`${icons[type]||'ℹ️'} ${title}\n\n${message}`);
+  }
+
+  // =========================
+  // 13) Smooth scroll + ancres
+  // =========================
+  function setupAnchors(){
+    $$('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', function(e){
+        const href=this.getAttribute('href');
+        if (href==='#' || href==='#!') return;
+        const target=$(href);
+        if (target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+      });
+    });
+  }
+
+  // =========================
+  // 14) Exit-Intent
+  // =========================
+  let exitIntentTimer=null;
+  function startExitIntentTimer(){ exitIntentTimer = setTimeout(()=>{}, CONFIG.exitIntentDelay); }
+  function showExitIntentPopup(){
+    if (state.exitIntentShown || !state.formCompleted) return;
+    const elapsed = (Date.now()-state.pageStart)/1000;
+    if (elapsed<90 || state.ctaClicked) return;
+    state.exitIntentShown = true;
+
+    const montant = fmtMontant(+el.montant.value||0);
+    const duree = el.duree.value||'—';
+    const deadline = new Date(); deadline.setHours(deadline.getHours()+72);
+    const deadlineStr = deadline.toLocaleDateString('fr-FR',{day:'numeric', month:'long'});
+
+    const pop = document.createElement('div');
+    pop.id='exit-intent-popup';
+    pop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    pop.innerHTML = `
+      <div style="background:#fff;max-width:500px;width:100%;border-radius:16px;padding:2rem;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🤭</div>
+        <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:1rem;">Oups ! Vous partez déjà ?</h2>
+        <p style="color:var(--muted);margin-bottom:1rem;">Votre demande de <strong style="color:var(--brand);">${montant}</strong> sur <strong>${duree} mois</strong> est prête.</p>
+        <p style="font-weight:600;margin-bottom:1.2rem;padding:1rem;background:#f7f8fb;border-radius:10px;">
+          ⏰ Obtenez vos ${montant} avant le<br><span style="color:var(--brand);font-size:1.05rem;">${deadlineStr}</span>
+        </p>
+        <button id="exit-intent-cta" style="width:100%;padding:1rem;background:var(--accent);color:#fff;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:.6rem;">📨 Finaliser ma demande maintenant</button>
+        <button id="exit-intent-close" style="background:transparent;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;">Non merci</button>
+      </div>`;
+    document.body.appendChild(pop);
+    $('#exit-intent-cta').addEventListener('click', ()=>{
+      pop.remove();
+      const submitBtn = $('.cta-submit');
+      if (submitBtn){ state.ctaClicked=true; submitBtn.scrollIntoView({behavior:'smooth',block:'center'}); submitBtn.style.animation='pulse 1s ease 3'; }
+    });
+    $('#exit-intent-close').addEventListener('click', ()=> pop.remove());
+    pop.addEventListener('click', (e)=>{ if(e.target===pop) pop.remove(); });
+  }
+  document.addEventListener('mouseleave', (e)=>{ if (e.clientY<10) showExitIntentPopup(); });
+  window.addEventListener('beforeunload', (e)=>{
+    const elapsed=(Date.now()-state.pageStart)/1000;
+    if (!state.exitIntentShown && state.formCompleted && !state.ctaClicked && elapsed>=90){
+      e.preventDefault(); e.returnValue=''; showExitIntentPopup();
+    }
+  });
+
+  // =========================
+  // 15) Real-time + Persistance
+  // =========================
+  function setupRealTime(){
+    $$('input, select, textarea').forEach(inp=>{
+      inp.addEventListener('change', saveFormData);
+      if (inp.tagName!=='SELECT') inp.addEventListener('input', saveFormData);
     });
 
-    // ========================================
-    // 13. VALIDATION TEMPS RÉEL + SAVE
-    // ========================================
-
-    function setupRealTimeValidation() {
-        const allInputs = document.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
-            input.addEventListener('change', saveFormData);
-            if (input.tagName !== 'SELECT') {
-                input.addEventListener('input', saveFormData);
-            }
-        });
-
-        const prenomInput = document.getElementById('prenom');
-        const nomInput = document.getElementById('nom');
-        const dateInput = document.getElementById('date-naissance');
-        const emailInput = document.getElementById('email');
-        const whatsappInput = document.getElementById('whatsapp');
-        const paysSelect = document.getElementById('pays');
-
-        [prenomInput, nomInput, dateInput, emailInput, whatsappInput, paysSelect].forEach(input => {
-            if (input) {
-                input.addEventListener('blur', () => validateStep1());
-                input.addEventListener('change', () => {
-                    validateStep1();
-                    if (!formState.formStarted) formState.formStarted = true;
-                });
-            }
-        });
-
-        if (emailInput) {
-            emailInput.addEventListener('blur', function() {
-                const email = this.value.trim();
-                if (email && !isValidEmail(email)) {
-                    this.setCustomValidity('Adresse e-mail invalide');
-                    this.style.borderColor = '#dc2626';
-                } else {
-                    this.setCustomValidity('');
-                    this.style.borderColor = '';
-                }
-            });
-        }
-
-        if (whatsappInput) {
-            whatsappInput.addEventListener('blur', function() {
-                const phone = this.value.trim();
-                if (phone && !isValidPhone(phone)) {
-                    this.setCustomValidity('Numéro invalide');
-                    this.style.borderColor = '#dc2626';
-                } else {
-                    this.setCustomValidity('');
-                    this.style.borderColor = '';
-                }
-            });
-        }
-
-        const raisonInput = document.getElementById('raison');
-        if (raisonInput) {
-            raisonInput.addEventListener('input', () => validateStep2());
-            raisonInput.addEventListener('blur', function() {
-                const validation = validateRaison(this.value);
-                if (this.value && !validation.valid) {
-                    this.setCustomValidity(validation.error);
-                    this.style.borderColor = '#dc2626';
-                } else {
-                    this.setCustomValidity('');
-                    this.style.borderColor = '';
-                }
-            });
-        }
-
-        const statutSelect = document.getElementById('statut');
-        const revenusSelect = document.getElementById('revenus');
-        [statutSelect, revenusSelect].forEach(select => {
-            if (select) select.addEventListener('change', () => validateStep3());
-        });
-    }
-
-    // ========================================
-    // 14. SOUMISSION (EMAIL PRÉREMPLI — SANS CONFIRMATION) + TRACKING
-    // ========================================
-
-    function buildPrefilledEmail() {
-        const prenom = (document.getElementById('prenom').value || '').trim();
-        const nom = (document.getElementById('nom').value || '').trim();
-        const fullName = `${prenom} ${nom}`.trim();
-        const dateNaissance = (document.getElementById('date-naissance').value || '').trim();
-        const email = (document.getElementById('email').value || '').trim();
-        const whatsapp = (document.getElementById('whatsapp').value || '').trim();
-        const pays = (document.getElementById('pays').value || '').trim();
-        const montantVal = parseFloat(document.getElementById('montant').value || '0');
-        const montantFmt = formatMontant(montantVal);
-        const dureeMois = (document.getElementById('duree').value || '').trim();
-        const raison = (document.getElementById('raison').value || '').trim();
-        const statut = (document.getElementById('statut').value || '').trim();
-        const revenus = (document.getElementById('revenus').value || '').trim();
-
-        const pieces = [];
-        if (document.getElementById('piece1')?.checked) pieces.push('carte d'identité');
-        if (document.getElementById('piece2')?.checked) pieces.push('preuve de revenus');
-        if (document.getElementById('piece3')?.checked) pieces.push('relevé bancaire récent');
-
-        const mensualite = calculerMensualite(montantVal, parseInt(dureeMois || '0', 10), CONFIG.tauxInteret);
-        const mensualiteFmt = formatEuros(isFinite(mensualite) ? mensualite : 0);
-
-        const subject = `demande de financement ${montantFmt} ${nom} ${prenom}`.trim();
-
-        const lines = [
-            'Bonjour,',
-            '',
-            'Je me permets de vous contacter pour une demande de financement auprès de MSGROUP.',
-            `Je m'appelle ${fullName || '—'}, né(e) le ${dateNaissance || '—'}, et je réside en ${pays || '—'}.`,
-            `Je souhaite obtenir un financement d'un montant de ${montantFmt} sur ${dureeMois || '—'} mois${raison ? ` pour ${raison}.` : '.'}`,
-            `Ma mensualité estimée (taux indicatif ${CONFIG.tauxInteret} %/an) serait de ${mensualiteFmt}.`,
-            '',
-            'Voici mes coordonnées pour tout complément d'information :',
-            `• E-mail : ${email || '—'}`,
-            '',
-            `• WhatsApp : ${whatsapp || '—'}`,
-            '',
-            `Côté situation : je suis actuellement ${statut || '—'}${revenus ? ` et ${revenus.toLowerCase()}` : ''}.`,
-            `J'ai à disposition ${pieces.length ? `ma ${pieces.join(' et ')}` : 'les pièces nécessaires sur demande'}.`,
-            '',
-            'Je reste bien entendu à votre disposition pour tout renseignement ou document supplémentaire.',
-            '',
-            'Bien cordialement,',
-            `${fullName || ''}`
-        ];
-        const body = lines.join('\n');
-
-        const mailto = `mailto:Contact@sergemagdeleinesolutions.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        return mailto;
-    }
-
-    const form = document.querySelector('form[action*="mailto"]');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            validateStep1(true);
-            validateStep2(true);
-            validateStep3(true);
-
-            if (!formState.step1Valid || !formState.step2Valid || !formState.step3Valid) {
-                let allErrors = [];
-                if (formState.validationErrors.step1.length > 0) {
-                    allErrors.push('ÉTAPE 1 - Informations de base :');
-                    allErrors.push(...formState.validationErrors.step1.map(e => '  • ' + e));
-                }
-                if (formState.validationErrors.step2.length > 0) {
-                    allErrors.push('\nÉTAPE 2 - Votre prêt :');
-                    allErrors.push(...formState.validationErrors.step2.map(e => '  • ' + e));
-                }
-                if (formState.validationErrors.step3.length > 0) {
-                    allErrors.push('\nÉTAPE 3 - Votre profil :');
-                    allErrors.push(...formState.validationErrors.step3.map(e => '  • ' + e));
-                }
-                showNotification('Formulaire incomplet', 'Veuillez corriger les erreurs suivantes :\n\n' + allErrors.join('\n'), 'error');
-                return false;
-            }
-
-            // ——— TRACKING: form_submit (une seule fois par session)
-            fireEventOnce(GADS.ssKeys.SUBMIT, GADS.events.form_submit, {
-                href: location.href
-            });
-
-            const mailtoLink = buildPrefilledEmail();
-            window.location.href = mailtoLink;
-
-            setTimeout(() => {
-                clearFormData();
-                showNotification('✅ Demande prête dans votre messagerie', 'Veuillez vérifier votre application e-mail (brouillon ouvert).', 'success');
-            }, 600);
-        });
-    }
-
-    // ========================================
-    // 15. CARROUSEL
-    // ========================================
-
-    const carousel = document.querySelector('.testimonials-carousel');
-    const dots = document.querySelectorAll('.carousel-dot');
-    let currentSlide = 0;
-
-    if (carousel && dots.length > 0) {
-
-        function goToSlide(index) {
-            const slides = document.querySelectorAll('.testimonial-slide');
-            if (index < 0 || index >= slides.length) return;
-            currentSlide = index;
-            const slideWidth = carousel.scrollWidth / slides.length;
-            const scrollAmount = slideWidth * currentSlide;
-            carousel.scrollTo({ left: scrollAmount, behavior: 'smooth' });
-            updateDots();
-        }
-
-        function updateDots() {
-            dots.forEach((dot, index) => {
-                if (index === currentSlide) dot.classList.add('active');
-                else dot.classList.remove('active');
-            });
-        }
-
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => goToSlide(index));
-        });
-
-        updateDots();
-    }
-
-    // ========================================
-    // 16. NOTIFICATIONS
-    // ========================================
-
-    function showNotification(title, message, type = 'info') {
-        const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };
-        alert(`${icons[type]} ${title}\n\n${message}`);
-    }
-
-    // ========================================
-    // 17. SMOOTH SCROLL
-    // ========================================
-
-    function enableSmoothScroll() {
-        const style = document.createElement('style');
-        style.textContent = `html { scroll-behavior: smooth; }`;
-        document.head.appendChild(style);
-    }
-
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#' || href === '#!') return;
-            const target = document.querySelector(href);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                const menuToggle = document.getElementById('menu-toggle');
-                if (menuToggle && menuToggle.checked) menuToggle.checked = false;
-            }
-        });
+    // Étape 1 champs : revalider à la volée
+    [el.prenom, el.nom, el.dateNaissance, el.email, el.whatsapp, el.pays].forEach(i=>{
+      if (!i) return;
+      i.addEventListener('blur', ()=> validateStep1());
+      i.addEventListener('change', ()=> validateStep1());
     });
 
-    // ========================================
-    // 18. MENU MOBILE (si présent)
-    // ========================================
+    // Contraintes individuelles
+    if (el.email){
+      el.email.addEventListener('blur', function(){
+        if (this.value && !isValidEmail(this.value)){ this.setCustomValidity('Adresse e-mail invalide'); this.style.borderColor='#dc2626'; }
+        else { this.setCustomValidity(''); this.style.borderColor=''; }
+      });
+    }
+    if (el.whatsapp){
+      el.whatsapp.addEventListener('blur', function(){
+        if (this.value && !isValidPhone(this.value)){ this.setCustomValidity('Numéro invalide'); this.style.borderColor='#dc2626'; }
+        else { this.setCustomValidity(''); this.style.borderColor=''; }
+      });
+    }
+    if (el.raison){
+      el.raison.addEventListener('input', ()=> validateStep2());
+      el.raison.addEventListener('blur', function(){
+        const v=validateRaison(this.value);
+        if (this.value && !v.valid){ this.setCustomValidity(v.error); this.style.borderColor='#dc2626'; }
+        else { this.setCustomValidity(''); this.style.borderColor=''; }
+      });
+    }
+    [el.statut, el.revenus].forEach(s=>{ if(s) s.addEventListener('change', ()=> validateStep3()); });
+  }
 
-    const menuToggle = document.getElementById('menu-toggle');
-    if (menuToggle) {
-        document.addEventListener('click', function(e) {
-            const navMenu = document.querySelector('.nav-menu');
-            const menuIcon = document.querySelector('.menu-icon');
-            if (menuToggle.checked && navMenu && !navMenu.contains(e.target) && !menuIcon.contains(e.target)) {
-                menuToggle.checked = false;
-            }
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && menuToggle.checked) {
-                menuToggle.checked = false;
-            }
-        });
+  // =========================
+  // 16) Tracking CTA (header/hero/submit)
+  // =========================
+  function snapshotLead(){ return {
+    pays: el.pays?.value||'',
+    montant: parseFloat(el.montant?.value||'0')||0,
+    duree: parseInt(el.duree?.value||'0',10)||0
+  }; }
+  function bindCtaTracking(){
+    const headerCTA = $('.cta-header');
+    const heroCTA = $('.cta-primary');
+    const submitBtn = $('.cta-submit');
+
+    function sendOnce(){
+      try { if (sessionStorage.getItem(GADS.ssKeys.CTA)) return false; sessionStorage.setItem(GADS.ssKeys.CTA,'1'); }
+      catch(_){}
+      return true;
     }
 
-    // ========================================
-    // 19. TRACKING CTA (header/hero/submit) — 1er clic
-    // ========================================
+    if (headerCTA) headerCTA.addEventListener('click', ()=>{
+      if (!sendOnce()) return;
+      state.ctaClicked = true;
+      fireEvent(GADS.events.cta_click, Object.assign({which:'header', href:location.href}, snapshotLead()));
+    });
+    if (heroCTA) heroCTA.addEventListener('click', ()=>{
+      if (!sendOnce()) return;
+      state.ctaClicked = true;
+      fireEvent(GADS.events.cta_click, Object.assign({which:'hero', href:location.href}, snapshotLead()));
+    });
+    if (submitBtn) submitBtn.addEventListener('click', ()=>{
+      if (!sendOnce()) return;
+      state.ctaClicked = true;
+      fireEvent(GADS.events.cta_click, Object.assign({which:'submit', href:location.href}, snapshotLead()));
+    });
+  }
 
-    function snapshotLeadForAnalytics(){
-        // snapshot minimal pour Ads/GA (pas de données sensibles)
-        const pays = (document.getElementById('pays')?.value || '').trim();
-        const montant = parseFloat(document.getElementById('montant')?.value || '0') || 0;
-        const duree = parseInt(document.getElementById('duree')?.value || '0') || 0;
-        return { pays, montant, duree };
-    }
+  // =========================
+  // 17) Soumission (mailto)
+  // =========================
+  function buildPrefilledEmail(){
+    const prenom=(el.prenom.value||'').trim();
+    const nom=(el.nom.value||'').trim();
+    const fullName=`${prenom} ${nom}`.trim();
+    const lines = [
+      'Bonjour,',
+      '',
+      'Je me permets de vous contacter pour une demande de financement auprès de MSGROUPS.',
+      `Je m'appelle ${fullName||'—'}, né(e) le ${el.dateNaissance.value||'—'}, et je réside en ${el.pays.value||'—'}.`,
+      `Je souhaite obtenir un financement d'un montant de ${fmtMontant(parseFloat(el.montant.value||'0'))} sur ${el.duree.value||'—'} mois${el.raison.value?` pour ${el.raison.value}.`:`.`}`,
+      `Ma mensualité estimée (taux indicatif ${CONFIG.tauxInteret}%/an) serait de ${fmtEuro(calculerMensualite(parseFloat(el.montant.value||'0'), parseInt(el.duree.value||'0',10), CONFIG.tauxInteret))}.`,
+      '',
+      'Voici mes coordonnées :',
+      `• E-mail : ${el.email.value||'—'}`,
+      `• WhatsApp : ${el.whatsapp.value||'—'}`,
+      '',
+      `Statut : ${el.statut.value||'—'}${el.revenus.value?`, ${el.revenus.value.toLowerCase()}`:''}`,
+      `Pièces : ${[el.piece1?.checked?'carte d\'identité':null, el.piece2?.checked?'preuve de revenus':null, el.piece3?.checked?'relevé bancaire récent':null].filter(Boolean).join(' et ') || 'sur demande'}.`,
+      '',
+      'Bien cordialement,',
+      `${fullName||''}`
+    ];
+    const body = encodeURIComponent(lines.join('\n'));
+    const subject = encodeURIComponent(CONFIG.emailSubject);
+    const to = encodeURIComponent(CONFIG.emailTo);
+    return `mailto:${to}?subject=${subject}&body=${body}`;
+  }
 
-    function bindCtaTracking(){
-        const headerCTA = document.querySelector('.cta-header');
-        const heroCTA = document.querySelector('.cta-primary');
-        const submitBtn = document.querySelector('.cta-submit');
+  function bindSubmit(){
+    if (!form) return;
+    form.setAttribute('novalidate','novalidate');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
 
-        const sendOnce = () => {
-            try {
-                if (sessionStorage.getItem(GADS.ssKeys.CTA)) return false;
-                sessionStorage.setItem(GADS.ssKeys.CTA,'1');
-            } catch(_){}
-            return true;
-        };
+      const ok1 = validateStep1(true);
+      const ok2 = validateStep2(true);
+      const ok3 = validateStep3(true);
+      if (!(ok1 && ok2 && ok3)){
+        const parts=[];
+        if (state.validationErrors.step1.length) parts.push('ÉTAPE 1 :\n  • '+state.validationErrors.step1.join('\n  • '));
+        if (state.validationErrors.step2.length) parts.push('ÉTAPE 2 :\n  • '+state.validationErrors.step2.join('\n  • '));
+        if (state.validationErrors.step3.length) parts.push('ÉTAPE 3 :\n  • '+state.validationErrors.step3.join('\n  • '));
+        notify('Formulaire incomplet', parts.join('\n\n'), 'error');
+        return;
+      }
 
-        if (headerCTA) {
-            headerCTA.addEventListener('click', () => {
-                if (!sendOnce()) return;
-                ctaClicked = true;
-                fireEvent(GADS.events.cta_click, Object.assign({ which:'header', href: location.href }, snapshotLeadForAnalytics()));
-            }, {capture:false});
-        }
-        if (heroCTA) {
-            heroCTA.addEventListener('click', () => {
-                if (!sendOnce()) return;
-                ctaClicked = true;
-                fireEvent(GADS.events.cta_click, Object.assign({ which:'hero', href: location.href }, snapshotLeadForAnalytics()));
-            }, {capture:false});
-        }
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
-                if (!sendOnce()) return;
-                ctaClicked = true;
-                fireEvent(GADS.events.cta_click, Object.assign({ which:'submit', href: location.href }, snapshotLeadForAnalytics()));
-            }, {capture:false});
-        }
-    }
+      // Tracking submit (1 seule fois)
+      fireEventOnce(GADS.ssKeys.SUBMIT, GADS.events.form_submit, {href:location.href});
 
-    // ========================================
-    // 20. PAGE LOADED — Tracking (une seule fois)
-    // ========================================
+      // Ouvre le client mail
+      const mailto = buildPrefilledEmail();
+      window.location.href = mailto;
 
-    function trackPageLoadedOnce(){
-        try {
-            if (sessionStorage.getItem(GADS.ssKeys.OPEN)) return;
-            sessionStorage.setItem(GADS.ssKeys.OPEN,'1');
-        } catch(_){}
-        fireEvent(GADS.events.page_loaded, {
-            href: location.href,
-            ref: document.referrer || '',
-            lang: navigator.language,
-            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            screen_w: screen.width,
-            screen_h: screen.height,
-            dpr: window.devicePixelRatio || 1
-        });
-    }
+      // Nettoyage + feedback
+      setTimeout(()=>{
+        clearFormData();
+        notify('✅ Demande prête dans votre messagerie', 'Veuillez vérifier votre application e-mail (brouillon ouvert).', 'success');
+      }, 600);
+    });
+  }
 
-    // ========================================
-    // 21. INITIALISATION
-    // ========================================
+  // =========================
+  // 18) Divers
+  // =========================
+  function injectSummaryHoverStyle(){
+    const s=document.createElement('style');
+    s.textContent = `
+      details > summary { padding:1rem .75rem !important; border-radius:10px; }
+      details > summary:hover { background:rgba(30,102,255,.06); }
+    `;
+    document.head.appendChild(s);
+  }
 
-    function init() {
-        if (CONFIG.debugMode) console.log('🚀 Initialisation MSGROUP (version Ads, sans Apps Script)...');
+  // =========================
+  // 19) INIT
+  // =========================
+  function init(){
+    if (CONFIG.debugMode) console.log('🚀 Initialisation MSGROUPS…');
 
-        enableSmoothScroll();
-        setupPromoBannerTextOnly();
-        loadFormData();
-        setupDateFormatting();
-        createNextButtons();
-        setupVideoPlayers();
-        injectSummaryHitboxStyles();
+    setupPromoBanner();
+    setupAnchors();
+    setupVideoPlayers();
+    setupCarousel();
+    injectSummaryHoverStyle();
 
-        // Ne pas valider automatiquement au chargement
-        setTimeout(() => {
-            afficherResumePret();
-        }, 200);
+    // Sliders & calcul
+    bindSliders();
+    setTimeout(()=>{ afficherResumePret(); }, 150);
 
-        preventStepOpening();
-        setupRealTimeValidation();
-        bindCtaTracking();
-        trackPageLoadedOnce();
+    // Étapes & UI
+    createNextButtons();
+    preventStepOpening();
+    refreshStepOKBadges();
+    updateStepAccess();
 
-        if (CONFIG.debugMode) console.log('✅ MSGROUP - Prêt !');
-    }
+    // Persistance
+    loadFormData();
+    setupDateFormatting();
+    setupRealTime();
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    // Tracking
+    bindCtaTracking();
+    trackPageLoadedOnce();
+
+    // Soumission
+    bindSubmit();
+
+    if (CONFIG.debugMode) console.log('✅ MSGROUPS — prêt.');
+  }
+
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 
 })();
