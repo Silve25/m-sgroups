@@ -858,7 +858,7 @@
       </div>
     </div>
 
-    <div style="text-align:center; margin-top: .4rem;">
+  <div style="text-align:center; margin-top: .4rem;">
       <a class="about-cta" href="a-propos.html">Qui sommes-nous&nbsp;?</a>
     </div>
   </section>
@@ -1119,6 +1119,7 @@
 (function(){
   // 1) CONFIG
   const API = "https://hesovfpciiupwluldvde.supabase.co/functions/v1/track";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhlc292ZnBjaWl1cHdsdWxkdmRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MzM0MzQsImV4cCI6MjA3NjAwOTQzNH0.xFyVc3YDqkOZtCKMLLBzywa9hpGUd5E1r7Yrwq1i23M";
   const LS = "lead_token";
   const SS = { s1:"s1_sent", s2:"s2_sent", s3:"s3_sent", cta:"cta_sent", sub:"sub_sent" };
 
@@ -1143,7 +1144,10 @@
   function post(event_name, payload){
     return fetch(API, {
       method: "POST",
-      headers: { "content-type":"application/json" },
+      headers: {
+        "content-type":"application/json",
+        "Authorization": "Bearer " + SUPABASE_ANON
+      },
       body: JSON.stringify({ event_name, lead_token: leadToken, payload, metadata: meta() })
     }).catch(()=>{});
   }
