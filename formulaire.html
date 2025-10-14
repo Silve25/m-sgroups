@@ -1,6 +1,33 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="fr">
 <head>
+  <!-- SEO de base -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MSGROUPS — Demande de financement rapide et facile</title>
+  <meta name="description" content="MSGROUPS — Demande de financement rapide et simple. Jusqu'à 200 000 €, décision et versement possibles en moins de 72 h après accord et signature." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://sergemagdeleinesolutions.fr/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MSGROUPS — Demande de financement" />
+  <meta property="og:description" content="Obtenez un financement jusqu'à 200 000 €. Processus simple, 100 % e-mail, décision et versement possibles en moins de 72 h après accord." />
+  <meta property="og:url" content="https://sergemagdeleinesolutions.fr/" />
+  <meta property="og:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png" />
+  <meta property="og:site_name" content="MSGROUPS" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MSGROUPS — Demande de financement" />
+  <meta name="twitter:description" content="Jusqu'à 200 000 €, parcours simple et rapide, décision et versement possibles en moins de 72 h après accord." />
+  <meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17600708002"></script>
   <script>
@@ -10,696 +37,966 @@
     gtag('config', 'AW-17600708002');
   </script>
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Snelle & betrouwbare lening — MSGROUP</title>
-  <meta name="description" content="Lening op maat vanaf 3% JKP. Countdown tot 30 oktober. Simulatie live, stappen helder, FAQ eenvoudig.">
-  <link rel="icon" href="https://sergemagdeleinesolutions.fr/logoMsg.png" />
-
   <style>
-    :root{
-      --bg:#f7f8fb; --fg:#0f1724; --muted:#667085; --line:#e6e9f2; --brand:#1a56db;
-      --ok:#12b76a; --warn:#d92d20; --card:#fff; --radius:16px; --shadow:0 10px 28px rgba(2,6,23,.06);
-      --accent:#fff7ed; --accentLine:#fed7aa; --hot:#b45309;
-      --safe: env(safe-area-inset-bottom, 0px);
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--fg);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial}
-    strong,b{font-weight:600} a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
-    .wrap{max-width:1040px;margin:34px auto;padding:0 18px}
-
-    /* Topbar */
-    .topbar{
-      position:sticky;top:0;z-index:60;background:#ffffffcc;backdrop-filter:saturate(140%) blur(8px);
-      border-bottom:1px solid var(--line);
-    }
-    .topbar-inner{
-      max-width:1120px;margin:0 auto;padding:8px 12px;
-      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-    }
-    .brand{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
-    .brand img.logo{height:32px;width:32px;border-radius:10px;flex:0 0 auto}
-    .brand h1{
-      font-weight:800;font-size:18px;line-height:1;letter-spacing:.1px;color:var(--brand);
-      display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .brand h1 img.badge{width:16px;height:16px;opacity:.95;flex:0 0 auto}
-
-    .nav{margin-left:auto;display:flex;gap:8px;align-items:center;flex:0 0 auto;flex-wrap:nowrap}
-    .nav a{padding:8px 10px;border-radius:10px;color:#0f1724;white-space:nowrap}
-    .nav a:hover{background:#eef2ff}
-    .nav a.cta{
-      background:var(--brand);color:#fff;font-weight:800;padding:10px 12px;border-radius:12px;border:0;
-      display:inline-flex;align-items:center;justify-content:center; gap:6px;
-      box-shadow:0 6px 18px rgba(26,86,219,.18); transition:transform .14s ease, box-shadow .2s ease;
-      font-size:14px;line-height:1;
-    }
-    .nav a.cta img.arrow{width:14px;height:14px;opacity:.9}
-    .nav a.cta:active{transform:translateY(1px)}
-
-    /* Mobile: centre le header (logo + nom + nav) */
-    @media (max-width:640px){
-      .topbar-inner{padding:10px 12px;flex-direction:column;align-items:center}
-      .brand{justify-content:center}
-      .brand img.logo{height:34px;width:34px}
-      .brand h1{font-size:17px}
-      .nav{margin-left:0}
-      .nav a{padding:6px 10px;font-size:14px}
-      .nav a.link-website{display:none}
-      .nav a.cta{padding:8px 10px}
-      .nav a.cta img.arrow{width:12px;height:12px}
-    }
-    @media (max-width:420px){
-      .brand h1{max-width:78vw;justify-content:center}
+    /* ========== Variables CSS ========== */
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f7f8fb;
+      --text: #0f172a;
+      --muted: #5b647a;
+      --line: #e6e8ef;
+      --brand: #1e66ff;
+      --accent: #16a34a;
+      --focus: #94b6ff;
+      --header-h: 60px;
     }
 
-    /* Global deadline banner */
-    .deadline-ribbon{
-      background:var(--accent); border-bottom:1px solid var(--accentLine); color:var(--hot);
-      padding:10px 18px; text-align:center; font-weight:800; font-size:14px;
-    }
-    .deadline-inline{display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
-    .pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px dashed var(--accentLine);color:var(--hot);border-radius:999px;padding:4px 10px;font-weight:800}
-    .pill img{width:16px;height:16px}
-    @media (max-width:420px){
-      .deadline-ribbon{font-size:13px;padding:8px 12px}
-      .pill{gap:6px}
+    /* ========== Reset & Base ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px; /* réduction globale ~1.5 pt */
+      line-height: 1.6; color: var(--text); background: var(--bg);
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* HERO */
-    .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
-    .kicker{display:inline-flex;gap:8px;align-items:center;background:#eef4ff;color:#3538CD;border:1px solid #d9e0ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:13px}
-    .hero h2{font-size:22px;margin:10px 0 6px;font-weight:800}
-    .hero p{color:#475467}
-    .usps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-    .usp{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:8px}
-    .usp img{width:20px;height:20px;opacity:.7}
-    .usp b{display:block;margin-bottom:4px;font-weight:700}
-    @media (max-width:900px){ .usps{grid-template-columns:1fr} }
-
-    /* CARD (form container) */
-    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px;position:relative}
-
-    /* Countdown above form */
-    .countdown{
-      display:flex;align-items:center;justify-content:center;gap:10px;background:#fff7ed;border:1px solid var(--accentLine);
-      border-radius:12px;padding:10px;margin:2px 0 12px 0;font-weight:800;color:#92400e; flex-wrap:wrap
-    }
-    .timer{font-variant-numeric:tabular-nums;font-size:16px}
-
-    /* FORM */
-    .form-shell{display:grid;grid-template-columns:1fr;gap:12px}
-    .form-title{font-size:18px;font-weight:800}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
-    .field{display:flex;flex-direction:column;gap:6px}
-    .label{font-size:13px;color:#111827;font-weight:800}
-    .input, .select{padding:12px;border:1px solid #e3e8ef;border-radius:12px;background:#fff;outline:0;transition:border-color .15s, box-shadow .15s}
-    .input:focus, .select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
-    .hint{font-size:12px;color:#667085}
-    .err{font-size:12px;color:#d92d20;display:none}
-    .err.show{display:block}
-    .invalid{border-color:var(--warn)!important; box-shadow:0 0 0 3px rgba(217,45,32,.12)!important}
-
-    /* Slider + micro-sim */
-    .panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
-    .amount-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .valbox{min-width:140px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#f8fafc;font-weight:800;text-align:center}
-    .slider{appearance:none;width:100%;height:8px;border-radius:999px;background:#e7ecf4;outline:none}
-    .slider::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 3px rgba(37,99,235,.2);cursor:pointer}
-
-    .micro-sim{display:none;margin-top:10px;padding:12px;border:1px dashed #93c5fd;background:#eff6ff;border-radius:12px;color:#1e3a8a;font-size:14px}
-    .micro-sim.show{display:block}
-    .micro-sim b{color:#0f1724}
-
-    /* Testimonials carousel */
-    .testi-title{font-size:18px;font-weight:800;margin:18px 0 8px}
-    .testi-viewport{overflow:hidden}
-    .track{display:flex;gap:14px;scroll-snap-type:x mandatory;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px}
-    .track::-webkit-scrollbar{height:6px}
-    .track::-webkit-scrollbar-thumb{background:rgba(26,86,219,0.18);border-radius:8px}
-    .slide{flex:0 0 320px;scroll-snap-align:center;background:#f8fafc;padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.03)}
-    .slide p{font-size:15px;color:#1f2937;margin-bottom:8px}
-    .who{font-weight:800;color:#1a56db;font-size:13px}
-    .addr{font-size:12px;color:#64748b}
-    .controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
-    .ctrl-btn{background:#eef2f7;border:1px solid #dde3ee;padding:8px 10px;border-radius:10px;cursor:pointer}
-    .ctrl-btn:hover{background:#e7edf7}
-
-    /* CTA (form) */
-    .btns{display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;margin-top:8px}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:12px 18px;border-radius:12px;font-weight:800;color:#fff;min-width:260px;border:0;
-      opacity:.6;pointer-events:none; position:relative;
-    }
-    .btn.enabled{opacity:1;pointer-events:auto; animation:ctaPulse 1.4s ease-in-out infinite}
-    @keyframes ctaPulse{0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)}}
-    .btn.email{background:#1a56db}
-    .btn img.mail{width:18px;height:18px}
-    .cta-note{font-size:12px;color:#475467;text-align:center}
-    .cta-note b{color:#1a56db}
-
-    /* Social proof bubble (fixed, smaller & lower) */
-    .social-proof{
-      position:fixed; right:12px; bottom:calc(12px + var(--safe)); z-index:70;
-      background:#0ea5e9; color:#fff; border-radius:12px; padding:8px 10px; box-shadow:0 8px 24px rgba(2,6,23,.18);
-      display:flex; align-items:center; gap:8px; font-weight:700; max-width:86vw; transform:translateY(8px); opacity:0; pointer-events:none;
-      transition:transform .25s ease, opacity .25s ease; font-size:12px; line-height:1.3;
-    }
-    .social-proof.show{opacity:1; transform:translateY(0)}
-    .social-proof img{width:16px;height:16px;filter:brightness(0) invert(1)}
-    @media (max-width:420px){
-      .social-proof{font-size:11px;padding:7px 9px;gap:6px}
-      .social-proof img{width:14px;height:14px}
+    a:focus, button:focus, input:focus, select:focus, textarea:focus, summary:focus {
+      outline: 4px solid var(--focus); outline-offset: 2px;
     }
 
-    /* Steps */
-    .section{margin-top:22px}
-    .section h3{font-size:18px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-    .section h3 img{width:20px;height:20px}
-    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    @media (max-width:900px){ .steps{grid-template-columns:1fr 1fr} }
-    @media (max-width:480px){ .steps{grid-template-columns:1fr} }
-    .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;gap:10px;align-items:flex-start;position:relative}
-    .step img{width:28px;height:28px}
-    .step b{display:block;margin-bottom:4px}
-    .step:after{content:"";position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:url('https://img.icons8.com/?size=100&id=26138&format=png&color=000000') center/contain no-repeat;opacity:.18}
-    .steps > :last-child:after{display:none}
+    /* ========== Header (sans menu) ========== */
+    .header {
+      position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+      z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .header-container {
+      max-width: 1200px; margin: 0 auto; padding: 0.5rem 1rem;
+      height: var(--header-h);
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .5rem;
+      grid-template-areas: "logo . cta";
+    }
+    .logo {
+      grid-area: logo;
+      display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+      color: var(--brand); font-weight: 700; font-size: .95rem;
+      letter-spacing: .2px;
+    }
+    .logo img {
+      height: 28px; width: 28px; display: block; object-fit: cover;
+      border-radius: 8px; /* bords arrondis du logo */
+    }
+    .brand-badge { width: 16px; height: 16px; }
 
-    /* FAQ (simple) */
-    .faq{margin-top:6px}
-    .qa{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
-    .qa summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:800}
-    .qa summary::-webkit-details-marker{display:none}
-    .qa div{padding:0 14px 14px 14px;color:#475467}
+    .cta-header{
+      grid-area: cta; justify-self: end;
+      background: var(--brand); color: #fff; padding: .45rem .8rem; border-radius: 10px;
+      text-decoration: none; font-weight: 600; font-size: .85rem; border: none; cursor: pointer;
+      transition: all .2s; display: inline-flex; align-items: center; gap: .35rem;
+    }
+    .cta-header:hover { background: #1557e0; transform: translateY(-1px); }
 
-    /* Small print */
-    .disclaimer{margin-top:10px;color:#64748b;font-size:12px}
+    @media (max-width: 900px){
+      .header-container { grid-template-columns: auto 1fr; grid-template-areas: "logo cta"; }
+      .cta-header { justify-self: center; }
+    }
+
+    /* ========== Bandeau promo ========== */
+    .promo-banner {
+      background: var(--bg-soft); border-bottom: 1px dashed var(--line);
+      padding: .5rem 1rem; text-align: center; color: var(--muted); font-size: .85rem;
+    }
+
+    /* ========== Héros ========== */
+    .hero {
+      position: relative;
+      padding: 2rem 1rem 1.8rem;
+      max-width: 1200px; margin: 0 auto;
+      text-align: center;
+      background: url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/pexels-olly-3760067.jpg') center/cover no-repeat;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero::after{
+      content:""; position:absolute; inset:0; background: rgba(255,255,255,0.15);
+      pointer-events:none;
+    }
+    .hero-inner{
+      position: relative;
+      max-width: 1000px; margin: 0 auto;
+      background: rgba(255,255,255,0.77); /* +1% de transparence (0.78 -> 0.77) */
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      border-radius: 16px;
+      padding: 1.4rem 1rem 1.25rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .hero h1 { font-size: 1.9rem; font-weight: 700; margin-bottom: .45rem; color: var(--text); line-height: 1.2; }
+    .hero-baseline { font-size: .98rem; color: var(--muted); margin-bottom: 1.1rem; }
+    .hero-features { display: grid; gap: .9rem; margin: 0 auto 1.25rem; text-align: left; max-width: 700px; }
+    .feature-item { display: flex; align-items: flex-start; gap: .6rem; }
+    .feature-icon { width: 24px; height: 24px; flex-shrink: 0; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .feature-icon img { width: 13px; height: 13px; filter: brightness(0) invert(1); }
+    .feature-text { flex: 1; font-size: .9rem; }
+    .feature-text strong { color: var(--text); display: block; margin-bottom: .08rem; }
+
+    .hero-ctas { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; }
+    .cta-primary, .cta-secondary {
+      padding: .65rem 1.2rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: .9rem;
+      transition: all .2s; display: inline-block; min-width: 160px; text-align: center;
+    }
+    .cta-primary { background: var(--brand); color: #fff; border: 2px solid var(--brand); }
+    .cta-primary:hover { background: #1557e0; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(30, 102, 255, 0.25); }
+    .cta-secondary { background: transparent; color: var(--brand); border: 2px solid var(--brand); }
+    .cta-secondary:hover { background: var(--bg-soft); }
+
+    @media (max-width: 760px) {
+      .hero { padding: 1.4rem .8rem 1rem; }
+      .hero h1 { font-size: 1.6rem; }
+      .hero-baseline { font-size: .92rem; margin-bottom: .95rem; }
+      .hero-ctas { flex-direction: column; }
+      .cta-primary, .cta-secondary { width: 100%; }
+    }
+
+    /* ========== Section générique ========== */
+    .section { padding: 2.6rem 1rem; max-width: 1200px; margin: 0 auto; }
+    .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.55rem; text-align: center; color: var(--text); }
+
+    /* ========== Formulaire (RESPONSIVE amélioré) ========== */
+    .form-section { background: var(--bg-soft); padding: 2.2rem 1rem; }
+    .form-container {
+      max-width: 800px; margin: 0 auto; background: var(--bg); padding: 1.8rem; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .form-intro { text-align: center; margin-bottom: 1.7rem; color: var(--muted); font-size: .9rem; }
+    .form-steps { display: flex; flex-direction: column; gap: 1rem; }
+
+    details { border: 2px solid var(--line); border-radius: 12px; padding: .9rem; background: var(--bg); transition: all .2s; }
+    details[open] { border-color: var(--brand); box-shadow: 0 4px 12px rgba(30, 102, 255, 0.08); }
+    summary { font-size: .95rem; font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: center; gap: .6rem; color: var(--text); }
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: '▶'; transition: transform .2s; color: var(--brand); font-size: .8rem; }
+    details[open] summary::before { transform: rotate(90deg); }
+
+    .step-content {
+      margin-top: .9rem; display: grid; gap: .9rem;
+      grid-template-columns: 1fr; /* mobile: 1 colonne */
+    }
+    /* 2 colonnes sur écrans moyens et +, avec éléments "full" sur toute largeur */
+    @media (min-width: 700px){
+      .step-content { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .form-group.full { grid-column: 1 / -1; }
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .3rem; width: 100%; min-width: 0; }
+    .form-label { font-weight: 600; color: var(--text); display: flex; align-items: center; gap: .45rem; font-size: .9rem; }
+    .form-label img { width: 16px; height: 16px; }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: .7rem; border: 2px solid var(--line); border-radius: 10px; font-size: .9rem; font-family: inherit; background: var(--bg); color: var(--text); transition: all .2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--brand); background: var(--bg-soft); }
+    .form-textarea { min-height: 110px; resize: vertical; }
+    .form-hint { font-size: .8rem; color: var(--muted); }
+
+    /* Range sliders */
+    .range-group { display: flex; flex-direction: column; gap: .55rem; }
+    .form-range {
+      width: 100%; height: 8px; border-radius: 8px;
+      background: linear-gradient(to right, var(--brand) 0%, var(--brand) 20%, var(--line) 20%, var(--line) 100%);
+      outline: none; -webkit-appearance: none; appearance: none;
+    }
+    .form-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--brand); cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .form-range::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--brand); cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .range-labels { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); margin-top: .2rem; }
+    .range-value { font-weight: 600; color: var(--brand); font-size: 1rem; margin-bottom: .25rem; }
+
+    .checkbox-group { display: grid; gap: .6rem; grid-template-columns: 1fr; }
+    @media (min-width: 700px){ .checkbox-group { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    .checkbox-item { display: flex; align-items: center; gap: .55rem; }
+    .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--brand); }
+    .checkbox-item label { cursor: pointer; font-weight: 500; font-size: .9rem; }
+
+    .form-submit { margin-top: 1.1rem; text-align: center; }
+    .cta-submit {
+      background: var(--accent); color: #fff; padding: .8rem 1.8rem; border-radius: 12px; border: none; font-size: .95rem; font-weight: 700;
+      cursor: pointer; transition: all .2s; width: 100%; max-width: 430px; display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+    }
+    .cta-submit img { width: 18px; height: 18px; filter: brightness(0) invert(1); }
+    .cta-submit:hover { background: #15a34a; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(22, 163, 74, 0.25); }
+    .submit-hint { margin-top: .65rem; font-size: .8rem; color: var(--muted); }
+
+    @media (max-width: 760px) {
+      .form-container { padding: 1.3rem .9rem; }
+      .section-title { font-size: 1.35rem; }
+    }
+
+    /* ========== Comment ça marche ========== */
+    .how-it-works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .step-card { background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 1.1rem .9rem; text-align: center; transition: all .2s; }
+    .step-card:hover { border-color: var(--brand); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); }
+    .step-icon { width: 46px; height: 46px; margin: 0 auto .9rem; background: var(--bg-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .step-icon img { width: 28px; height: 28px; }
+    .step-title { font-weight: 600; margin-bottom: .35rem; color: var(--text); font-size: .9rem; }
+    .step-desc { color: var(--muted); font-size: .85rem; line-height: 1.5; }
+
+    /* ========== Témoignages Carrousel ========== */
+    .testimonials-section { background: var(--bg-soft); overflow: hidden; }
+    .carousel-container { position: relative; max-width: 1200px; margin: 0 auto; }
+    .testimonials-carousel {
+      display: flex; gap: 1.1rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: .9rem 0 1.5rem;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .testimonials-carousel::-webkit-scrollbar { display: none; }
+    .testimonial-slide {
+      min-width: 100%; max-width: 100%; scroll-snap-align: center;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.1rem; padding: 0 1rem;
+    }
+    .testimonial-card {
+      background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem; transition: all .3s; position: relative; display: flex; flex-direction: column; height: 100%;
+    }
+    .testimonial-card:hover { border-color: var(--brand); box-shadow: 0 8px 20px rgba(0,0,0,0.08); transform: translateY(-4px); }
+    .testimonial-card::before { content: '"'; position: absolute; top: -10px; left: 20px; font-size: 3.5rem; color: var(--brand); opacity: .15; font-family: Georgia, serif; line-height: 1; }
+    .testimonial-text { color: var(--text); margin-bottom: .9rem; font-size: .92rem; line-height: 1.6; flex: 1; }
+    .testimonial-footer { display: flex; align-items: center; gap: .6rem; padding-top: .9rem; border-top: 1px solid var(--line); }
+    .testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--accent)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .95rem; flex-shrink: 0; }
+    .testimonial-author { font-weight: 600; color: var(--text); font-size: .9rem; margin-bottom: .08rem; }
+    .testimonial-location { color: var(--muted); font-size: .8rem; display: flex; align-items: center; gap: .3rem; }
+    .carousel-dots { display: flex; justify-content: center; gap: .5rem; margin-top: 1.1rem; }
+    .carousel-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); cursor: pointer; transition: all .3s; border: none; padding: 0; }
+    .carousel-dot:hover, .carousel-dot.active { background: var(--brand); transform: scale(1.2); }
+    @media (max-width: 900px) { .testimonial-slide { grid-template-columns: 1fr; } }
+
+    /* ========== Témoignages Vidéo ========== */
+    .video-testimonials { margin-top: 2rem; }
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.1rem; }
+    .video-card {
+      position: relative; background: var(--bg); border-radius: 12px; overflow: hidden; border: 2px solid var(--line);
+      transition: all .3s; cursor: pointer;
+    }
+    .video-card:hover { border-color: var(--brand); box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: translateY(-4px); }
+    .video-thumbnail { position: relative; width: 100%; overflow: hidden; }
+    .video-thumbnail.thumb-cover { padding-top: 100%; background-size: cover; background-position: center center; background-repeat: no-repeat; }
+    .video-thumbnail::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.35)); }
+    .video-play-button {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 56px; height: 56px; background: rgba(255,255,255,.95); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; z-index: 2; transition: all .3s; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .video-card:hover .video-play-button { background: #fff; transform: translate(-50%, -50%) scale(1.1); }
+    .video-play-button::after {
+      content: ''; width: 0; height: 0; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent var(--brand); margin-left: 4px;
+    }
+    .video-duration {
+      position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,.85); color: #fff; padding: .3rem .55rem; border-radius: 6px; font-size: .75rem; font-weight: 600; z-index: 2;
+    }
+    .video-info { padding: .9rem; }
+    .video-author { font-weight: 600; color: var(--text); margin-bottom: .2rem; font-size: .9rem; }
+    .video-location { color: var(--muted); font-size: .8rem; display: flex; align-items: center; gap: .3rem; }
+
+    /* ========== Pourquoi nous choisir ========== */
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.1rem; }
+    .why-card { background: var(--bg-soft); border-radius: 12px; padding: 1.3rem; }
+    .why-title { font-weight: 600; font-size: .95rem; margin-bottom: .5rem; color: var(--text); }
+    .why-desc { color: var(--muted); font-size: .88rem; line-height: 1.5; }
+    @media (max-width: 760px) { .why-grid { grid-template-columns: 1fr; } }
+
+    .about-cta {
+      display: inline-block; margin: 1rem auto 0; padding: .5rem .85rem; font-size: .85rem; color: var(--brand);
+      border: 1px solid var(--line); border-radius: 10px; text-decoration: none; transition: background .2s, transform .2s;
+    }
+    .about-cta:hover { background: var(--bg-soft); transform: translateY(-1px); }
+
+    /* ========== FAQ ========== */
+    .faq { background: var(--bg); border-top: 1px solid var(--line); }
+    .faq-grid { max-width: 1000px; margin: 0 auto; display: grid; gap: 1rem; }
+    .faq details {
+      background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .faq details[open] { border-color: var(--brand); box-shadow: 0 6px 14px rgba(30,102,255,.08); }
+    .faq summary {
+      font-weight: 600; cursor: pointer; list-style: none; display: flex; align-items: flex-start; gap: .6rem; color: var(--text); font-size: .95rem;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::before { content: "❓"; font-size: 1rem; line-height: 1.1; }
+    .faq .answer { margin-top: .7rem; color: var(--muted); font-size: .9rem; }
+    .faq ul { padding-left: 1.1rem; margin: .5rem 0; }
+    .faq li { margin: .2rem 0; }
+
+    /* ========== Footer ========== */
+    .footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding: 1.8rem 1rem 1.3rem; text-align: center; }
+    .footer-links { display: flex; gap: 1.1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.1rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-weight: 500; font-size: .85rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--brand); }
+    .footer-copyright { color: var(--muted); font-size: .8rem; margin-bottom: .3rem; }
+    .footer-disclaimer { color: var(--muted); font-size: .75rem; font-style: italic; }
+    @media (max-width: 760px) { .footer-links { flex-direction: column; gap: .65rem; } }
   </style>
 </head>
 <body>
 
-<!-- Global deadline banner -->
-<div class="deadline-ribbon" role="note" aria-live="polite">
-  <span class="deadline-inline">
-    <span class="pill"><img src="https://img.icons8.com/?size=100&id=nkGDoqzPxYM3&format=png&color=000000" alt="">Aanbod sluit op <b>30 oktober</b></span>
-  </span>
-</div>
-
-<!-- Sticky header -->
-<div class="topbar" role="navigation" aria-label="Hoofdnavigatie">
-  <div class="topbar-inner">
-    <a href="#" class="brand" aria-label="MSGROUP home">
-      <img class="logo" src="logoMsg.png" alt="MSGROUP logo">
-      <h1>MSGROUP <img class="badge" src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt="gecertificeerd"></h1>
-    </a>
-    <nav class="nav">
-      <a href="#formSection" class="link-form" aria-label="Ga naar het formulier">Formulier</a>
-      <a href="https://sergemagdeleinesolutions.fr/" class="link-website" target="_blank" rel="noopener" aria-label="Bezoek onze website">Website</a>
-      <a href="#formSection" id="navCta" class="cta" aria-label="Financiering aanvragen">
-        <span>Financiering aanvragen</span>
-        <img class="arrow" src="https://img.icons8.com/?size=100&id=26138&format=png&color=000000" alt="">
+  <!-- ========== Header ========== -->
+  <header class="header">
+    <div class="header-container">
+      <a href="#" class="logo" aria-label="MSGROUPS - Accueil">
+        <img src="https://sergemagdeleinesolutions.fr/logoMsg.png" alt="MSGROUPS" />
+        MSGROUPS
+        <img class="brand-badge" src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt="Certifié" />
       </a>
-    </nav>
-  </div>
-</div>
+      <a href="#formulaire" class="cta-header">Demander un prêt</a>
+    </div>
+  </header>
 
-<div class="wrap">
-  <!-- HERO -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="kicker">Tijdelijk voordeel t/m <b>30 oktober</b></div>
-    <h2 id="hero-title">Vraag uw lening aan — snel, transparant, realistisch</h2>
-    <p><strong>Wat doen wij?</strong> Financiering op maat met <strong>rente vanaf 3% JKP</strong>, duidelijke voorwaarden en <strong>flexibele looptijden</strong>. Vaak <strong>uitbetaling &lt; 3 dagen</strong>.</p>
-    <div class="usps">
-      <div class="usp"><img src="https://img.icons8.com/?size=100&id=64638&format=png&color=000000" alt=""><div><b>Vanaf 3% JKP</b><span>Marktconform en afgestemd op uw profiel.</span></div></div>
-      <div class="usp"><img src="https://img.icons8.com/?size=100&id=nkGDoqzPxYM3&format=png&color=000000" alt=""><div><b>Snelle goedkeuring</b><span>Indicatief binnen 24–48u; vaak uitbetaling binnen 3 dagen.</span></div></div>
-      <div class="usp"><img src="https://img.icons8.com/?size=100&id=L4TKxAee4EJ2&format=png&color=000000" alt=""><div><b>Heldere stappen</b><span>U weet precies wat er volgt — wij begeleiden u.</span></div></div>
+  <!-- ========== Bandeau promo ========== -->
+  <div class="promo-banner" role="banner">
+    Offre valable jusqu'au 30 octobre 23:59
+  </div>
+
+  <!-- ========== Héros ========== -->
+  <section class="hero" aria-label="Financement rapide et facile">
+    <div class="hero-inner">
+      <h1>Financement rapide et facile</h1>
+      <p class="hero-baseline">Des solutions adaptées à votre situation.</p>
+
+      <div class="hero-features">
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <img src="https://img.icons8.com/?size=100&id=63760&format=png&color=000000" alt="" />
+          </div>
+          <div class="feature-text">
+            <strong>Montant jusqu'à 200 000 €</strong>
+            selon dossier et durée choisie.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <img src="https://img.icons8.com/?size=100&id=63760&format=png&color=000000" alt="" />
+          </div>
+          <div class="feature-text">
+            <strong>Prêt disponible en moins de 72 h</strong>
+            après accord et signature.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <img src="https://img.icons8.com/?size=100&id=63760&format=png&color=000000" alt="" />
+          </div>
+          <div class="feature-text">
+            <strong>Dossiers variés acceptés</strong>
+            particuliers, entreprises, trésorerie, auto, immobilier, consolidation, situations d'endettement.
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="#formulaire" class="cta-primary">Demander un prêt</a>
+        <a href="#pourquoi-nous-choisir" class="cta-secondary">En savoir plus</a>
+      </div>
     </div>
   </section>
 
-  <div class="card" id="formSection">
-    <!-- Countdown ABOVE form to Oct 30 -->
-    <div class="countdown" aria-live="polite">
-      ⏳ Nog <span class="timer" id="timer">00:00:00</span> tot <b>30 oktober 23:59</b>
-    </div>
+  <!-- ========== Formulaire ========== -->
+  <section id="formulaire" class="form-section">
+    <div class="form-container">
+      <h2 class="section-title">Remplissez ce formulaire pour nous permettre de vous contacter facilement</h2>
+      <p class="form-intro">Complétez les informations ci-dessous en 3 étapes simples.</p>
 
-    <!-- FORM (no icons inside) -->
-    <div class="form-shell">
-      <div class="form-title">Aanvraagformulier</div>
+      <form action="mailto:contact@msgroup.example?subject=Demande%20de%20financement%20-%20MSGROUPS" method="post" enctype="text/plain" novalidate>
+        <div class="form-steps">
 
-      <form id="leadForm" novalidate>
-        <div class="form-grid">
-          <div class="field">
-            <span class="label">Voornaam</span>
-            <input id="firstName" class="input" type="text" placeholder="Bijv. Jan" autocomplete="given-name" required>
-            <div id="e_fname" class="err">Vul uw voornaam in.</div>
-          </div>
-          <div class="field">
-            <span class="label">Achternaam</span>
-            <input id="lastName" class="input" type="text" placeholder="Bijv. Jansen" autocomplete="family-name" required>
-            <div id="e_lname" class="err">Vul uw achternaam in.</div>
-          </div>
+          <!-- Étape 1 -->
+          <details open>
+            <summary>Informations de base (1/3)</summary>
+            <div class="step-content">
+              <div class="form-group">
+                <label for="prenom" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=WWIRij774QJt&format=png&color=000000" alt="" aria-hidden="true" />
+                  Prénom
+                </label>
+                <input type="text" id="prenom" name="Prénom" class="form-input" required autocomplete="given-name" placeholder="Jean" />
+              </div>
+
+              <div class="form-group">
+                <label for="nom" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=WWIRij774QJt&format=png&color=000000" alt="" aria-hidden="true" />
+                  Nom
+                </label>
+                <input type="text" id="nom" name="Nom" class="form-input" required autocomplete="family-name" placeholder="Dupont" />
+              </div>
+
+              <div class="form-group">
+                <label for="date-naissance" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=60611&format=png&color=000000" alt="" aria-hidden="true" />
+                  Date de naissance (JJ/MM/AAAA)
+                </label>
+                <input type="text" id="date-naissance" name="Date de naissance" class="form-input" placeholder="01/01/1990" required autocomplete="bday" pattern="\d{2}/\d{2}/\d{4}" />
+                <span class="form-hint">Vous devez avoir au moins 18 ans</span>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=53388&format=png&color=000000" alt="" aria-hidden="true" />
+                  E-mail
+                </label>
+                <input type="email" id="email" name="E-mail" class="form-input" required autocomplete="email" placeholder="jean.dupont@email.com" />
+              </div>
+
+              <div class="form-group">
+                <label for="whatsapp" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=vbST8WV7crEk&format=png&color=000000" alt="" aria-hidden="true" />
+                  Numéro WhatsApp
+                </label>
+                <input type="tel" id="whatsapp" name="Numéro WhatsApp" class="form-input" placeholder="+31 6 12345678" required autocomplete="tel" />
+                <span class="form-hint">Format international recommandé (ex: +31 pour Pays-Bas)</span>
+              </div>
+
+              <div class="form-group">
+                <label for="pays" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=108777&format=png&color=000000" alt="" aria-hidden="true" />
+                  Pays
+                </label>
+                <select id="pays" name="Pays" class="form-select" required>
+                  <option value="">-- Sélectionnez votre pays --</option>
+                  <option value="Pays-Bas">Pays-Bas</option>
+                  <option value="Belgique">Belgique</option>
+                  <option value="France">France</option>
+                  <option value="Allemagne">Allemagne</option>
+                  <option value="Espagne">Espagne</option>
+                  <option value="Italie">Italie</option>
+                  <option value="Portugal">Portugal</option>
+                  <option value="Luxembourg">Luxembourg</option>
+                  <option value="Irlande">Irlande</option>
+                  <option value="Danemark">Danemark</option>
+                  <option value="Suède">Suède</option>
+                  <option value="Finlande">Finlande</option>
+                  <option value="Norvège">Norvège</option>
+                  <option value="Islande">Islande</option>
+                  <option value="Suisse">Suisse</option>
+                  <option value="Autriche">Autriche</option>
+                  <option value="Tchéquie">Tchéquie</option>
+                  <option value="Pologne">Pologne</option>
+                  <option value="Hongrie">Hongrie</option>
+                  <option value="Slovénie">Slovénie</option>
+                  <option value="Slovaquie">Slovaquie</option>
+                  <option value="Croatie">Croatie</option>
+                  <option value="Grèce">Grèce</option>
+                  <option value="Bulgarie">Bulgarie</option>
+                  <option value="Roumanie">Roumanie</option>
+                  <option value="Estonie">Estonie</option>
+                  <option value="Lettonie">Lettonie</option>
+                  <option value="Lituanie">Lituanie</option>
+                  <option value="Chypre">Chypre</option>
+                  <option value="Malte">Malte</option>
+                  <option value="Royaume-Uni">Royaume-Uni</option>
+                  <option value="Liechtenstein">Liechtenstein</option>
+                </select>
+              </div>
+            </div>
+          </details>
+
+          <!-- Étape 2 -->
+          <details>
+            <summary>Votre prêt (2/3)</summary>
+            <div class="step-content">
+              <div class="form-group full">
+                <label for="montant" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=2800&format=png&color=000000" alt="" aria-hidden="true" />
+                  Montant souhaité
+                </label>
+                <div class="range-group">
+                  <div class="range-value" id="montant-value" aria-live="polite">10 000 €</div>
+                  <input type="range" id="montant" name="Montant souhaité (€)" class="form-range" min="2000" max="200000" step="500" value="10000" required aria-label="Montant souhaité en euros" />
+                  <div class="range-labels">
+                    <span>2 000 €</span><span>200 000 €</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label for="duree" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=60611&format=png&color=000000" alt="" aria-hidden="true" />
+                  Durée souhaitée
+                </label>
+                <div class="range-group">
+                  <div class="range-value" id="duree-value" aria-live="polite">36 mois</div>
+                  <input type="range" id="duree" name="Durée souhaitée (mois)" class="form-range" min="6" max="120" step="6" value="36" required aria-label="Durée souhaitée en mois" />
+                  <div class="range-labels">
+                    <span>6 mois</span><span>120 mois</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label for="raison" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=59736&format=png&color=000000" alt="" aria-hidden="true" />
+                  Raison du projet
+                </label>
+                <textarea id="raison" name="Raison du projet" class="form-textarea" placeholder="Décrivez brièvement votre besoin (auto, travaux, trésorerie, consolidation, immobilier, etc.)." required minlength="10" maxlength="1000"></textarea>
+                <span class="form-hint">Minimum 10 caractères</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Étape 3 -->
+          <details>
+            <summary>Votre profil (3/3)</summary>
+            <div class="step-content">
+              <div class="form-group">
+                <label for="statut" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=53371&format=png&color=000000" alt="" aria-hidden="true" />
+                  Statut professionnel
+                </label>
+                <select id="statut" name="Statut professionnel" class="form-select" required>
+                  <option value="">-- Sélectionnez --</option>
+                  <option value="CDI">CDI</option>
+                  <option value="CDD">CDD</option>
+                  <option value="Indépendant">Indépendant</option>
+                  <option value="Étudiant">Étudiant</option>
+                  <option value="Retraité">Retraité</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="revenus" class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=2800&format=png&color=000000" alt="" aria-hidden="true" />
+                  Revenus réguliers ?
+                </label>
+                <select id="revenus" name="Revenus réguliers" class="form-select" required>
+                  <option value="">-- Sélectionnez --</option>
+                  <option value="Oui">Oui</option>
+                  <option value="Parfois">Parfois</option>
+                  <option value="Pas pour l'instant">Pas pour l'instant</option>
+                </select>
+              </div>
+
+              <div class="form-group full">
+                <label class="form-label">
+                  <img src="https://img.icons8.com/?size=100&id=59736&format=png&color=000000" alt="" aria-hidden="true" />
+                  Pièces à disposition
+                </label>
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="piece1" name="Pièce: Carte d'identité" value="Oui" />
+                    <label for="piece1">Carte d'identité</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="piece2" name="Pièce: Preuve de revenus" value="Oui" />
+                    <label for="piece2">Preuve de revenus</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="piece3" name="Pièce: Relevé bancaire récent" value="Oui" />
+                    <label for="piece3">Relevé bancaire récent</label>
+                  </div>
+                </div>
+                <span class="form-hint">Optionnel — cochez les documents dont vous disposez</span>
+              </div>
+            </div>
+          </details>
         </div>
 
-        <div class="form-grid">
-          <div class="field">
-            <span class="label">E-mailadres</span>
-            <input id="email" class="input" type="email" placeholder="bijv. naam@domein.nl" autocomplete="email" required>
-            <div class="hint">Gebruik uw echte e-mail (geen tijdelijk adres).</div>
-            <div id="e_email" class="err">Voer een geldig e-mailadres in.</div>
-          </div>
-          <div class="field">
-            <span class="label">Land</span>
-            <select id="country" class="select" required></select>
-            <div class="hint">Standaard: Nederland. U kunt dit wijzigen.</div>
-          </div>
+        <div class="form-submit">
+          <button type="submit" class="cta-submit">
+            <img src="https://img.icons8.com/?size=100&id=63499&format=png&color=000000" alt="" aria-hidden="true" />
+            Envoyer ma demande par e-mail maintenant
+          </button>
+          <p class="submit-hint">Votre messagerie s'ouvrira et le message sera prêt à envoyer.</p>
         </div>
-
-        <div class="form-grid">
-          <div class="field">
-            <span class="label">Telefoon</span>
-            <input id="phone" class="input" type="tel" inputmode="tel" placeholder="Voorbeeld: +31 6 12 34 56 78" required>
-            <div class="hint">Typ uw <strong>volledig internationaal nummer</strong> met "+" (bv. <strong>+31 …</strong>).</div>
-            <div id="e_phone" class="err">Nummer ongeldig.</div>
-          </div>
-          <div class="field">
-            <span class="label">Duur van de lening</span>
-            <select id="duration" class="select">
-              <option value="12">12 maanden</option>
-              <option value="24">24 maanden</option>
-              <option value="36">36 maanden</option>
-              <option value="48">48 maanden</option>
-              <option value="60" selected>60 maanden (5 jaar)</option>
-              <option value="84">84 maanden</option>
-              <option value="120">120 maanden</option>
-              <option value="180">180 maanden</option>
-              <option value="240">240 maanden</option>
-              <option value="360">360 maanden</option>
-            </select>
-            <div class="hint">Kies een comfortabele looptijd.</div>
-          </div>
-        </div>
-
-        <div class="field" style="margin-top:2px">
-          <span class="label">Doel van de lening</span>
-          <input id="purpose" class="input" type="text" placeholder="Bijv. auto, renovatie, consolidatie, investering…">
-        </div>
-
-        <label class="field" style="flex-direction:row;align-items:flex-start;gap:10px;margin-top:6px">
-          <input type="checkbox" id="consent" required>
-          <span class="hint" style="margin-top:0">Ik ga akkoord dat MSGROUP mijn gegevens verwerkt om mijn aanvraag te beoordelen.</span>
-        </label>
       </form>
+    </div>
+  </section>
 
-      <!-- Slider + micro-sim -->
-      <div class="panel" style="margin-top:4px">
-        <div class="amount-row">
-          <h4>Gewenst leenbedrag</h4>
-          <div id="amtBox" class="valbox">10 000 €</div>
+  <!-- ========== Comment ça marche ========== -->
+  <section id="comment-ca-marche" class="section">
+    <h2 class="section-title">Comment ça marche</h2>
+    <div class="how-it-works-grid">
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=S1RK2Nhn2FC5&format=png&color=000000" alt="" />
         </div>
-        <input id="amount" class="slider" type="range" min="1000" max="200000" step="500" value="10000" aria-label="Leenbedrag">
-        <div class="hint">Minimum 1 000 €, maximum 200 000 €.</div>
+        <div class="step-title">Vous remplissez le formulaire</div>
+        <div class="step-desc">Saisissez vos informations et votre demande.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=41430&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Vous envoyez l'e-mail pré-rempli</div>
+        <div class="step-desc">Un message est prêt dans votre messagerie.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=124439&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Nous recevons votre demande</div>
+        <div class="step-desc">Votre dossier est pris en charge.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=53388&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Nous échangeons par e-mail</div>
+        <div class="step-desc">Questions, précisions et options.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=t5GRNS5yIsHP&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Vous signez le contrat</div>
+        <div class="step-desc">Signature simple et sécurisée.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=xBAYHpSy5zYd&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Les fonds sont versés</div>
+        <div class="step-desc">En moins de 72 h après accord.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-icon" aria-hidden="true">
+          <img src="https://img.icons8.com/?size=100&id=15114&format=png&color=000000" alt="" />
+        </div>
+        <div class="step-title">Vous remboursez</div>
+        <div class="step-desc">Selon l'échéancier prévu.</div>
+      </div>
+    </div>
+  </section>
 
-        <!-- Micro-simulation dynamic -->
-        <div id="microSim" class="micro-sim" aria-live="polite">
-          <span id="microSimText">Indicatie: €—/maand — <b>geldig t/m 30/10 23:59</b>.</span>
+  <!-- ========== Témoignages Carrousel ========== -->
+  <section id="témoignages" class="section testimonials-section">
+    <h2 class="section-title">Ce que disent nos clients</h2>
+    <div class="carousel-container">
+      <div class="testimonials-carousel" role="region" aria-label="Témoignages clients" tabindex="0">
+        <!-- Slide 1 -->
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-text">Montant approuvé rapidement, étapes claires. Délais respectés et échanges par e-mail uniquement. Le processus était vraiment simple et transparent, j'ai reçu les fonds en moins de 72 h.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">AF</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Aline F.</div>
+                <div class="testimonial-location">Amsterdam</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">En tant qu'indépendant, j'avais besoin de trésorerie rapidement. MSGROUPS a su s'adapter à ma situation et m'a proposé un échéancier compréhensible. Service réactif et professionnel.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">MD</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Marc D.</div>
+                <div class="testimonial-location">Rotterdam</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">J'étais dans une situation d'endettement complexe. L'équipe a pris le temps d'étudier mon dossier et m'a proposé une solution de consolidation adaptée. Merci pour votre accompagnement.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">SL</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Sophie L.</div>
+                <div class="testimonial-location">Utrecht</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-text">Financement auto obtenu en quelques jours seulement. Les échanges par e-mail étaient clairs et je n'ai jamais eu besoin d'appeler. Parfait pour mon emploi du temps chargé.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">TV</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Thomas V.</div>
+                <div class="testimonial-location">Eindhoven</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">Retraitée, j'avais des doutes sur ma capacité à obtenir un prêt. MSGROUPS a été à l'écoute et m'a proposé des conditions adaptées à mes revenus. Processus rassurant de bout en bout.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">MC</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Marie C.</div>
+                <div class="testimonial-location">La Haye</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">Projet immobilier concrétisé grâce à MSGROUPS. Le montant était important mais l'échéancier était compréhensible et bien expliqué. Service client très réactif, je recommande.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">PM</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Pierre M.</div>
+                <div class="testimonial-location">Groningen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <p class="testimonial-text">Besoin urgent de financement pour des travaux. Délai de 72 h respecté après signature du contrat. Communication fluide et professionnelle tout au long du processus.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">LB</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Laura B.</div>
+                <div class="testimonial-location">Haarlem</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">En CDD, je pensais que ce serait compliqué. MSGROUPS accepte les dossiers variés et m'a proposé une solution flexible. Versement rapide et sans mauvaise surprise.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">KS</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Kevin S.</div>
+                <div class="testimonial-location">Maastricht</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <p class="testimonial-text">Consolidation de dettes réussie. L'équipe a pris le temps d'analyser ma situation et de me proposer un plan de remboursement réaliste. Enfin une solution claire et honnête.</p>
+            <div class="testimonial-footer">
+              <div class="testimonial-avatar" aria-hidden="true">NR</div>
+              <div class="testimonial-info">
+                <div class="testimonial-author">Nathalie R.</div>
+                <div class="testimonial-location">Leiden</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- CTA (NL + Gmail icon) -->
-      <div class="btns">
-        <button id="ctaEmail" class="btn email" type="button" disabled>
-          <img class="mail" src="https://img.icons8.com/?size=100&id=qyRpAggnV0zH&format=png&color=000000" alt="">
-          Vraag nu een lening aan
-        </button>
-        <div class="cta-note">Indicatieve simulatie — <b>geldig t/m 30 oktober 23:59</b>.</div>
+      <!-- Dots (visuels) -->
+      <div class="carousel-dots" role="tablist" aria-label="Navigation carrousel">
+        <button class="carousel-dot active" role="tab" aria-label="Témoignages 1 à 3" aria-selected="true"></button>
+        <button class="carousel-dot" role="tab" aria-label="Témoignages 4 à 6" aria-selected="false"></button>
+        <button class="carousel-dot" role="tab" aria-label="Témoignages 7 à 9" aria-selected="false"></button>
       </div>
     </div>
 
-    <!-- Social proof bubble (fixed, small text, lower) -->
-    <div id="socialProof" class="social-proof" aria-live="polite">
-      <img src="https://img.icons8.com/?size=100&id=PVPUVpdb7Cpt&format=png&color=000000" alt="" />
-      <span id="socialProofText">Claire B. uit Rotterdam kreeg zojuist een aanbod</span>
-    </div>
+    <!-- ========== Témoignages Vidéo ========== -->
+    <div class="video-testimonials">
+      <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.1rem; text-align: center; color: var(--text);">Témoignages vidéo</h3>
+      <div class="video-grid">
+        <div class="video-card" data-video-id="1">
+          <div class="video-thumbnail thumb-cover"
+               style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(1).jpg');"
+               role="img" aria-label="Miniature vidéo 1"></div>
+          <div class="video-duration">2:34</div>
+          <div class="video-info">
+            <div class="video-author">Sophie M.</div>
+            <div class="video-location">Amsterdam</div>
+          </div>
+          <div class="video-play-button" aria-label="Lire la vidéo"></div>
+        </div>
 
-    <!-- Getuigenissen (20 volledig) -->
-    <h3 class="testi-title">Wat zeggen onze klanten over ons?</h3>
-    <div class="testi-viewport" aria-label="Klantgetuigenissen">
-      <div class="track" id="track" tabindex="0" aria-roledescription="carousel" aria-label="Getuigenissen - horizontaal scrollen">
-        <!-- 1 -->
-        <div class="slide"><p>“Mijn autolening was in minder dan drie dagen geregeld. De adviseur belde mij na elke stap, legde de documenten helder uit en waarschuwde voor eventuele bijkomende kosten zodat ik niet voor verrassingen kwam te staan. De maandlasten passen precies binnen mijn budget en ik kan vervroegd aflossen zonder gedoe.”</p><div class="who">— Marc L.</div><div class="addr">Keizersgracht 321, 1016 EE Amsterdam</div></div>
-        <!-- 2 -->
-        <div class="slide"><p>“Binnen 48 uur lag er een voorstel met meerdere scenario’s. We kozen samen voor een iets langere looptijd zodat de cashflow voor mijn kleine zaak gezond blijft. Het was prettig dat de voorwaarden in gewone taal stonden en ik snel antwoord kreeg.”</p><div class="who">— Claire B.</div><div class="addr">Mathenesserlaan 88, 3014 HH Rotterdam</div></div>
-        <!-- 3 -->
-        <div class="slide"><p>“Voor een verbouwing zocht ik een realistische financiering. Er werd meteen gevraagd naar mijn planning en offertes, waarna ik een transparant overzicht van kosten, rente en totale aflossing kreeg. De uitbetaling volgde vlot en de nazorg was aandachtig.”</p><div class="who">— Sophie M.</div><div class="addr">Twijnstraat 14, 3511 ZH Utrecht</div></div>
-        <!-- 4 -->
-        <div class="slide"><p>“Ik heb hergefinancierd om lagere maandlasten te krijgen. De overstap werd nagenoeg volledig voor me geregeld, inclusief het opvragen van oude stukken. De nieuwe rente en looptijd zijn eerlijk onderbouwd met marktvergelijkingen. Geen kleine lettertjes, wel duidelijkheid.”</p><div class="who">— Julien R.</div><div class="addr">Frederik Hendriklaan 227, 2582 CB Den Haag</div></div>
-        <!-- 5 -->
-        <div class="slide"><p>“De simulatie hielp me beslissen welk bedrag verantwoord was. Na het indienen van mijn loonstrook en bankafschriften was de voorlopige goedkeuring er snel. Betaaldata kon ik zelf kiezen, wat voor mijn salariscyclus ideaal is.”</p><div class="who">— Tom W.</div><div class="addr">KNSM-laan 190, 1019 LC Amsterdam</div></div>
-        <!-- 6 -->
-        <div class="slide"><p>“Als starter had ik weinig tijd voor papierwerk. Ik kreeg een checklist met exacte documenten en voorbeelden, waardoor ik alles in één keer goed kon aanleveren. De communicatie was vriendelijk en to the point. Aanrader.”</p><div class="who">— Iris D.</div><div class="addr">Stationsstraat 5, 6211 BP Maastricht</div></div>
-        <!-- 7 -->
-        <div class="slide"><p>“Voor de aankoop van een bestelbus kreeg ik meerdere opties: variabele of vaste rente, en uitleg over de impact op de totale kosten. Ik koos vast, omdat ik rust wilde. De totale JKP/TAEG werd netjes voorgetoond en klopte bij het contract.”</p><div class="who">— Ahmed K.</div><div class="addr">Europalaan 60, 3526 KS Utrecht</div></div>
-        <!-- 8 -->
-        <div class="slide"><p>“Mijn vorige kredietverstrekker reageerde traag. Hier werd ik dezelfde dag nog teruggebeld met gerichte vragen. Het gevoel dat iemand meedenkt en niet pusht, maakte het verschil. Nu heb ik duidelijk zicht op aflossing én reserve.”</p><div class="who">— Niels V.</div><div class="addr">Bergse Dorpsstraat 133, 3054 GC Rotterdam</div></div>
-        <!-- 9 -->
-        <div class="slide"><p>“Voor renovatie van mijn dak kreeg ik een helder schema met termijnen en controlepunten. Er werd zelfs uitgelegd wat er gebeurt als de aannemer uitloopt, zodat ik niet onnodig rente betaal. De flexibiliteit was precies wat ik zocht.”</p><div class="who">— Petra S.</div><div class="addr">Zijlweg 210, 2015 CK Haarlem</div></div>
-        <!-- 10 -->
-        <div class="slide"><p>“Ik combineerde twee kleine leningen tot één overzichtelijk krediet. De adviseur rekende live verschillende scenario’s voor en liet zien hoeveel ik bespaarde op totale rente. Het contract en de SEPA-machtiging waren direct digitaal te tekenen.”</p><div class="who">— Björn T.</div><div class="addr">Grote Markt 11, 9712 HN Groningen</div></div>
-        <!-- 11 -->
-        <div class="slide"><p>“Als zzp’er wilde ik geen strakke verplichtingen tijdens rustige maanden. De mogelijkheid tot kosteloos extra aflossen en betaalpauze bij seizoendips gaf me vertrouwen. Documentcontrole ging snel nadat ik mijn btw-aangiften uploadde.”</p><div class="who">— Laura J.</div><div class="addr">Wycker Grachtstraat 7, 6221 CX Maastricht</div></div>
-        <!-- 12 -->
-        <div class="slide"><p>“Ik kreeg eerlijke feedback dat mijn eerste bedrag te hoog was voor mijn inkomen. Samen stelden we het bij en kreeg ik toch een nette rente. Beter een haalbaar voorstel dan loze beloftes; die transparantie waardeer ik.”</p><div class="who">— Koen P.</div><div class="addr">Assendorperstraat 98, 8012 CE Zwolle</div></div>
-        <!-- 13 -->
-        <div class="slide"><p>“Voor studie en verhuis heb ik een kleiner krediet genomen. Er werd rekening gehouden met mijn toekomstige inkomsten, zonder dat er druk werd gezet. Duidelijke app-updates en snelle uitbetaling, precies volgens afspraak.”</p><div class="who">— Jasmijn E.</div><div class="addr">Oudedijk 56, 3062 AE Rotterdam</div></div>
-        <!-- 14 -->
-        <div class="slide"><p>“De berekening van JKP en totale kosten was uitzonderlijk transparant. Ik kon rustig vergelijken met mijn bank, en kreeg zelfs tips waar ik op moest letten. Uiteindelijk bleek dit aanbod beter te passen bij mijn plannen.”</p><div class="who">— Wouter H.</div><div class="addr">Vismarkt 4, 9711 KT Groningen</div></div>
-        <!-- 15 -->
-        <div class="slide"><p>“Na een schade aan mijn keuken had ik snel financiering nodig. Er werd empathisch meegedacht over de timing en ik kon de eerste aflossing een maand opschuiven. Het hele traject voelde menselijk en professioneel.”</p><div class="who">— Sanne R.</div><div class="addr">Herengracht 88, 1015 BS Amsterdam</div></div>
-        <!-- 16 -->
-        <div class="slide"><p>“De kredietanalyse was grondig maar niet onnodig zwaar. Met een helder overzicht van inkomsten en vaste lasten zag ik precies wat verstandig was. Daardoor durfde ik te kiezen voor een iets kortere looptijd en lagere totale kosten.”</p><div class="who">— Thomas C.</div><div class="addr">Karrestraat 21, 4811 WL Breda</div></div>
-        <!-- 17 -->
-        <div class="slide"><p>“Ik kreeg meteen duidelijkheid over documenten en doorlooptijd. De medewerker checkte mijn dossier proactief en hield me op de hoogte. Binnen drie werkdagen stond het geld op mijn rekening en kon de leverancier aan de slag.”</p><div class="who">— Eva G.</div><div class="addr">Noordeinde 140, 2514 GP Den Haag</div></div>
-        <!-- 18 -->
-        <div class="slide"><p>“Voor mijn e-bike-zaak had ik werkkapitaal nodig. De offerte bevatte ook een stresstest met hogere rente, zodat ik wist wat er in het slechtste geval kon gebeuren. Dat soort eerlijkheid kom je zelden tegen.”</p><div class="who">— Mehmet A.</div><div class="addr">Kanaalstraat 120, 3531 CG Utrecht</div></div>
-        <!-- 19 -->
-        <div class="slide"><p>“De mogelijkheid om extra af te lossen zonder boete was doorslaggevend. Toen ik een bonus kreeg, kon ik direct een deel terugbetalen en daalde mijn resterende looptijd. Alles werd netjes bevestigd per e-mail.”</p><div class="who">— Fleur N.</div><div class="addr">Prins Hendrikstraat 9, 2518 HS Den Haag</div></div>
-        <!-- 20 -->
-        <div class="slide"><p>“Mijn dossier was niet standaard, maar er werd oplossingsgericht meegedacht. Ik kreeg onderbouwde keuzes, geen verkooppraatjes. Het eindresultaat is een lening die mijn plannen mogelijk maakt zonder mijn buffer op te eten.”</p><div class="who">— Daan B.</div><div class="addr">Loolaan 33, 7315 AC Apeldoorn</div></div>
-      </div>
-      <div class="controls">
-        <button class="ctrl-btn" id="prev" aria-label="Vorige">◀</button>
-        <button class="ctrl-btn" id="next" aria-label="Volgende">▶</button>
+        <div class="video-card" data-video-id="2">
+          <div class="video-thumbnail thumb-cover"
+               style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(3).jpg');"
+               role="img" aria-label="Miniature vidéo 2"></div>
+          <div class="video-duration">1:47</div>
+          <div class="video-info">
+            <div class="video-author">Patrick L.</div>
+            <div class="video-location">Rotterdam</div>
+          </div>
+          <div class="video-play-button" aria-label="Lire la vidéo"></div>
+        </div>
+
+        <div class="video-card" data-video-id="3">
+          <div class="video-thumbnail thumb-cover"
+               style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(2).jpg');"
+               role="img" aria-label="Miniature vidéo 3"></div>
+          <div class="video-duration">3:12</div>
+          <div class="video-info">
+            <div class="video-author">Isabelle D.</div>
+            <div class="video-location">Utrecht</div>
+          </div>
+          <div class="video-play-button" aria-label="Lire la vidéo"></div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Steps -->
-    <div class="section" id="steps">
-      <h3><img src="https://img.icons8.com/?size=100&id=L4TKxAee4EJ2&format=png&color=000000" alt="">Hoe werkt het?</h3>
-      <div class="steps">
-        <div class="step"><img src="https://img.icons8.com/?size=100&id=S1RK2Nhn2FC5&format=png&color=000000" alt=""><div><b>1) Vul kort het formulier in</b><span>Naam, e-mail, telefoon en gewenst bedrag.</span></div></div>
-        <div class="step"><img src="https://img.icons8.com/?size=100&id=qyRpAggnV0zH&format=png&color=000000" alt=""><div><b>2) Verstuur per e-mail</b><span>Met 1 klik komt uw aanvraag direct bij ons binnen.</span></div></div>
-        <div class="step"><img src="https://img.icons8.com/?size=100&id=nkGDoqzPxYM3&format=png&color=000000" alt=""><div><b>3) Indicatief voorstel</b><span>Gewoonlijk binnen 24–48u.</span></div></div>
-        <div class="step"><img src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt=""><div><b>4) Duidelijk & digitaal</b><span>Onderteken digitaal; uitbetaling volgt vlot.</span></div></div>
+  <!-- ========== Pourquoi nous choisir ========== -->
+  <section id="pourquoi-nous-choisir" class="section">
+    <h2 class="section-title">Pourquoi nous choisir</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-title">Rapidité d'exécution</div>
+        <div class="why-desc">Décision et versement possibles en moins de 72 h après accord et signature.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-title">Service client réactif</div>
+        <div class="why-desc">Échanges 100 % par e-mail, réponses claires et suivis rapides.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-title">Flexibilité des dossiers</div>
+        <div class="why-desc">Solutions pour particuliers, entreprises et situations d'endettement.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-title">Taux compétitifs</div>
+        <div class="why-desc">Taux indicatifs selon le dossier et la durée.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-title">Montants et durées adaptés</div>
+        <div class="why-desc">Jusqu'à 200 000 € avec des échéances compréhensibles.</div>
+      </div>
+      <div class="why-card">
+        <div class="why-title">Processus simple</div>
+        <div class="why-desc">Formulaire, e-mail, signature : un parcours court et lisible.</div>
       </div>
     </div>
 
-    <!-- FAQ -->
-    <div class="section" id="faq">
-      <h3>FAQ</h3>
-      <div class="faq">
-        <details class="qa"><summary>Is de simulatie bindend?</summary><div>Nee — het is een indicatie op basis van 3% JKP (minimum) en uw looptijd. Het definitieve aanbod hangt af van uw dossier.</div></details>
-        <details class="qa"><summary>Welk bedrag/looptijd is verstandig?</summary><div>Gebruik de schuif voor een indicatieve maandlast. Daarna sturen we opties die passen bij uw budget.</div></details>
-        <details class="qa"><summary>Hoe snel is de uitbetaling?</summary><div>Na volledige goedkeuring en ondertekening is uitbetaling vaak binnen 3 werkdagen.</div></details>
-        <details class="qa"><summary>Welke documenten heb ik nodig?</summary><div>Meestal: ID, recente loonstrook of btw-/inkomensgegevens (zzp) en bankoverzicht. U krijgt een korte checklist.</div></details>
-        <details class="qa"><summary>Wat gebeurt er na mijn e-mail?</summary><div>We bevestigen ontvangst, vragen ontbrekende info en sturen een voorstel met duidelijke scenario’s.</div></details>
-        <details class="qa"><summary>Kan ik extra aflossen?</summary><div>Vaak wel. Uw voorstel vermeldt of en hoe boetevrij extra aflossen kan, en het effect op looptijd en kosten.</div></details>
-      </div>
-      <p class="disclaimer">Indicatieve simulatie; geen aanbod op zich. Voorwaarden en beschikbaarheid kunnen variëren. Geldig tot <b>30 oktober 23:59</b>.</p>
+    <div style="text-align:center; margin-top: .4rem;">
+      <a class="about-cta" href="a-propos.html">Qui sommes-nous&nbsp;?</a>
     </div>
-  </div>
-</div>
+  </section>
 
-<!-- Scripts -->
-<script>
-(function(){
-  // ===== COUNTRY & VALIDATION =====
-  const COUNTRIES = [
-    {code:'NL', name:'Nederland', dial:'+31', ex:'+31 6 12 34 56 78', nsn:/^[1-9]\d{8}$/},
-    {code:'BE', name:'België', dial:'+32', ex:'+32 4 12 34 56 78', nsn:/^(?:4\d{8}|[1-9]\d{7})$/},
-    {code:'FR', name:'Frankrijk', dial:'+33', ex:'+33 6 12 34 56 78', nsn:/^[1-9]\d{8}$/},
-    {code:'DE', name:'Duitsland', dial:'+49', ex:'+49 151 234 5678', nsn:/^(?:1\d{9,10}|[2-9]\d{5,12})$/},
-    {code:'GB', name:'Verenigd Koninkrijk', dial:'+44', ex:'+44 7 1234 5678', nsn:/^(?:7\d{9}|[1-9]\d{8,9})$/},
-    {code:'IE', name:'Ierland', dial:'+353', ex:'+353 86 123 4567', nsn:/^[1-9]\d{8}$/},
-    {code:'ES', name:'Spanje', dial:'+34', ex:'+34 612 34 56 78', nsn:/^[1-9]\d{8}$/},
-    {code:'IT', name:'Italië', dial:'+39', ex:'+39 3 12 345 6789', nsn:/^(?:3\d{8,9}|[1-9]\d{5,10})$/},
-    {code:'PT', name:'Portugal', dial:'+351', ex:'+351 912 345 678', nsn:/^(?:2|9)\d{8}$/},
-  ];
-  const DISPOSABLE = new Set(['mailinator.com','tempmail.com','10minutemail.com','guerrillamail.com','sharklasers.com','yopmail.com','tmpmail.com','getnada.com']);
+  <!-- ========== FAQ longue et détaillée (sans question sur les frais) ========== -->
+  <section class="section faq" id="faq">
+    <h2 class="section-title">FAQ — Questions fréquentes</h2>
+    <div class="faq-grid">
+      <details>
+        <summary>Quels montants puis-je demander&nbsp;?</summary>
+        <div class="answer">
+          Vous pouvez formuler une demande entre <strong>2 000 €</strong> et <strong>200 000 €</strong>. Le montant accordé dépend de votre profil (revenus, stabilité, endettement) et de votre projet. Pour les montants élevés, des justificatifs complémentaires peuvent être demandés (relevés, preuves de revenus, contrat, etc.).
+        </div>
+      </details>
 
-  const $=(s,root=document)=>root.querySelector(s);
-  const trim=v=>(v||'').toString().trim();
-  const digits=v=>(v||'').replace(/\D+/g,'');
-  const fmtEUR=n=> (n).toLocaleString('fr-FR')+' €';
+      <details>
+        <summary>Quel est le délai pour recevoir les fonds&nbsp;?</summary>
+        <div class="answer">
+          Après <strong>accord et signature</strong>, le versement peut intervenir en <strong>moins de 72 h</strong>. Les dossiers complets et clairs sont traités plus rapidement.
+        </div>
+      </details>
 
-  const selCountry=$('#country');
-  const f={
-    first:$('#firstName'), last:$('#lastName'), email:$('#email'), phone:$('#phone'),
-    duration:$('#duration'), purpose:$('#purpose'), consent:$('#consent'),
-    amount:$('#amount'), amtBox:$('#amtBox'), ctaEmail:$('#ctaEmail')
-  };
-  const navCta = $('#navCta');
-  const formEl = $('#leadForm');
-  const formCard = $('#formSection');
-  const microSim = $('#microSim'); const microSimText = $('#microSimText');
+      <details>
+        <summary>Quels types de projets financez-vous&nbsp;?</summary>
+        <div class="answer">
+          Projets personnels (trésorerie, auto, travaux), <strong>professionnels</strong> (besoin de trésorerie, achat matériel), <strong>immobilier</strong>, et <strong>consolidation de dettes</strong>. Expliquez brièvement votre besoin dans le formulaire pour une orientation adaptée.
+        </div>
+      </details>
 
-  // init countries
-  selCountry.innerHTML = COUNTRIES.map(c=>`<option value="${c.code}" data-dial="${c.dial}">${c.name}</option>`).join('');
-  selCountry.value='NL';
-  function currentCountry(){ return COUNTRIES.find(c=>c.code===selCountry.value) || COUNTRIES[0]; }
-  function phonePlaceholder(){ const c=currentCountry(); f.phone.placeholder=`Voorbeeld: ${c.ex}`; }
-  phonePlaceholder();
-  selCountry.addEventListener('change', ()=>{ phonePlaceholder(); validatePhoneField(); });
+      <details>
+        <summary>Quels documents sont généralement requis&nbsp;?</summary>
+        <div class="answer">
+          Selon les cas : <ul>
+            <li>Pièce d’identité en cours de validité</li>
+            <li>Preuves de revenus (bulletins, bilans pour indépendants)</li>
+            <li>Relevés bancaires récents</li>
+            <li>Justificatif de domicile</li>
+          </ul>
+          Cochez ce dont vous disposez dans le formulaire — nous revenons vers vous par e-mail au besoin.
+        </div>
+      </details>
 
-  function isEmailValid(v){
-    const s=trim(v).toLowerCase();
-    const ok=/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(s);
-    if(!ok) return false;
-    const dom=s.split('@')[1]||'';
-    return !DISPOSABLE.has(dom);
-  }
-  function guessCountryByDial(v){
-    const m=trim(v).match(/^(\+\d{1,3})/);
-    if(!m) return null;
-    const dial=m[1];
-    let best=null;
-    for(const c of COUNTRIES){
-      if(dial.startsWith(c.dial) || c.dial.startsWith(dial)){
-        if(!best || c.dial.length>best.dial.length) best=c;
+      <details>
+        <summary>Puis-je faire une demande si je suis en CDD, indépendant ou retraité&nbsp;?</summary>
+        <div class="answer">
+          Oui. Nous évaluons <strong>des profils variés</strong> (CDD, indépendants, retraités, étudiants). L’analyse tient compte de la régularité des revenus, de la stabilité et du projet.
+        </div>
+      </details>
+
+      <details>
+        <summary>J’ai déjà des crédits en cours. Est-ce bloquant&nbsp;?</summary>
+        <div class="answer">
+          Pas nécessairement. Nous pouvons étudier une <strong>consolidation</strong> pour regrouper vos mensualités, réduire la charge mensuelle et clarifier l’échéancier.
+        </div>
+      </details>
+
+      <details>
+        <summary>Comment se déroule la signature du contrat&nbsp;?</summary>
+        <div class="answer">
+          La signature est <strong>simple et sécurisée</strong>. Tout se fait par e-mail : vous recevez le contrat, vous le signez selon les instructions, puis nous confirmons la réception et procédons au versement.
+        </div>
+      </details>
+
+      <details>
+        <summary>Les échanges se font-ils uniquement par e-mail&nbsp;?</summary>
+        <div class="answer">
+          Oui, le parcours est pensé pour être <strong>100 % e-mail</strong> : rapide, traçable et pratique. Nous vous contactons si un complément est nécessaire.
+        </div>
+      </details>
+
+      <details>
+        <summary>Quelles durées de remboursement sont possibles&nbsp;?</summary>
+        <div class="answer">
+          Vous pouvez ajuster entre <strong>6 et 120 mois</strong>. Une durée plus longue allège la mensualité mais augmente le coût total ; une durée plus courte fait l’inverse. Le simulateur (curseur) vous aide à cadrer votre besoin.
+        </div>
+      </details>
+
+      <details>
+        <summary>Mon score bancaire n’est pas idéal. Est-ce utile de tenter&nbsp;?</summary>
+        <div class="answer">
+          Oui, nous <strong>étudions des situations d’endettement</strong> avec une approche au cas par cas. Expliquez le contexte et les améliorations récentes (revenus, charges, stabilité).
+        </div>
+      </details>
+
+      <details>
+        <summary>Comment protéger mes données&nbsp;?</summary>
+        <div class="answer">
+          Nous appliquons des bonnes pratiques de <strong>confidentialité</strong> et limitons les documents collectés au strict nécessaire. Partagez uniquement via les canaux indiqués dans nos e-mails.
+        </div>
+      </details>
+
+      <details>
+        <summary>Puis-je rembourser par anticipation&nbsp;?</summary>
+        <div class="answer">
+          Le remboursement anticipé est possible selon les conditions du contrat. Les modalités (indemnités, calcul) sont précisées dans l’offre transmise pour signature.
+        </div>
+      </details>
+
+      <details>
+        <summary>Que faire si je change d’avis après l’envoi du formulaire&nbsp;?</summary>
+        <div class="answer">
+          Répondez simplement à l’e-mail que vous recevrez et <strong>indiquez votre souhait d’annuler</strong>. Tant que le contrat n’est pas signé, vous n’êtes engagé à rien.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ========== Footer ========== -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#mentions-legales">Mentions légales</a>
+      <span aria-hidden="true">·</span>
+      <a href="mailto:contact@msgroup.example">Contact</a>
+      <span aria-hidden="true">·</span>
+      <a href="a-propos.html">Qui sommes-nous</a>
+    </div>
+    <div class="footer-copyright">© 2025 MSGROUPS</div>
+    <div class="footer-disclaimer">Taux indicatifs selon dossier et durée. Offre non contractuelle.</div>
+  </footer>
+
+  <!-- ========== Scripts ========== -->
+  <script>
+    // Sliders UI
+    (function(){
+      const montant = document.getElementById('montant');
+      const duree = document.getElementById('duree');
+      const mv = document.getElementById('montant-value');
+      const dv = document.getElementById('duree-value');
+      function fmtEuro(n){ return n.toLocaleString('fr-FR') + ' €'; }
+      function paintRange(el){
+        if(!el) return;
+        const min = +el.min, max = +el.max, val = +el.value;
+        const pct = ((val - min) * 100) / (max - min);
+        el.style.background = `linear-gradient(to right, var(--brand) 0%, var(--brand) ${pct}%, var(--line) ${pct}%, var(--line) 100%)`;
       }
-    }
-    return best;
-  }
-  function isPhoneValid(v){
-    const s=trim(v);
-    if(!/^\+\d[\d\s-]{5,}$/.test(s)) return false;
-    const g=guessCountryByDial(s);
-    if(!g) return true;
-    const nsn = digits(s.replace(g.dial,''));
-    return g.nsn.test(nsn);
-  }
-  function setErr(el,id,show,msg){
-    const n=document.getElementById(id);
-    if(show){
-      el.classList.add('invalid');
-      if(n){ n.textContent=msg||n.textContent; n.classList.add('show'); }
-    } else {
-      el.classList.remove('invalid');
-      n?.classList.remove('show');
-    }
-  }
-  function validatePhoneField(){
-    const c = currentCountry();
-    const ok = isPhoneValid(f.phone.value);
-    const g = guessCountryByDial(f.phone.value) || c;
-    const dynamicMsg = `Ongeldig nummer voor ${g.name}. Gebruik de landcode ${g.dial}. Voorbeeld: ${g.ex}`;
-    setErr(f.phone,'e_phone', !ok, dynamicMsg);
-  }
-  function isFormOk(){
-    return isEmailValid(f.email.value) && trim(f.first.value) && trim(f.last.value) && isPhoneValid(f.phone.value) && f.consent.checked;
-  }
-  function updateCTAs(){
-    const ok = isFormOk();
-    [f.ctaEmail].forEach(b=>{
-      if(ok){ b.classList.add('enabled'); b.removeAttribute('disabled'); }
-      else { b.classList.remove('enabled'); b.setAttribute('disabled','disabled'); }
-    });
-  }
-
-  // Bindings
-  f.first.addEventListener('input', ()=>{ setErr(f.first,'e_fname', !trim(f.first.value),'Vul uw voornaam in.'); updateCTAs(); showMicroSim(); });
-  f.last .addEventListener('input', ()=>{ setErr(f.last ,'e_lname', !trim(f.last.value),'Vul uw achternaam in.'); updateCTAs(); showMicroSim(); });
-  f.email.addEventListener('input', ()=>{ setErr(f.email,'e_email', !isEmailValid(f.email.value),'Voer een geldig e-mailadres in.'); updateCTAs(); showMicroSim(); });
-  f.phone.addEventListener('input', ()=>{ validatePhoneField(); updateCTAs(); showMicroSim(); });
-  f.duration.addEventListener('change', ()=>{ showMicroSim(); });
-  f.consent.addEventListener('change', updateCTAs);
-
-  // Amount slider
-  const amountEl = $('#amount');
-  function updateAmount(){ f.amtBox.textContent = fmtEUR(Number(amountEl.value)); }
-  amountEl.addEventListener('input', ()=>{ updateAmount(); showMicroSim(); });
-  updateAmount();
-
-  // Countdown to 30 October 23:59 (local)
-  const timerEl = document.getElementById('timer');
-  function deadline(){
-    const d = new Date();
-    const year = d.getFullYear();
-    const target = new Date(year, 9, 30, 23, 59, 59, 999); // Oct=9
-    if(d > target){ target.setFullYear(year+1); }
-    return target;
-  }
-  function pad2(n){ return String(n).padStart(2,'0'); }
-  function tick(){
-    const now = new Date();
-    const end = deadline();
-    const ms = Math.max(0, end - now);
-    const d = Math.floor(ms/86400000);
-    const h = Math.floor((ms%86400000)/3600000);
-    const m = Math.floor((ms%3600000)/60000);
-    const s = Math.floor((ms%60000)/1000);
-    const dh = d>0 ? (d+'d ') : '';
-    timerEl.textContent = `${dh}${pad2(h)}:${pad2(m)}:${pad2(s)}`;
-  }
-  setInterval(tick, 500); tick();
-
-  // Micro-simulation (3% APR indicative)
-  function monthlyPayment(amount, months, apr=0.02){
-    const r = apr/12;
-    if(!months || months<=0) return 0;
-    if(r===0) return amount/months;
-    return amount * r / (1 - Math.pow(1+r, -months));
-  }
-  function showMicroSim(){
-    const amt = Number(amountEl.value||0);
-    const months = Number(f.duration.value||60);
-    const pmt = Math.round(monthlyPayment(amt, months, 0.02)); // 3% JKP minimum
-    microSim.classList.add('show');
-    microSimText.innerHTML =
-      `Met <b>${fmtEUR(amt)}</b> over <b>${months} mnd</b> is de indicatieve last circa <b>€${pmt}/maand</b> — <b>geldig t/m 30/10 23:59</b>.`;
-  }
-  showMicroSim();
-
-  // Mail helpers (mailto)
-  function encodeMail(s){ return encodeURIComponent(String(s).replace(/\r?\n/g,'\r\n')); }
-  function toMailto(to,sub,body){ return `mailto:${encodeURIComponent(to)}?subject=${encodeMail(sub)}&body=${encodeMail(body)}`; }
-
-  function buildEmail(){
-    const c = COUNTRIES.find(x=>x.code===selCountry.value)||COUNTRIES[0];
-    const years = Math.round(Number(f.duration.value)/12);
-    const amt = fmtEUR(Number(amountEl.value));
-    const subject = `Financieringsaanvraag — ${trim(f.first.value)} ${trim(f.last.value)} — ${amt} over ${years} jaar`;
-    const body = [
-      `Beste team van MSGROUP,`,
-      ``,
-      `Mijn naam is ${trim(f.first.value)} ${trim(f.last.value)} (${c.name}).`,
-      `Ik vraag een financiering aan van ${amt} over ${years} jaar${trim(f.purpose.value)?` voor ${trim(f.purpose.value)}`:''}.`,
-      ``,
-      `Contactgegevens:`,
-      `• E-mail: ${trim(f.email.value)}`,
-      `• Telefoon: ${trim(f.phone.value)}`,
-      ``,
-      `Graag ontvang ik een voorstel.`,
-      ``,
-      `Met vriendelijke groet,`,
-      `${trim(f.first.value)} ${trim(f.last.value)}`
-    ].join('\n');
-    return {subject, body};
-  }
-
-  function requireValidThen(fn, onInvalid){
-    return function(e){
-      e.preventDefault();
-      setErr(f.first,'e_fname', !trim(f.first.value),'Vul uw voornaam in.');
-      setErr(f.last ,'e_lname', !trim(f.last.value),'Vul uw achternaam in.');
-      setErr(f.email,'e_email', !isEmailValid(f.email.value),'Voer een geldig e-mailadres in.');
-      validatePhoneField();
-      if(!isFormOk()){ onInvalid?.(); return; }
-      fn();
-    };
-  }
-
-  const AW_ID = 'AW-17600708002';
-  const LABEL_EMAIL = 'OMwLCPrc-KEbEKL71chB';
-
-  const triggerEmail = ()=>{
-    const {subject,body}=buildEmail();
-    const url = toMailto('contact@sergemagdeleinesolutions.fr', subject, body);
-    gtag('event','conversion',{
-      send_to: `${AW_ID}/${LABEL_EMAIL}`,
-      event_callback: function(){ location.href = url; }
-    });
-    setTimeout(()=>{ location.href = url; }, 800);
-  };
-
-  // CTA bindings
-  f.ctaEmail.addEventListener('click', requireValidThen(triggerEmail));
-  function scrollToFormFocus(){
-    formCard?.scrollIntoView({behavior:'smooth', block:'start'});
-    setTimeout(()=>{
-      const firstInvalid = formEl.querySelector('.invalid, input:invalid, select:invalid') || f.first;
-      firstInvalid?.focus();
-    }, 350);
-  }
-  navCta?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToFormFocus(); });
-
-  // Carousel controls
-  (function(){
-    const track=$('#track'), prev=$('#prev'), next=$('#next');
-    if(!track) return;
-    const step=()=>{
-      const slide=track.querySelector('.slide');
-      if(!slide) return Math.round(track.clientWidth*0.8);
-      const gap=parseInt(getComputedStyle(track).gap)||14;
-      return Math.round(slide.getBoundingClientRect().width+gap);
-    };
-    prev?.addEventListener('click',()=>track.scrollBy({left:-step(),behavior:'smooth'}));
-    next?.addEventListener('click',()=>track.scrollBy({left: step(),behavior:'smooth'}));
-  })();
-
-  // Social Proof rotating (more messages, small text)
-  const proof = $('#socialProof'); const proofText = $('#socialProofText');
-  const events = [
-    'Claire B. uit Rotterdam kreeg zojuist een aanbod',
-    'Marc L. uit Amsterdam is voorlopig goedgekeurd',
-    'Iris D. uit Maastricht diende zonet haar dossier in',
-    'Ahmed K. uit Utrecht ontvangt een voorstel',
-    'Sanne R. uit Amsterdam bevestigde documenten',
-    'Wouter H. uit Groningen tekende digitaal',
-    'Petra S. uit Haarlem ontving een bijgewerkt scenario',
-    'Niels V. uit Rotterdam bespaarde op totale rente',
-    'Laura J. uit Maastricht kreeg een betalingstermijn op maat',
-    'Thomas C. uit Breda koos voor kortere looptijd',
-    'Julien R. uit Den Haag stapte succesvol over',
-    'Sophie M. uit Utrecht kreeg transparant kostenoverzicht',
-    'Björn T. uit Groningen tekende met e-sign',
-    'Fleur N. uit Den Haag deed een extra aflossing',
-    'Daan B. uit Apeldoorn kreeg maatwerkopties',
-    'Mehmet A. uit Utrecht ontving werkkapitaalvoorstel',
-    'Eva G. uit Den Haag kreeg uitbetaling gepland',
-    'Tom W. uit Amsterdam ontving zijn voorlopige goedkeuring',
-    'Jasmijn E. uit Rotterdam kreeg studentenscenario',
-    'Koen P. uit Zwolle ontving aangepast bedrag',
-    'Marc L. uit Amsterdam bevestigde de SEPA-machtiging',
-    'Claire B. uit Rotterdam vergeleek twee looptijden',
-    'Iris D. uit Maastricht kreeg checklist-documenten',
-    'Ahmed K. uit Utrecht koos vaste rente',
-    'Sanne R. uit Amsterdam verschoof eerste aflossing',
-    'Wouter H. uit Groningen bevestigde via app',
-    'Petra S. uit Haarlem kreeg renovatieschema',
-    'Niels V. uit Rotterdam consolideerde twee leningen',
-    'Laura J. uit Maastricht activeerde betaalpauze',
-    'Thomas C. uit Breda verlaagde totale kosten'
-  ];
-  let idx=0;
-  function cycleProof(){
-    idx=(idx+1)%events.length;
-    proofText.textContent = events[idx];
-    proof.classList.add('show');
-    setTimeout(()=>proof.classList.remove('show'), 5200);
-  }
-  setTimeout(()=>{ cycleProof(); setInterval(cycleProof, 7000); }, 3000);
-
-  // Init CTA state
-  updateCTAs();
-
-})();
-</script>
-
-<!-- Télémétrie (optionnelle; backend inchangé) -->
-<script src="formulaire.js"></script>
-
+      if(montant && mv){ mv.textContent = fmtEuro(+montant.value); montant.addEventListener('input', ()=>{ mv.textContent = fmtEuro(+montant.value); paintRange(montant); }); paintRange(montant); }
+      if(duree && dv){ dv.textContent = duree.value + ' mois'; duree.addEventListener('input', ()=>{ dv.textContent = duree.value + ' mois'; paintRange(duree); }); paintRange(duree); }
+    })();
+  </script>
+  <script src="formulaire.js"></script>
 </body>
 </html>
