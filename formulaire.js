@@ -113,6 +113,9 @@
         formStarted: false,
         formCompleted: false,
         exitIntentShown: false,
+        step1Touched: false,
+        step2Touched: false,
+        step3Touched: false,
         validationErrors: {
             step1: [],
             step2: [],
@@ -243,7 +246,7 @@
         return { valid: true, error: '' };
     }
 
-    function validateStep1() {
+    function validateStep1(showErrors = false) {
         formState.validationErrors.step1 = [];
 
         const prenom = document.getElementById('prenom').value.trim();
@@ -252,6 +255,15 @@
         const email = document.getElementById('email').value.trim();
         const whatsapp = document.getElementById('whatsapp').value.trim();
         const pays = document.getElementById('pays').value;
+
+        // Ne valide que si au moins un champ est rempli OU si showErrors = true
+        const hasAnyValue = prenom || nom || dateNaissance || email || whatsapp || pays;
+        if (!hasAnyValue && !showErrors) {
+            formState.step1Valid = false;
+            refreshStepOKBadges();
+            updateStepAccess();
+            return false;
+        }
 
         const prenomValidation = validateName(prenom);
         if (!prenom) formState.validationErrors.step1.push('Prénom : champ vide');
@@ -275,7 +287,7 @@
 
         formState.step1Valid = formState.validationErrors.step1.length === 0;
 
-        if (CONFIG.debugMode && formState.validationErrors.step1.length > 0) {
+        if (CONFIG.debugMode && formState.validationErrors.step1.length > 0 && showErrors) {
             console.log('❌ Étape 1 - Erreurs:', formState.validationErrors.step1);
         }
 
@@ -286,12 +298,20 @@
         return formState.step1Valid;
     }
 
-    function validateStep2() {
+    function validateStep2(showErrors = false) {
         formState.validationErrors.step2 = [];
 
         const montant = parseFloat(document.getElementById('montant').value);
         const duree = parseInt(document.getElementById('duree').value);
         const raison = document.getElementById('raison').value.trim();
+
+        // Ne valide que si la raison est remplie OU si showErrors = true
+        if (!raison && !showErrors) {
+            formState.step2Valid = false;
+            refreshStepOKBadges();
+            updateStepAccess();
+            return false;
+        }
 
         if (isNaN(montant) || montant < 2000 || montant > 200000) {
             formState.validationErrors.step2.push(`Montant : doit être entre 2 000 € et 200 000 € (actuel: ${montant} €)`);
@@ -305,7 +325,7 @@
 
         formState.step2Valid = formState.validationErrors.step2.length === 0;
 
-        if (CONFIG.debugMode && formState.validationErrors.step2.length > 0) {
+        if (CONFIG.debugMode && formState.validationErrors.step2.length > 0 && showErrors) {
             console.log('❌ Étape 2 - Erreurs:', formState.validationErrors.step2);
         }
 
@@ -316,18 +336,25 @@
         return formState.step2Valid;
     }
 
-    function validateStep3() {
+    function validateStep3(showErrors = false) {
         formState.validationErrors.step3 = [];
 
         const statut = document.getElementById('statut').value;
         const revenus = document.getElementById('revenus').value;
+
+        // Ne valide que si au moins un champ est sélectionné OU si showErrors = true
+        if (!statut && !revenus && !showErrors) {
+            formState.step3Valid = false;
+            refreshStepOKBadges();
+            return false;
+        }
 
         if (!statut) formState.validationErrors.step3.push('Statut professionnel : non sélectionné');
         if (!revenus) formState.validationErrors.step3.push('Revenus réguliers : non sélectionné');
 
         formState.step3Valid = formState.validationErrors.step3.length === 0;
 
-        if (CONFIG.debugMode && formState.validationErrors.step3.length > 0) {
+        if (CONFIG.debugMode && formState.validationErrors.step3.length > 0 && showErrors) {
             console.log('❌ Étape 3 - Erreurs:', formState.validationErrors.step3);
         }
 
@@ -772,10 +799,10 @@
                 let isValid = false;
                 let errors = [];
                 if (index === 0) {
-                    isValid = validateStep1();
+                    isValid = validateStep1(true);
                     errors = formState.validationErrors.step1;
                 } else if (index === 1) {
-                    isValid = validateStep2();
+                    isValid = validateStep2(true);
                     errors = formState.validationErrors.step2;
                 }
                 if (!isValid) {
@@ -1038,7 +1065,7 @@
 
         [prenomInput, nomInput, dateInput, emailInput, whatsappInput, paysSelect].forEach(input => {
             if (input) {
-                input.addEventListener('blur', validateStep1);
+                input.addEventListener('blur', () => validateStep1());
                 input.addEventListener('change', () => {
                     validateStep1();
                     if (!formState.formStarted) formState.formStarted = true;
@@ -1074,7 +1101,7 @@
 
         const raisonInput = document.getElementById('raison');
         if (raisonInput) {
-            raisonInput.addEventListener('input', validateStep2);
+            raisonInput.addEventListener('input', () => validateStep2());
             raisonInput.addEventListener('blur', function() {
                 const validation = validateRaison(this.value);
                 if (this.value && !validation.valid) {
@@ -1090,7 +1117,7 @@
         const statutSelect = document.getElementById('statut');
         const revenusSelect = document.getElementById('revenus');
         [statutSelect, revenusSelect].forEach(select => {
-            if (select) select.addEventListener('change', validateStep3);
+            if (select) select.addEventListener('change', () => validateStep3());
         });
     }
 
@@ -1114,7 +1141,7 @@
         const revenus = (document.getElementById('revenus').value || '').trim();
 
         const pieces = [];
-        if (document.getElementById('piece1')?.checked) pieces.push('carte d’identité');
+        if (document.getElementById('piece1')?.checked) pieces.push('carte d'identité');
         if (document.getElementById('piece2')?.checked) pieces.push('preuve de revenus');
         if (document.getElementById('piece3')?.checked) pieces.push('relevé bancaire récent');
 
@@ -1127,17 +1154,17 @@
             'Bonjour,',
             '',
             'Je me permets de vous contacter pour une demande de financement auprès de MSGROUP.',
-            `Je m’appelle ${fullName || '—'}, né(e) le ${dateNaissance || '—'}, et je réside en ${pays || '—'}.`,
-            `Je souhaite obtenir un financement d’un montant de ${montantFmt} sur ${dureeMois || '—'} mois${raison ? ` pour ${raison}.` : '.'}`,
+            `Je m'appelle ${fullName || '—'}, né(e) le ${dateNaissance || '—'}, et je réside en ${pays || '—'}.`,
+            `Je souhaite obtenir un financement d'un montant de ${montantFmt} sur ${dureeMois || '—'} mois${raison ? ` pour ${raison}.` : '.'}`,
             `Ma mensualité estimée (taux indicatif ${CONFIG.tauxInteret} %/an) serait de ${mensualiteFmt}.`,
             '',
-            'Voici mes coordonnées pour tout complément d’information :',
+            'Voici mes coordonnées pour tout complément d'information :',
             `• E-mail : ${email || '—'}`,
             '',
             `• WhatsApp : ${whatsapp || '—'}`,
             '',
             `Côté situation : je suis actuellement ${statut || '—'}${revenus ? ` et ${revenus.toLowerCase()}` : ''}.`,
-            `J’ai à disposition ${pieces.length ? `ma ${pieces.join(' et ')}` : 'les pièces nécessaires sur demande'}.`,
+            `J'ai à disposition ${pieces.length ? `ma ${pieces.join(' et ')}` : 'les pièces nécessaires sur demande'}.`,
             '',
             'Je reste bien entendu à votre disposition pour tout renseignement ou document supplémentaire.',
             '',
@@ -1155,9 +1182,9 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            validateStep1();
-            validateStep2();
-            validateStep3();
+            validateStep1(true);
+            validateStep2(true);
+            validateStep3(true);
 
             if (!formState.step1Valid || !formState.step2Valid || !formState.step3Valid) {
                 let allErrors = [];
@@ -1355,17 +1382,15 @@
         if (CONFIG.debugMode) console.log('🚀 Initialisation MSGROUP (version Ads, sans Apps Script)...');
 
         enableSmoothScroll();
-        setupPromoBannerTextOnly();   // ← texte fixe FOMO
+        setupPromoBannerTextOnly();
         loadFormData();
         setupDateFormatting();
         createNextButtons();
         setupVideoPlayers();
         injectSummaryHitboxStyles();
 
+        // Ne pas valider automatiquement au chargement
         setTimeout(() => {
-            validateStep1();
-            validateStep2();
-            validateStep3();
             afficherResumePret();
         }, 200);
 
