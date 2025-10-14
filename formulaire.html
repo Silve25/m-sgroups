@@ -407,7 +407,8 @@
       <h2 class="section-title">Remplissez ce formulaire pour nous permettre de vous contacter facilement</h2>
       <p class="form-intro">Complétez les informations ci-dessous en 3 étapes simples.</p>
 
-      <form action="mailto:contact@msgroup.example?subject=Demande%20de%20financement%20-%20MSGROUPS" method="post" enctype="text/plain" novalidate>
+      <!-- PATCH: pas de mailto dans action (évite l'avertissement Chrome) -->
+      <form id="lead-form" action="" method="post" enctype="text/plain" novalidate>
         <div class="form-steps">
 
           <!-- Étape 1 -->
@@ -979,6 +980,122 @@
   </footer>
 
   <!-- ========== Scripts ========== -->
+
+  <!-- PATCH: Persistance localStorage + ouverture e-mail sans action mailto -->
+  <script>
+    (function(){
+      const FORM_ID = 'lead-form';
+      const STORAGE_KEY = 'msgroups_form_v1';
+      const EMAIL_TO = 'contact@msgroup.example';
+      const EMAIL_SUBJECT = 'Demande de financement - MSGROUPS';
+
+      function qs(id){ return document.getElementById(id); }
+
+      function saveForm(){
+        const form = document.getElementById(FORM_ID);
+        if(!form) return;
+        const data = {};
+        Array.from(form.elements).forEach(el=>{
+          if(!el.name && !el.id) return;
+          const key = el.id || el.name;
+          if(el.type === 'checkbox'){
+            data[key] = !!el.checked;
+          }else if(el.type === 'radio'){
+            if(el.checked) data[key] = el.value;
+          }else{
+            data[key] = el.value;
+          }
+        });
+        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(_){}
+      }
+
+      function loadForm(){
+        const form = document.getElementById(FORM_ID);
+        if(!form) return;
+        let data = null;
+        try{ data = JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); }catch(_){}
+        if(!data) return;
+        Array.from(form.elements).forEach(el=>{
+          const key = el.id || el.name;
+          if(!(key in data)) return;
+          const val = data[key];
+          if(el.type === 'checkbox'){
+            el.checked = !!val;
+          }else if(el.type === 'radio'){
+            el.checked = (el.value === val);
+          }else{
+            el.value = val;
+          }
+          // déclenche les rafraîchissements UI (sliders)
+          el.dispatchEvent(new Event('input', {bubbles:true}));
+          el.dispatchEvent(new Event('change', {bubbles:true}));
+        });
+      }
+
+      function attachPersistence(){
+        const form = document.getElementById(FORM_ID);
+        if(!form) return;
+        form.addEventListener('input', saveForm);
+        form.addEventListener('change', saveForm);
+      }
+
+      function serializeForEmail(){
+        const form = document.getElementById(FORM_ID);
+        if(!form) return '';
+        const lines = [];
+        const seen = new Set();
+        Array.from(form.elements).forEach(el=>{
+          if(!el.name) return;
+          const n = el.name;
+          // Évite les doublons checkbox non cochées
+          if(el.type === 'checkbox'){
+            if(el.checked) lines.push(n + ': Oui');
+            else if(!seen.has(n)) { /* ignore non cochées */ }
+            seen.add(n);
+          } else if(el.type === 'radio'){
+            if(el.checked) lines.push(n + ': ' + el.value);
+          } else {
+            lines.push(n + ': ' + el.value);
+          }
+        });
+        return lines.join('\n');
+      }
+
+      function openMailClient(){
+        const body = serializeForEmail();
+        const mailto = 'mailto:' + encodeURIComponent(EMAIL_TO)
+          + '?subject=' + encodeURIComponent(EMAIL_SUBJECT)
+          + '&body=' + encodeURIComponent(body);
+        // Ouvre le client mail sans utiliser form action "mailto:"
+        window.location.href = mailto;
+      }
+
+      function interceptSubmit(){
+        const form = document.getElementById(FORM_ID);
+        if(!form) return;
+        form.addEventListener('submit', function(e){
+          e.preventDefault();
+          saveForm(); // dernière sauvegarde
+          openMailClient();
+        });
+      }
+
+      // Init
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', function(){
+          loadForm();
+          attachPersistence();
+          interceptSubmit();
+        });
+      }else{
+        loadForm();
+        attachPersistence();
+        interceptSubmit();
+      }
+    })();
+  </script>
+
+  <!-- Sliders UI -->
   <script>
     // Sliders UI
     (function(){
