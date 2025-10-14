@@ -858,7 +858,7 @@
       </div>
     </div>
 
-  <div style="text-align:center; margin-top: .4rem;">
+    <div style="text-align:center; margin-top: .4rem;">
       <a class="about-cta" href="a-propos.html">Qui sommes-nous&nbsp;?</a>
     </div>
   </section>
@@ -1144,17 +1144,33 @@
   function post(event_name, payload){
     return fetch(API, {
       method: "POST",
+      // PATCH: cors + keepalive pour unload, et headers complets (apikey + Authorization)
+      mode: "cors",
+      keepalive: true,
       headers: {
         "content-type":"application/json",
-        "Authorization": "Bearer " + SUPABASE_ANON
+        "accept":"application/json",
+        "Authorization": "Bearer " + SUPABASE_ANON,
+        "apikey": SUPABASE_ANON
       },
       body: JSON.stringify({ event_name, lead_token: leadToken, payload, metadata: meta() })
-    }).catch(()=>{});
+    }).then(async (res)=>{
+      if(!res.ok){
+        const t = await res.text().catch(()=> "");
+        console.error("[track] HTTP " + res.status, t);
+      }
+      return res;
+    }).catch((err)=>{
+      console.error("[track] fetch error", err);
+    });
   }
 
-  // 5) page_loaded (1x / session)
-  if(!sessionStorage.getItem("pl_sent")){
-    post("page_loaded", {});
+  // 5) page_loaded
+  // PATCH: renvoie à chaque "reload" d'onglet (et 1× par session pour le reste)
+  const nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  const isReload = nav && nav.type === "reload";
+  if(isReload || !sessionStorage.getItem("pl_sent")){
+    post("page_loaded", { reload: !!isReload });
     sessionStorage.setItem("pl_sent","1");
   }
 
