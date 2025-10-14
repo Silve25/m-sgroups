@@ -73,7 +73,7 @@
 
     .cta-header{
       grid-area:cta;justify-self:end;background:var(--brand);color:#fff;padding:.55rem .95rem;border-radius:10px;text-decoration:none;font-weight:700;font-size:.9rem;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.35rem;
-      min-width:44px;min-height:44px; /* hit area mobile */
+      min-width:44px;min-height:44px;
     }
     .cta-header:hover{background:#1557e0;transform:translateY(-1px)}
     .cta-header[aria-disabled="true"]{opacity:.5;pointer-events:none}
@@ -84,7 +84,7 @@
     }
 
     /* ========== Bandeau promo ========== */
-    .promo-banner{background:var(--bg-soft);border-bottom:1px dashed var(--line);padding:.6rem 1rem;text-align:center;color:var(--muted);font-size:.9rem}
+    .promo-banner{background:#000;color:#fff;border-bottom:1px dashed var(--line);padding:.6rem 1rem;text-align:center;font-weight:600;font-size:.9rem}
 
     /* ========== Héros ========== */
     .hero{position:relative;padding:2rem 1rem 1.8rem;max-width:1200px;margin:0 auto;text-align:center;background:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/pexels-olly-3760067.jpg') center/cover no-repeat;border-bottom:1px solid var(--line)}
@@ -168,7 +168,6 @@
     }
     .cta-submit img{width:18px;height:18px;filter:brightness(0) invert(1)}
     .cta-submit:hover{background:#15a34a;transform:translateY(-2px);box-shadow:0 6px 12px rgba(22,163,74,.25)}
-    .cta-submit[disabled]{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
     .submit-hint{margin-top:.65rem;font-size:.85rem;color:var(--muted)}
 
     /* ========== Comment ça marche ========== */
@@ -260,7 +259,7 @@
     </div>
   </header>
 
-  <!-- ========== Bandeau promo ========== -->
+  <!-- ========== Bandeau promo (minuteur géré par formulaire.js) ========== -->
   <div class="promo-banner" role="banner">
     Offre valable jusqu'au 30 octobre 23:59
   </div>
@@ -314,7 +313,8 @@
       <h2 class="section-title">Remplissez ce formulaire pour nous permettre de vous contacter facilement</h2>
       <p class="form-intro">Complétez les informations ci-dessous en 3 étapes simples.</p>
 
-      <form id="lead-form" action="" method="post" enctype="text/plain" novalidate>
+      <!-- IMPORTANT : action doit contenir "mailto" pour que le JS s'attache -->
+      <form id="lead-form" action="mailto:Contact@sergemagdeleinesolutions.fr" method="post" enctype="text/plain" novalidate>
         <div class="form-steps">
 
           <!-- Étape 1 -->
@@ -509,7 +509,7 @@
         </div>
 
         <div class="form-submit">
-          <button type="submit" class="cta-submit" disabled>
+          <button type="submit" class="cta-submit">
             <img src="https://img.icons8.com/?size=100&id=63499&format=png&color=000000" alt="" aria-hidden="true" />
             Envoyer ma demande par e-mail maintenant
           </button>
@@ -580,7 +580,7 @@
     <h2 class="section-title">Ce que disent nos clients</h2>
     <div class="carousel-container">
       <div class="testimonials-carousel" role="region" aria-label="Témoignages clients" tabindex="0">
-        <!-- Slides (inchangés) -->
+        <!-- Slides -->
         <div class="testimonial-slide">
           <div class="testimonial-card">
             <p class="testimonial-text">Montant approuvé rapidement, étapes claires. Délais respectés et échanges par e-mail uniquement. Le processus était vraiment simple et transparent, j'ai reçu les fonds en moins de 72 h.</p>
@@ -691,7 +691,7 @@
     <div class="video-testimonials">
       <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.1rem; text-align: center; color: var(--text);">Témoignages vidéo</h3>
       <div class="video-grid">
-        <div class="video-card" data-video-id="1">
+        <div class="video-card" data-video-id="1" tabindex="0">
           <div class="video-thumbnail thumb-cover" style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(1).jpg');" role="img" aria-label="Miniature vidéo 1"></div>
           <div class="video-duration">2:34</div>
           <div class="video-info">
@@ -701,7 +701,7 @@
           <div class="video-play-button" aria-label="Lire la vidéo"></div>
         </div>
 
-        <div class="video-card" data-video-id="2">
+        <div class="video-card" data-video-id="2" tabindex="0">
           <div class="video-thumbnail thumb-cover" style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(3).jpg');" role="img" aria-label="Miniature vidéo 2"></div>
           <div class="video-duration">1:47</div>
           <div class="video-info">
@@ -711,7 +711,7 @@
           <div class="video-play-button" aria-label="Lire la vidéo"></div>
         </div>
 
-        <div class="video-card" data-video-id="3">
+        <div class="video-card" data-video-id="3" tabindex="0">
           <div class="video-thumbnail thumb-cover" style="background-image:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/test%201%20(2).jpg');" role="img" aria-label="Miniature vidéo 3"></div>
           <div class="video-duration">3:12</div>
           <div class="video-info">
@@ -763,14 +763,24 @@
   <section class="section faq" id="faq">
     <h2 class="section-title">FAQ — Questions fréquentes</h2>
     <div class="faq-grid">
-      <!-- (inchangé) … -->
       <details>
         <summary>Quels montants puis-je demander&nbsp;?</summary>
         <div class="answer">
-          Vous pouvez formuler une demande entre <strong>2 000 €</strong> et <strong>200 000 €</strong>…
+          Vous pouvez formuler une demande entre <strong>2 000 €</strong> et <strong>200 000 €</strong>.
         </div>
       </details>
-      <!-- … autres questions inchangées … -->
+      <details>
+        <summary>Quel est le délai de versement&nbsp;?</summary>
+        <div class="answer">
+          Après accord et signature, le versement peut intervenir en moins de <strong>72 h</strong>.
+        </div>
+      </details>
+      <details>
+        <summary>Quels types de projets sont éligibles&nbsp;?</summary>
+        <div class="answer">
+          Auto, travaux, trésorerie, immobilier, consolidation, et d'autres cas étudiés au cas par cas.
+        </div>
+      </details>
     </div>
   </section>
 
@@ -779,7 +789,7 @@
     <div class="footer-links">
       <a href="#mentions-legales">Mentions légales</a>
       <span aria-hidden="true">·</span>
-      <a href="mailto:contact@msgroup.example">Contact</a>
+      <a href="mailto:Contact@sergemagdeleinesolutions.fr">Contact</a>
       <span aria-hidden="true">·</span>
       <a href="a-propos.html">Qui sommes-nous</a>
     </div>
@@ -787,295 +797,8 @@
     <div class="footer-disclaimer">Taux indicatifs selon dossier et durée. Offre non contractuelle.</div>
   </footer>
 
-  <!-- ========== Scripts ========== -->
-  <script>
-    (function(){
-      const FORM_ID = 'lead-form';
-      const STORAGE_KEY = 'msgroups_form_v1';
-      const EMAIL_TO = 'contact@msgroup.example';
-      const EMAIL_SUBJECT = 'Demande de financement - MSGROUPS';
-
-      // Helpers
-      const $ = (s, r=document) => r.querySelector(s);
-      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-      const form = $('#' + FORM_ID);
-      const details = $$('details[data-step]');
-      const submitBtn = $('.cta-submit');
-      const headerCTA = $('.cta-header');
-      const heroCTA = $('.cta-primary');
-
-      const el = {
-        prenom: $('#prenom'), nom: $('#nom'),
-        date: $('#date-naissance'), email: $('#email'), tel: $('#whatsapp'), pays: $('#pays'),
-        montant: $('#montant'), montantValue: $('#montant-value'),
-        duree: $('#duree'), dureeValue: $('#duree-value'),
-        raison: $('#raison'),
-        statut: $('#statut'), revenus: $('#revenus')
-      };
-
-      // ========== Persist ==========
-      function saveForm(){
-        if(!form) return;
-        const data={};
-        Array.from(form.elements).forEach(e=>{
-          if(!e.name && !e.id) return;
-          const key = e.id || e.name;
-          if(e.type==='checkbox'){ data[key]=!!e.checked; }
-          else if(e.type==='radio'){ if(e.checked) data[key]=e.value; }
-          else data[key]=e.value;
-        });
-        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(_){}
-      }
-      function loadForm(){
-        if(!form) return;
-        let data=null; try{ data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); }catch(_){}
-        if(!data) return;
-        Array.from(form.elements).forEach(e=>{
-          const key=e.id||e.name; if(!(key in data)) return;
-          const v=data[key];
-          if(e.type==='checkbox') e.checked=!!v;
-          else if(e.type==='radio') e.checked=(e.value===v);
-          else e.value=v;
-          e.dispatchEvent(new Event('input',{bubbles:true}));
-          e.dispatchEvent(new Event('change',{bubbles:true}));
-        });
-      }
-
-      // ========== Validation minimale solide ==========
-      function isEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v||''); }
-      function isIntlPhone(v){ return /^\+\d{6,15}$/.test((v||'').replace(/\s+/g,'')); }
-      function validDate(d){
-        const m=(d||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if(!m) return false;
-        const dd=+m[1], mm=+m[2]-1, yy=+m[3]; const dt=new Date(yy,mm,dd);
-        if(dt.getFullYear()!==yy||dt.getMonth()!==mm||dt.getDate()!==dd) return false;
-        const now=new Date(); let age=now.getFullYear()-yy; const md=now.getMonth()-mm, ddiff=now.getDate()-dd; if(md<0||(md===0&&ddiff<0)) age--;
-        return age>=18;
-      }
-      function mark(elm, ok){
-        if(!elm) return;
-        if(ok){ elm.classList.remove('invalid'); elm.setCustomValidity(''); }
-        else{ elm.classList.add('invalid'); elm.classList.add('shake'); setTimeout(()=>elm.classList.remove('shake'), 400); }
-      }
-
-      function validateStep1(show=false){
-        const ok = [
-          [el.prenom, (el.prenom.value||'').trim().length>=2],
-          [el.nom, (el.nom.value||'').trim().length>=2],
-          [el.date, validDate(el.date.value)],
-          [el.email, isEmail(el.email.value)],
-          [el.tel, isIntlPhone(el.tel.value)],
-          [el.pays, !!el.pays.value]
-        ];
-        if(show) ok.forEach(([i,v])=>mark(i,v));
-        return ok.every(([_,v])=>v);
-      }
-      function validateStep2(show=false){
-        const montantOk = +el.montant.value>=2000 && +el.montant.value<=200000;
-        const dureeOk = +el.duree.value>=6 && +el.duree.value<=120;
-        const raisonOk = (el.raison.value||'').trim().length>=10;
-        if(show){ mark(el.raison, raisonOk); }
-        return montantOk && dureeOk && raisonOk;
-      }
-      function validateStep3(show=false){
-        const ok = [ !!el.statut.value, !!el.revenus.value ];
-        if(show){ mark(el.statut, !!el.statut.value); mark(el.revenus, !!el.revenus.value); }
-        return ok.every(Boolean);
-      }
-
-      // ========== Lock dur : empêcher ouverture étapes suivantes ==========
-      function stepAllowed(step){
-        if(step===1) return true;
-        if(step===2) return validateStep1();
-        if(step===3) return validateStep1() && validateStep2();
-        return false;
-      }
-
-      function forceLockUI(){
-        // 1) Forcer l'état "open" selon validations
-        const s1 = details.find(d=>d.dataset.step==='1');
-        const s2 = details.find(d=>d.dataset.step==='2');
-        const s3 = details.find(d=>d.dataset.step==='3');
-
-        if(!validateStep1()){ s2.removeAttribute('open'); s3.removeAttribute('open'); }
-        if(!(validateStep1() && validateStep2())){ s3.removeAttribute('open'); }
-
-        // 2) Visuel "verrouillé"
-        [s2, s3].forEach(d=>{
-          const step = +d.dataset.step;
-          const allowed = stepAllowed(step);
-          d.querySelector('summary').style.opacity = allowed ? '1' : '.5';
-          d.querySelector('summary').style.cursor = allowed ? 'pointer' : 'not-allowed';
-          d.dataset.locked = allowed ? '0' : '1';
-        });
-
-        // 3) Bouton submit activé seulement si 1+2+3 OK
-        const allOk = validateStep1() && validateStep2() && validateStep3();
-        submitBtn.disabled = !allOk;
-      }
-
-      // Intercepter toute ouverture (souris/clavier/programme)
-      details.forEach(d=>{
-        const step = +d.dataset.step;
-        // Empêche l’ouverture si non autorisé (click)
-        d.querySelector('summary').addEventListener('click', (e)=>{
-          if(!stepAllowed(step)){
-            e.preventDefault();
-            e.stopPropagation();
-            d.removeAttribute('open');
-            pingFirstInvalid(step);
-          }
-        });
-        // Sécurité: si un script/UA “ouvre”, on referme aussitôt
-        d.addEventListener('toggle', ()=>{
-          if(d.open && !stepAllowed(step)){
-            d.open = false;
-            pingFirstInvalid(step);
-          }
-        });
-        // Clavier (Enter/Espace sur summary)
-        d.querySelector('summary').addEventListener('keydown', (e)=>{
-          if((e.key==='Enter'||e.key===' ') && !stepAllowed(step)){
-            e.preventDefault(); e.stopPropagation(); d.removeAttribute('open'); pingFirstInvalid(step);
-          }
-        });
-      });
-
-      // Met en avant le 1er champ invalide de la/les étapes prérequises
-      function pingFirstInvalid(targetStep){
-        let toCheck = [];
-        if(targetStep===2){ toCheck=[1]; }
-        if(targetStep===3){ toCheck=[1,2]; }
-        const s1 = details.find(d=>+d.dataset.step===1);
-        const s2 = details.find(d=>+d.dataset.step===2);
-
-        for(const s of toCheck){
-          if(s===1 && !validateStep1()){
-            s1.open = true;
-            const first = [el.prenom, el.nom, el.date, el.email, el.tel, el.pays].find(i=>{
-              return (i===el.prenom && (i.value||'').trim().length<2) ||
-                     (i===el.nom && (i.value||'').trim().length<2) ||
-                     (i===el.date && !validDate(i.value)) ||
-                     (i===el.email && !isEmail(i.value)) ||
-                     (i===el.tel && !isIntlPhone(i.value)) ||
-                     (i===el.pays && !i.value);
-            });
-            if(first){ mark(first,false); first.focus(); first.scrollIntoView({behavior:'smooth', block:'center'}); }
-            return;
-          }
-          if(s===2 && !validateStep2()){
-            s2.open = true;
-            mark(el.raison, (el.raison.value||'').trim().length>=10);
-            el.raison.focus();
-            el.raison.scrollIntoView({behavior:'smooth', block:'center'});
-            return;
-          }
-        }
-      }
-
-      // ========== CTA : ne pas “laisser passer” ==========
-      function handleCTA(e){
-        e.preventDefault();
-        // Toujours scroller au formulaire, puis ouvrir l’étape à compléter
-        document.getElementById('formulaire').scrollIntoView({behavior:'smooth', block:'start'});
-        // Ouvrir la première étape incomplète
-        const s1 = details.find(d=>d.dataset.step==='1');
-        const s2 = details.find(d=>d.dataset.step==='2');
-        const s3 = details.find(d=>d.dataset.step==='3');
-        if(!validateStep1(true)){ s1.open=true; pingFirstInvalid(2); return; }
-        if(!validateStep2(true)){ s2.open=true; pingFirstInvalid(3); return; }
-        s3.open=true; // Dernière étape à compléter
-      }
-      if(headerCTA) headerCTA.addEventListener('click', handleCTA);
-      if(heroCTA) heroCTA.addEventListener('click', handleCTA);
-
-      // ========== Sliders UI + valeurs ==========
-      function fmtEuro(n){ return Number(n||0).toLocaleString('fr-FR')+' €'; }
-      function paintRange(input){
-        if(!input) return;
-        const min=+input.min||0, max=+input.max||100, val=+input.value||0;
-        const pct=((val-min)*100)/(max-min);
-        input.style.background=`linear-gradient(to right,var(--brand) 0%,var(--brand) ${pct}%,var(--line) ${pct}%,var(--line) 100%)`;
-      }
-      function bindSliders(){
-        if(el.montant && el.montantValue){
-          el.montantValue.textContent = fmtEuro(el.montant.value);
-          paintRange(el.montant);
-          el.montant.addEventListener('input', ()=>{ el.montantValue.textContent=fmtEuro(el.montant.value); paintRange(el.montant); saveForm(); forceLockUI(); });
-        }
-        if(el.duree && el.dureeValue){
-          el.dureeValue.textContent = el.duree.value + ' mois';
-          paintRange(el.duree);
-          el.duree.addEventListener('input', ()=>{ el.dureeValue.textContent=el.duree.value+' mois'; paintRange(el.duree); saveForm(); forceLockUI(); });
-        }
-      }
-
-      // ========== Mailto submit ==========
-      function serializeForEmail(){
-        const lines=[]; const seen=new Set();
-        Array.from(form.elements).forEach(el=>{
-          if(!el.name) return;
-          const n=el.name;
-          if(el.type==='checkbox'){ if(el.checked) lines.push(n+': Oui'); seen.add(n); }
-          else if(el.type==='radio'){ if(el.checked) lines.push(n+': '+el.value); }
-          else{ lines.push(n+': '+el.value); }
-        });
-        return lines.join('\n');
-      }
-      function openMailClient(){
-        const body = serializeForEmail();
-        const mailto = 'mailto:' + encodeURIComponent(EMAIL_TO)
-          + '?subject=' + encodeURIComponent(EMAIL_SUBJECT)
-          + '&body=' + encodeURIComponent(body);
-        window.location.href = mailto;
-      }
-
-      // ========== Listeners ==========
-      function attachRealtime(){
-        $$('input,select,textarea').forEach(i=>{
-          i.addEventListener('input', ()=>{ saveForm(); forceLockUI(); });
-          i.addEventListener('change', ()=>{ saveForm(); forceLockUI(); });
-          // format JJ/MM/AAAA assisté
-          if(i.id==='date-naissance'){
-            i.maxLength = 10;
-            i.addEventListener('input', (e)=>{
-              let v=e.target.value.replace(/\D/g,'');
-              if(v.length>=3) v=v.slice(0,2)+'/'+v.slice(2);
-              if(v.length>=6) v=v.slice(0,5)+'/'+v.slice(5,9);
-              e.target.value = v;
-            });
-          }
-        });
-      }
-
-      function bindSubmit(){
-        form.addEventListener('submit', (e)=>{
-          e.preventDefault();
-          const s1ok=validateStep1(true), s2ok=validateStep2(true), s3ok=validateStep3(true);
-          forceLockUI();
-          if(!(s1ok && s2ok && s3ok)){
-            // Ouvre la première étape invalide
-            if(!s1ok){ details.find(d=>d.dataset.step==='1').open=true; pingFirstInvalid(2); }
-            else if(!s2ok){ details.find(d=>d.dataset.step==='2').open=true; pingFirstInvalid(3); }
-            else{ details.find(d=>d.dataset.step==='3').open=true; }
-            return;
-          }
-          saveForm();
-          openMailClient();
-        });
-      }
-
-      // Init
-      function init(){
-        loadForm();
-        bindSliders();
-        attachRealtime();
-        forceLockUI();
-        bindSubmit();
-      }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
-      else init();
-
-    })();
-  </script>
+  <!-- ========== Script principal (unique) ========== -->
+  <!-- IMPORTANT : ne pas dupliquer de logique ici ; tout est géré dans formulaire.js -->
+  <script src="formulaire.js" defer></script>
 </body>
 </html>
