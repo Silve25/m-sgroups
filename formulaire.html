@@ -1140,18 +1140,16 @@
     };
   }
 
-  // 4) ENVOI
+  // 4) ENVOI (corrigé: CORS + apikey + Authorization Bearer)
   function post(event_name, payload){
     return fetch(API, {
       method: "POST",
-      // PATCH: cors + keepalive pour unload, et headers complets (apikey + Authorization)
       mode: "cors",
       keepalive: true,
       headers: {
         "content-type":"application/json",
-        "accept":"application/json",
-        "Authorization": "Bearer " + SUPABASE_ANON,
-        "apikey": SUPABASE_ANON
+        "apikey": SUPABASE_ANON,
+        "Authorization": "Bearer " + SUPABASE_ANON
       },
       body: JSON.stringify({ event_name, lead_token: leadToken, payload, metadata: meta() })
     }).then(async (res)=>{
@@ -1166,7 +1164,6 @@
   }
 
   // 5) page_loaded
-  // PATCH: renvoie à chaque "reload" d'onglet (et 1× par session pour le reste)
   const nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
   const isReload = nav && nav.type === "reload";
   if(isReload || !sessionStorage.getItem("pl_sent")){
