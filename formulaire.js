@@ -28,7 +28,7 @@
     exitIntentDelay: 60000,      // (timer inoffensif, exit sur intention)
     lstoreKey: 'msgroups_form_v1',
     lstoreTTLms: 7 * 24 * 60 * 60 * 1000, // 7 jours
-    emailTo: 'contact@msgroup.example',
+    emailTo: 'contact@sergemagdeleinesolutions.fr',
     emailSubject: 'Demande de financement - MSGROUPS',
     promoText: "Offre valable jusqu'au 30 octobre 23:59"
   };
@@ -191,51 +191,30 @@
     return {valid:true, error:''};
   }
 
-  // Helpers visuels (évite conflits : on n’utilise pas :invalid)
-  function markInvalid(input, msg){
-    if (!input) return;
-    input.classList.add('invalid');
-    if (msg) input.setCustomValidity(msg); else input.setCustomValidity(' ');
-    input.style.borderColor='#dc2626';
-  }
-  function clearInvalid(input){
-    if (!input) return;
-    input.classList.remove('invalid');
-    input.setCustomValidity('');
-    input.style.borderColor='';
-  }
-
   // =========================
   // 4) Validations par étape
   // =========================
   function validateStep1(show=false){
     state.validationErrors.step1 = [];
-
     const prenomV = validateName(el.prenom.value);
-    if (!el.prenom.value) { state.validationErrors.step1.push('Prénom : champ vide'); if (show) markInvalid(el.prenom,'Champ requis'); }
-    else if(!prenomV.valid){ state.validationErrors.step1.push(`Prénom : ${prenomV.error}`); if (show) markInvalid(el.prenom, prenomV.error); }
-    else if (show) clearInvalid(el.prenom);
+    if (!el.prenom.value) state.validationErrors.step1.push('Prénom : champ vide');
+    else if(!prenomV.valid) state.validationErrors.step1.push(`Prénom : ${prenomV.error}`);
 
     const nomV = validateName(el.nom.value);
-    if (!el.nom.value) { state.validationErrors.step1.push('Nom : champ vide'); if (show) markInvalid(el.nom,'Champ requis'); }
-    else if(!nomV.valid){ state.validationErrors.step1.push(`Nom : ${nomV.error}`); if (show) markInvalid(el.nom, nomV.error); }
-    else if (show) clearInvalid(el.nom);
+    if (!el.nom.value) state.validationErrors.step1.push('Nom : champ vide');
+    else if(!nomV.valid) state.validationErrors.step1.push(`Nom : ${nomV.error}`);
 
     const birthV = validateBirthDate(el.dateNaissance.value);
-    if (!el.dateNaissance.value) { state.validationErrors.step1.push('Date de naissance : champ vide'); if (show) markInvalid(el.dateNaissance,'JJ/MM/AAAA'); }
-    else if(!birthV.valid){ state.validationErrors.step1.push(`Date de naissance : ${birthV.error}`); if (show) markInvalid(el.dateNaissance, birthV.error); }
-    else if (show) clearInvalid(el.dateNaissance);
+    if (!el.dateNaissance.value) state.validationErrors.step1.push('Date de naissance : champ vide');
+    else if(!birthV.valid) state.validationErrors.step1.push(`Date de naissance : ${birthV.error}`);
 
-    if (!el.email.value) { state.validationErrors.step1.push('E-mail : champ vide'); if (show) markInvalid(el.email,'Champ requis'); }
-    else if(!isValidEmail(el.email.value)) { state.validationErrors.step1.push('E-mail : adresse invalide'); if (show) markInvalid(el.email,'Adresse invalide'); }
-    else if (show) clearInvalid(el.email);
+    if (!el.email.value) state.validationErrors.step1.push('E-mail : champ vide');
+    else if(!isValidEmail(el.email.value)) state.validationErrors.step1.push('E-mail : adresse invalide');
 
-    if (!el.whatsapp.value) { state.validationErrors.step1.push('WhatsApp : champ vide'); if (show) markInvalid(el.whatsapp,'Champ requis'); }
-    else if(!isValidPhone(el.whatsapp.value)) { state.validationErrors.step1.push('WhatsApp : numéro invalide (format international)'); if (show) markInvalid(el.whatsapp,'Ex: +33XXXXXXXXX'); }
-    else if (show) clearInvalid(el.whatsapp);
+    if (!el.whatsapp.value) state.validationErrors.step1.push('WhatsApp : champ vide');
+    else if(!isValidPhone(el.whatsapp.value)) state.validationErrors.step1.push('WhatsApp : numéro invalide (format international)');
 
-    if (!el.pays.value) { state.validationErrors.step1.push('Pays : non sélectionné'); if (show) markInvalid(el.pays,'Sélection requise'); }
-    else if (show) clearInvalid(el.pays);
+    if (!el.pays.value) state.validationErrors.step1.push('Pays : non sélectionné');
 
     state.step1Valid = state.validationErrors.step1.length===0;
     if (CONFIG.debugMode && show && !state.step1Valid) console.log('❌ Étape 1', state.validationErrors.step1);
@@ -258,9 +237,8 @@
       state.validationErrors.step2.push(`Durée : 6–120 mois (actuel: ${duree||0})`);
 
     const r = validateRaison(el.raison.value);
-    if (!el.raison.value) { state.validationErrors.step2.push('Raison du projet : champ vide'); if (show) markInvalid(el.raison,'Minimum 10 caractères'); }
-    else if(!r.valid) { state.validationErrors.step2.push(`Raison du projet : ${r.error}`); if (show) markInvalid(el.raison, r.error); }
-    else if (show) clearInvalid(el.raison);
+    if (!el.raison.value) state.validationErrors.step2.push('Raison du projet : champ vide');
+    else if(!r.valid) state.validationErrors.step2.push(`Raison du projet : ${r.error}`);
 
     state.step2Valid = state.validationErrors.step2.length===0;
     if (CONFIG.debugMode && show && !state.step2Valid) console.log('❌ Étape 2', state.validationErrors.step2);
@@ -273,11 +251,8 @@
 
   function validateStep3(show=false){
     state.validationErrors.step3 = [];
-    if (!el.statut.value) { state.validationErrors.step3.push('Statut professionnel : non sélectionné'); if (show) markInvalid(el.statut,'Sélection requise'); }
-    else if (show) clearInvalid(el.statut);
-    if (!el.revenus.value) { state.validationErrors.step3.push('Revenus réguliers : non sélectionné'); if (show) markInvalid(el.revenus,'Sélection requise'); }
-    else if (show) clearInvalid(el.revenus);
-
+    if (!el.statut.value) state.validationErrors.step3.push('Statut professionnel : non sélectionné');
+    if (!el.revenus.value) state.validationErrors.step3.push('Revenus réguliers : non sélectionné');
     state.step3Valid = state.validationErrors.step3.length===0;
     if (CONFIG.debugMode && show && !state.step3Valid) console.log('❌ Étape 3', state.validationErrors.step3);
 
@@ -291,7 +266,7 @@
   // =========================
   function calculerMensualite(montant, dureeMois, tauxAnnuel){
     const tm = tauxAnnuel/100/12;
-    return (montant*tm)/(1-Math.pow(1+tm, -dureeMois || 1));
+    return (montant*tm)/(1-Math.pow(1+tm, -dureeMois));
   }
   function getDateFin(dureeMois){
     const d=new Date(); d.setMonth(d.getMonth()+parseInt(dureeMois||0,10));
@@ -313,7 +288,7 @@
     const taux    = CONFIG.tauxInteret;
 
     const mensualite = calculerMensualite(montant, duree, taux);
-    const coutTotal  = mensualite * (duree||1);
+    const coutTotal  = mensualite * duree;
     const coutCredit = coutTotal - montant;
     const dateFin    = getDateFin(duree);
 
@@ -406,84 +381,11 @@
     const s2=details[1].querySelector('summary');
     const s3=details[2].querySelector('summary');
     if (!state.step1Valid){
-      details[1].removeAttribute('open'); s2.style.opacity='.5'; s2.style.cursor='not-allowed';
+      details[1].removeAttribute('open'); s2.style.opacity='.5'; s2.style.cursor='not-allowed'; s2.style.pointerEvents='auto';
     }else{ s2.style.opacity='1'; s2.style.cursor='pointer'; }
     if (!state.step1Valid || !state.step2Valid){
-      details[2].removeAttribute('open'); s3.style.opacity='.5'; s3.style.cursor='not-allowed';
+      details[2].removeAttribute('open'); s3.style.opacity='.5'; s3.style.cursor='not-allowed'; s3.style.pointerEvents='auto';
     }else{ s3.style.opacity='1'; s3.style.cursor='pointer'; }
-  }
-
-  // Ajout PATCH : empêcher ouverture via clic/clavier et fallback toggle
-  function interceptStepOpening(){
-    const ds=$$('details');
-    ds.forEach((d, idx)=>{
-      const sum = d.querySelector('summary');
-      if (!sum) return;
-
-      function canOpen(i){
-        if (i===0) return true;
-        if (i===1) return state.step1Valid;
-        if (i===2) return state.step1Valid && state.step2Valid;
-        return false;
-      }
-
-      // Clic / clavier
-      sum.addEventListener('click', (e)=>{
-        if (!canOpen(idx)){
-          e.preventDefault(); e.stopPropagation();
-          d.removeAttribute('open');
-          notifyStepBlock(idx);
-          focusFirstInvalid(idx);
-        }
-      });
-      sum.addEventListener('keydown', (e)=>{
-        if ((e.key==='Enter'||e.key===' ') && !canOpen(idx)){
-          e.preventDefault(); e.stopPropagation();
-          d.removeAttribute('open');
-          notifyStepBlock(idx);
-          focusFirstInvalid(idx);
-        }
-      });
-
-      // Sécurité sur toggle
-      d.addEventListener('toggle', function(){
-        if (this.open && !canOpen(idx)){
-          this.open = false;
-          notifyStepBlock(idx);
-          focusFirstInvalid(idx);
-        }
-      });
-    });
-  }
-
-  function notifyStepBlock(idx){
-    if (idx===1 && !state.step1Valid) notify('Étape 1 incomplète','Complétez l’étape 1.','warning');
-    if (idx===2 && (!state.step1Valid || !state.step2Valid)) notify('Étapes incomplètes','Complétez les étapes 1 et 2.','warning');
-  }
-
-  function focusFirstInvalid(idxTarget){
-    // Ouvre la première étape à compléter et focus le premier champ KO
-    const ds=$$('details');
-    if (idxTarget>=1 && !state.step1Valid){
-      ds[0].open = true;
-      const order = [el.prenom, el.nom, el.dateNaissance, el.email, el.whatsapp, el.pays];
-      const bad = order.find(f=>{
-        if (f===el.prenom) return !validateName(f.value);
-        if (f===el.nom) return !validateName(f.value);
-        if (f===el.dateNaissance) return !validateBirthDate(f.value);
-        if (f===el.email) return !isValidEmail(f.value);
-        if (f===el.whatsapp) return !isValidPhone(f.value);
-        if (f===el.pays) return !f.value;
-        return false;
-      }) || order.find(f=>!f.value);
-      if (bad){ bad.focus(); bad.scrollIntoView({behavior:'smooth', block:'center'}); }
-      return;
-    }
-    if (idxTarget>=2 && !state.step2Valid){
-      ds[1].open = true;
-      el.raison.focus();
-      el.raison.scrollIntoView({behavior:'smooth', block:'center'});
-    }
   }
 
   function createNextButtons(){
@@ -503,13 +405,53 @@
         else if (idx===1){ ok=validateStep2(true); errs=state.validationErrors.step2; }
         if (!ok){
           notify('Informations incomplètes', 'Veuillez corriger :\n\n• '+errs.join('\n• '), 'warning');
-          focusFirstInvalid(idx+1);
           return;
         }
         d.open=false; const next = ds[idx+1]; if (next){ next.open=true; next.scrollIntoView({behavior:'smooth', block:'start'}); }
       });
       content.appendChild(btn);
     });
+  }
+
+  // Verrouillage RENFORCÉ : on bloque l'ouverture au niveau du click/keydown
+  function preventStepOpening(){
+    const ds=$$('details');
+    ds.forEach((d, idx)=>{
+      const summary = d.querySelector('summary');
+      const guard = (e)=>{
+        // 0=étape1, 1=étape2, 2=étape3 (index)
+        if (idx===1 && !state.step1Valid){ e.preventDefault(); e.stopPropagation(); d.removeAttribute('open'); notify('Étape 1 incomplète','Complétez l’étape 1.','warning'); focusFirstInvalid(1); }
+        if (idx===2 && (!state.step1Valid || !state.step2Valid)){ e.preventDefault(); e.stopPropagation(); d.removeAttribute('open'); notify('Étapes incomplètes','Complétez les étapes 1 et 2.','warning'); focusFirstInvalid(state.step1Valid?2:1); }
+      };
+      summary.addEventListener('click', guard, true);
+      summary.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ guard(e);} }, true);
+      // Sécurité : si un script/UA force open
+      d.addEventListener('toggle', ()=>{
+        if (!d.open) return;
+        if (idx===1 && !state.step1Valid){ d.open=false; }
+        if (idx===2 && (!state.step1Valid || !state.step2Valid)){ d.open=false; }
+      });
+    });
+  }
+
+  function focusFirstInvalid(stepIdx){
+    // stepIdx: 1, 2 ou 3
+    if (stepIdx===1){
+      const order = [el.prenom, el.nom, el.dateNaissance, el.email, el.whatsapp, el.pays];
+      const bad = order.find((i, ix)=>{
+        if (!i) return false;
+        if (ix===0 || ix===1) return !validateName(i.value);
+        if (i===el.dateNaissance) return !validateBirthDate(i.value).valid;
+        if (i===el.email) return !isValidEmail(i.value);
+        if (i===el.whatsapp) return !isValidPhone(i.value);
+        if (i===el.pays) return !i.value;
+        return false;
+      });
+      if (bad){ bad.focus(); bad.scrollIntoView({behavior:'smooth', block:'center'}); }
+    } else if (stepIdx===2){
+      el.raison?.focus();
+      el.raison?.scrollIntoView({behavior:'smooth', block:'center'});
+    }
   }
 
   function checkFormCompletion(){
@@ -657,8 +599,8 @@
     });
     el.dateNaissance.addEventListener('blur', function(){
       const v = validateBirthDate(this.value);
-      if (this.value && !v.valid){ markInvalid(this, v.error); }
-      else { clearInvalid(this); validateStep1(); }
+      if (this.value && !v.valid){ this.setCustomValidity(v.error); this.style.borderColor='#dc2626'; }
+      else { this.setCustomValidity(''); this.style.borderColor=''; validateStep1(); }
     });
   }
 
@@ -732,230 +674,4 @@
       const submitBtn = $('.cta-submit');
       if (submitBtn){ state.ctaClicked=true; submitBtn.scrollIntoView({behavior:'smooth',block:'center'}); submitBtn.style.animation='pulse 1s ease 3'; }
     });
-    $('#exit-intent-close').addEventListener('click', ()=> pop.remove());
-    pop.addEventListener('click', (e)=>{ if(e.target===pop) pop.remove(); });
-  }
-  document.addEventListener('mouseleave', (e)=>{ if (e.clientY<10) showExitIntentPopup(); });
-  window.addEventListener('beforeunload', (e)=>{
-    const elapsed=(Date.now()-state.pageStart)/1000;
-    if (!state.exitIntentShown && state.formCompleted && !state.ctaClicked && elapsed>=90){
-      e.preventDefault(); e.returnValue=''; showExitIntentPopup();
-    }
-  });
-
-  // =========================
-  // 15) Real-time + Persistance
-  // =========================
-  function setupRealTime(){
-    $$('input, select, textarea').forEach(inp=>{
-      inp.addEventListener('change', ()=>{ saveFormData(); validateAllLight(); });
-      if (inp.tagName!=='SELECT') inp.addEventListener('input', ()=>{ saveFormData(); validateAllLight(); });
-    });
-
-    // Étape 1 champs : revalider à la volée
-    [el.prenom, el.nom, el.dateNaissance, el.email, el.whatsapp, el.pays].forEach(i=>{
-      if (!i) return;
-      i.addEventListener('blur', ()=> { validateStep1(true); });
-      i.addEventListener('change', ()=> { validateStep1(true); });
-    });
-
-    // Contraintes individuelles (messages natifs neutralisés)
-    if (el.email){
-      el.email.addEventListener('blur', function(){
-        if (this.value && !isValidEmail(this.value)){ markInvalid(this,'Adresse e-mail invalide'); }
-        else { clearInvalid(this); }
-      });
-    }
-    if (el.whatsapp){
-      el.whatsapp.addEventListener('blur', function(){
-        if (this.value && !isValidPhone(this.value)){ markInvalid(this,'Numéro invalide (ex: +33XXXXXXXXX)'); }
-        else { clearInvalid(this); }
-      });
-    }
-    if (el.raison){
-      el.raison.addEventListener('input', ()=> validateStep2());
-      el.raison.addEventListener('blur', function(){
-        const v=validateRaison(this.value);
-        if (this.value && !v.valid){ markInvalid(this, 'Minimum 10 caractères'); }
-        else { clearInvalid(this); }
-      });
-    }
-    [el.statut, el.revenus].forEach(s=>{ if(s) s.addEventListener('change', ()=> validateStep3(true)); });
-  }
-
-  function validateAllLight(){
-    // Valide sans messages intrusifs pour mettre à jour les verrous
-    validateStep1(false);
-    validateStep2(false);
-    validateStep3(false);
-    updateStepAccess();
-  }
-
-  // =========================
-  // 16) Tracking CTA (header/hero/submit) + ouverture étape incomplète
-  // =========================
-  function snapshotLead(){ return {
-    pays: el.pays?.value||'',
-    montant: parseFloat(el.montant?.value||'0')||0,
-    duree: parseInt(el.duree?.value||'0',10)||0
-  }; }
-  function bindCtaTracking(){
-    const headerCTA = $('.cta-header');
-    const heroCTA = $('.cta-primary');
-    const submitBtn = $('.cta-submit');
-
-    function sendOnce(){
-      try { if (sessionStorage.getItem(GADS.ssKeys.CTA)) return false; sessionStorage.setItem(GADS.ssKeys.CTA,'1'); }
-      catch(_){}
-      return true;
-    }
-
-    function openFirstIncomplete(){
-      const ds=$$('details');
-      if (!validateStep1(true)){ ds[0].open=true; focusFirstInvalid(1); return; }
-      if (!validateStep2(true)){ ds[1].open=true; focusFirstInvalid(2); return; }
-      ds[2].open=true;
-      ds[2].scrollIntoView({behavior:'smooth', block:'start'});
-    }
-
-    if (headerCTA) headerCTA.addEventListener('click', (e)=>{
-      if (!sendOnce()) return;
-      state.ctaClicked = true;
-      fireEvent(GADS.events.cta_click, Object.assign({which:'header', href:location.href}, snapshotLead()));
-      e.preventDefault(); $('#formulaire')?.scrollIntoView({behavior:'smooth'}); openFirstIncomplete();
-    });
-    if (heroCTA) heroCTA.addEventListener('click', (e)=>{
-      if (!sendOnce()) return;
-      state.ctaClicked = true;
-      fireEvent(GADS.events.cta_click, Object.assign({which:'hero', href:location.href}, snapshotLead()));
-      e.preventDefault(); $('#formulaire')?.scrollIntoView({behavior:'smooth'}); openFirstIncomplete();
-    });
-    if (submitBtn) submitBtn.addEventListener('click', ()=>{
-      if (!sendOnce()) return;
-      state.ctaClicked = true;
-      fireEvent(GADS.events.cta_click, Object.assign({which:'submit', href:location.href}, snapshotLead()));
-    });
-  }
-
-  // =========================
-  // 17) Soumission (mailto)
-  // =========================
-  function buildPrefilledEmail(){
-    const prenom=(el.prenom.value||'').trim();
-    const nom=(el.nom.value||'').trim();
-    const fullName=`${prenom} ${nom}`.trim();
-    const lines = [
-      'Bonjour,',
-      '',
-      'Je me permets de vous contacter pour une demande de financement auprès de MSGROUPS.',
-      `Je m'appelle ${fullName||'—'}, né(e) le ${el.dateNaissance.value||'—'}, et je réside en ${el.pays.value||'—'}.`,
-      `Je souhaite obtenir un financement d'un montant de ${fmtMontant(parseFloat(el.montant.value||'0'))} sur ${el.duree.value||'—'} mois${el.raison.value?` pour ${el.raison.value}.`:`.`}`,
-      `Ma mensualité estimée (taux indicatif ${CONFIG.tauxInteret}%/an) serait de ${fmtEuro(calculerMensualite(parseFloat(el.montant.value||'0'), parseInt(el.duree.value||'0',10), CONFIG.tauxInteret))}.`,
-      '',
-      'Voici mes coordonnées :',
-      `• E-mail : ${el.email.value||'—'}`,
-      `• WhatsApp : ${el.whatsapp.value||'—'}`,
-      '',
-      `Statut : ${el.statut.value||'—'}${el.revenus.value?`, ${el.revenus.value.toLowerCase()}`:''}`,
-      `Pièces : ${[el.piece1?.checked?'carte d\'identité':null, el.piece2?.checked?'preuve de revenus':null, el.piece3?.checked?'relevé bancaire récent':null].filter(Boolean).join(' et ') || 'sur demande'}.`,
-      '',
-      'Bien cordialement,',
-      `${fullName||''}`
-    ];
-    const body = encodeURIComponent(lines.join('\n'));
-    const subject = encodeURIComponent(CONFIG.emailSubject);
-    const to = encodeURIComponent(CONFIG.emailTo);
-    return `mailto:${to}?subject=${subject}&body=${body}`;
-  }
-
-  function bindSubmit(){
-    if (!form) return;
-    form.setAttribute('novalidate','novalidate');
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-
-      const ok1 = validateStep1(true);
-      const ok2 = validateStep2(true);
-      const ok3 = validateStep3(true);
-      if (!(ok1 && ok2 && ok3)){
-        const parts=[];
-        if (state.validationErrors.step1.length) parts.push('ÉTAPE 1 :\n  • '+state.validationErrors.step1.join('\n  • '));
-        if (state.validationErrors.step2.length) parts.push('ÉTAPE 2 :\n  • '+state.validationErrors.step2.join('\n  • '));
-        if (state.validationErrors.step3.length) parts.push('ÉTAPE 3 :\n  • '+state.validationErrors.step3.join('\n  • '));
-        notify('Formulaire incomplet', parts.join('\n\n'), 'error');
-
-        // Ouvrir la première étape non valide + focus
-        if (!ok1){ $$('details')[0].open = true; focusFirstInvalid(1); }
-        else if (!ok2){ $$('details')[1].open = true; focusFirstInvalid(2); }
-        else { $$('details')[2].open = true; }
-        return;
-      }
-
-      // Tracking submit (1 seule fois)
-      fireEventOnce(GADS.ssKeys.SUBMIT, GADS.events.form_submit, {href:location.href});
-
-      // Ouvre le client mail
-      const mailto = buildPrefilledEmail();
-      window.location.href = mailto;
-
-      // Nettoyage + feedback
-      setTimeout(()=>{
-        clearFormData();
-        notify('✅ Demande prête dans votre messagerie', 'Veuillez vérifier votre application e-mail (brouillon ouvert).', 'success');
-      }, 600);
-    });
-  }
-
-  // =========================
-  // 18) Divers
-  // =========================
-  function injectSummaryHoverStyle(){
-    const s=document.createElement('style');
-    s.textContent = `
-      details > summary { padding:1rem .75rem !important; border-radius:10px; }
-      details > summary:hover { background:rgba(30,102,255,.06); }
-    `;
-    document.head.appendChild(s);
-  }
-
-  // =========================
-  // 19) INIT
-  // =========================
-  function init(){
-    if (CONFIG.debugMode) console.log('🚀 Initialisation MSGROUPS…');
-
-    setupPromoBanner();
-    setupAnchors();
-    setupVideoPlayers();
-    setupCarousel();
-    injectSummaryHoverStyle();
-
-    // Sliders & calcul
-    bindSliders();
-    setTimeout(()=>{ afficherResumePret(); }, 150);
-
-    // Étapes & UI
-    createNextButtons();
-    interceptStepOpening(); // PATCH: verrouillage fort
-    refreshStepOKBadges();
-    updateStepAccess();
-
-    // Persistance
-    loadFormData();
-    setupDateFormatting();
-    setupRealTime();
-
-    // Tracking
-    bindCtaTracking();
-    trackPageLoadedOnce();
-
-    // Soumission
-    bindSubmit();
-
-    if (CONFIG.debugMode) console.log('✅ MSGROUPS — prêt.');
-  }
-
-  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-
-})();
+    $('#exit-intent-close
