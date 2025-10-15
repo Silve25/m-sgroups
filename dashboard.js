@@ -1,42 +1,38 @@
 /* ================================
- * MSGROUPS — dashboard.js
- * ================================
- * Rôle : brancher l’UI au backend (Google Sheet via Apps Script)
- *
- * Sources possibles (dans cet ordre) :
- * 1) App Script même origine (GET ?list=1) → JSON brut
- * 2) App Script cross-origin mais via proxy CORS (config.CORS_PROXY_URL)
- * 3) Google Sheets GViz (si config.SHEET_ID publié au web)
- *
- * Config attendue (optionnelle) :
- *   window.DASHBOARD_CONFIG = {
- *     APP_SCRIPT_URL: 'https://script.google.com/macros/s/.../exec',
- *     SHEET_ID: '<spreadsheetId>',   // si publié au web
- *     SHEET_GID: 0,                  // onglet "sessions" (gid), facultatif
- *     CORS_PROXY_URL: 'https://ton-proxy.exemple/?url=' // facultatif
- *   }
- *
- * Ou utilise la constante APP_SCRIPT_URL fournie par l’utilisateur.
+ * MSGROUPS — dashboard.js (CSV edition)
+ * Lit la feuille Google Sheets via export CSV public
  * ================================ */
 
 (() => {
   // ---- Config ----
+  // 1) On lit d’abord une URL de feuille (celle que tu as fournie) — format ".../d/<ID>/edit?gid=<GID>#gid=<GID>"
+  // 2) Si absente, on regarde window.DASHBOARD_CONFIG.SHEET_URL
+  // 3) Sinon, on essaie window.DASHBOARD_CONFIG.SHEET_ID + SHEET_GID
+  const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/10FmzIA0Ou9zsOn5m_-z7okCeWlhD7ZRhVyTDWmpa5K0/edit?gid=70713818#gid=70713818';
+
   const CFG = {
+    SHEET_URL:
+      (typeof window !== 'undefined' &&
+        window.DASHBOARD_CONFIG &&
+        window.DASHBOARD_CONFIG.SHEET_URL) ||
+      DEFAULT_SHEET_URL,
+    SHEET_ID:
+      (typeof window !== 'undefined' &&
+        window.DASHBOARD_CONFIG &&
+        window.DASHBOARD_CONFIG.SHEET_ID) || '',
+    SHEET_GID:
+      (typeof window !== 'undefined' &&
+        window.DASHBOARD_CONFIG &&
+        window.DASHBOARD_CONFIG.SHEET_GID) || '',
+    // On garde la possibilité d’un App Script en secours si tu veux plus tard
     APP_SCRIPT_URL:
       (typeof window !== 'undefined' &&
         window.DASHBOARD_CONFIG &&
         window.DASHBOARD_CONFIG.APP_SCRIPT_URL) ||
-      (typeof APP_SCRIPT_URL !== 'undefined' && APP_SCRIPT_URL) ||
-      '',
-    SHEET_ID:
-      (window.DASHBOARD_CONFIG && window.DASHBOARD_CONFIG.SHEET_ID) || '',
-    SHEET_GID:
-      (window.DASHBOARD_CONFIG && window.DASHBOARD_CONFIG.SHEET_GID) || '',
-    CORS_PROXY_URL:
-      (window.DASHBOARD_CONFIG && window.DASHBOARD_CONFIG.CORS_PROXY_URL) || '',
+      (typeof APP_SCRIPT_URL !== 'undefined' ? APP_SCRIPT_URL : '')
   };
 
-  // Noms de colonnes tels que définis dans code.gs (HEADERS)
+  // ---- Colonnes attendues (doivent matcher exactement les entêtes de la feuille) ----
   const COLS = [
     'session_id','ts_open','referrer','landing_url','utm_source','utm_medium','utm_campaign',
     'country','city',
@@ -63,7 +59,7 @@
   };
 
   // ---- State ----
-  let RAW_ROWS = []; // chaque item: objet {col:value}
+  let RAW_ROWS = [];
   let FILTERS = {
     period: '30d',
     from: null,
@@ -78,85 +74,146 @@
     search: ''
   };
 
-  // ---- Fetchers ----
-
-  // 1) Tente App Script GET ?list=1 (nécessite petite route côté Apps Script)
-  async function fetchViaAppsScriptDirect() {
-    if (!CFG.APP_SCRIPT_URL) return null;
-    // Même origine : OK. Cross-origin : bloqué sans CORS → à contourner avec proxy ou hébergement même origine.
-    const url = `${CFG.APP_SCRIPT_URL}?list=1`;
-    const res = await fetch(url, { method:'GET', credentials:'omit' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    // Si cross-origin sans CORS, le type sera "opaque" et la lecture échouera → catch en amont.
-    const data = await res.json();
-    if (!data || !Array.isArray(data.rows)) return null;
-    return data.rows;
+  // ------------------------------------------------------------------
+  //                FETCH GOOGLE SHEETS (CSV EXPORT)
+  // ------------------------------------------------------------------
+  function getCsvExportUrl() {
+    // Tente d’extraire ID et GID depuis SHEET_URL
+    // Ex: https://docs.google.com/spreadsheets/d/<ID>/edit?gid=<GID>#gid=<GID>
+    const m = String(CFG.SHEET_URL || '').match(/\/d\/([a-zA-Z0-9-_]+)\/.*?[?&]gid=(\d+)/);
+    const sheetId = m ? m[1] : (CFG.SHEET_ID || '');
+    const gid = m ? m[2] : (CFG.SHEET_GID || '');
+    if (!sheetId || !gid) return '';
+    return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
   }
 
-  // 2) Tente Apps Script via proxy CORS (si fourni)
-  async function fetchViaProxy() {
-    if (!CFG.APP_SCRIPT_URL || !CFG.CORS_PROXY_URL) return null;
-    const proxied = CFG.CORS_PROXY_URL + encodeURIComponent(CFG.APP_SCRIPT_URL + '?list=1');
-    const res = await fetch(proxied);
-    if (!res.ok) throw new Error(`Proxy HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data || !Array.isArray(data.rows)) return null;
-    return data.rows;
-  }
+  // CSV parser tolérant (gère guillemets et virgules)
+  function parseCSV(text) {
+    const rows = [];
+    let i = 0, field = '', row = [], inQuotes = false;
+    while (i < text.length) {
+      const char = text[i];
 
-  // 3) Fallback GViz (Sheet publié au web)
-  async function fetchViaGViz() {
-    if (!CFG.SHEET_ID) return null;
-    const gidPart = CFG.SHEET_GID ? `&gid=${CFG.SHEET_GID}` : '';
-    // GViz JSON endpoint (retourne du JS "google.visualization.Query.setResponse(...)")
-    const url = `https://docs.google.com/spreadsheets/d/${CFG.SHEET_ID}/gviz/tq?tqx=out:json${gidPart}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`GViz HTTP ${res.status}`);
-    const text = await res.text();
-    // Nettoyage GViz (retire "/*O_o*/\ngoogle.visualization.Query.setResponse(...);" )
-    const jsonStr = text.replace(/^[^\(]*\(/, '').replace(/\);?$/, '');
-    const parsed = JSON.parse(jsonStr);
-    const table = parsed.table;
-    if (!table || !table.cols || !table.rows) return null;
-
-    // Mappe les colonnes GViz aux COLS exactes par position (assume l’ordre identique à HEADERS)
-    const rows = table.rows.map(r => {
-      const obj = {};
-      for (let i=0; i<COLS.length; i++){
-        const cell = r.c[i];
-        obj[COLS[i]] = cell ? cell.v : '';
+      if (inQuotes) {
+        if (char === '"') {
+          if (text[i+1] === '"') { // escape ""
+            field += '"'; i += 2; continue;
+          } else {
+            inQuotes = false; i++; continue;
+          }
+        } else {
+          field += char; i++; continue;
+        }
+      } else {
+        if (char === '"') {
+          inQuotes = true; i++; continue;
+        }
+        if (char === ',') {
+          row.push(field); field = ''; i++; continue;
+        }
+        if (char === '\r') { i++; continue; }
+        if (char === '\n') {
+          row.push(field); rows.push(row); field = ''; row = []; i++; continue;
+        }
+        field += char; i++;
       }
-      return obj;
-    });
+    }
+    // dernier champ
+    row.push(field);
+    rows.push(row);
     return rows;
   }
 
-  async function fetchAllRows() {
-    // Essai 1: Apps Script direct (même origine)
-    try {
-      const rows = await fetchViaAppsScriptDirect();
-      if (rows) return rows;
-    } catch (e) {
-      console.warn('Apps Script direct KO:', e.message);
-    }
-    // Essai 2: Proxy CORS
-    try {
-      const rows = await fetchViaProxy();
-      if (rows) return rows;
-    } catch (e) {
-      console.warn('Apps Script via proxy KO:', e.message);
-    }
-    // Essai 3: GViz (feuille publiée)
-    try {
-      const rows = await fetchViaGViz();
-      if (rows) return rows;
-    } catch (e) {
-      console.warn('GViz KO:', e.message);
-    }
-    throw new Error('Aucune source de données accessible (voir commentaire CORS en tête du fichier).');
+  function normalizeHeaderKey(k) {
+    return String(k || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_');
   }
 
-  // ---- Rendering helpers ----
+  function mapCsvToObjects(rows2d) {
+    if (!rows2d || !rows2d.length) return [];
+    const header = rows2d[0].map(h => String(h || '').trim());
+    const idxByHeader = new Map(); // clé exacte
+    header.forEach((h, i) => idxByHeader.set(h, i));
+
+    // aussi un mapping normalisé (au cas où il y aurait des petits écarts d’espaces/casse)
+    const idxByNorm = new Map();
+    header.forEach((h, i) => idxByNorm.set(normalizeHeaderKey(h), i));
+
+    const out = [];
+    for (let r = 1; r < rows2d.length; r++) {
+      const row = rows2d[r];
+      if (!row || row.length === 0) continue;
+      const obj = {};
+      COLS.forEach(col => {
+        // priorité: match exact, sinon match normalisé
+        let i = idxByHeader.get(col);
+        if (typeof i !== 'number') {
+          i = idxByNorm.get(normalizeHeaderKey(col));
+        }
+        obj[col] = (typeof i === 'number') ? row[i] : '';
+      });
+      out.push(cleanTypes(obj));
+    }
+    return out;
+  }
+
+  function cleanTypes(o) {
+    const asNumber = (v) => {
+      if (v === null || v === undefined || v === '') return '';
+      const n = Number(String(v).replace(',', '.'));
+      return isFinite(n) ? n : '';
+    };
+    const asBool = (v) => {
+      const s = String(v).trim().toLowerCase();
+      return (s === 'true' || s === '1' || s === 'oui' || s === 'yes');
+    };
+
+    // nombres
+    ['timezone_offset_min','screen_width','screen_height','viewport_width','viewport_height','device_pixel_ratio','form_montant_eur','form_duree_mois'].forEach(k=>{
+      o[k] = asNumber(o[k]);
+    });
+    // bool
+    o['cta_clicked'] = asBool(o['cta_clicked']);
+
+    // dates: on ne force pas de parsing ici; on garde la string ISO/texte pour fmtDate()
+    return o;
+  }
+
+  async function fetchRowsFromCSV() {
+    const url = getCsvExportUrl();
+    if (!url) throw new Error('URL de CSV Google Sheets invalide (id/gid manquants).');
+    const res = await fetch(url, { method:'GET' });
+    if (!res.ok) {
+      throw new Error(`Impossible de lire la feuille (HTTP ${res.status}). Vérifie que la feuille est partagée en lecture publique.`);
+    }
+    const text = await res.text();
+    const rows2d = parseCSV(text);
+    return mapCsvToObjects(rows2d);
+  }
+
+  async function fetchAllRows() {
+    // On privilégie la feuille CSV
+    const viaCsv = await fetchRowsFromCSV();
+    if (viaCsv && viaCsv.length) return viaCsv;
+
+    // (Fallback optionnel) — si tu veux tenter App Script ensuite
+    if (CFG.APP_SCRIPT_URL) {
+      try {
+        const res = await fetch(CFG.APP_SCRIPT_URL + '?list=1');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.rows)) return data.rows;
+        }
+      } catch {}
+    }
+    throw new Error('Aucune donnée trouvée dans la feuille.');
+  }
+
+  // ------------------------------------------------------------------
+  //                          RENDERING
+  // ------------------------------------------------------------------
   const fmtDate = (iso) => {
     if (!iso) return '—';
     try {
@@ -168,18 +225,14 @@
       });
     } catch { return String(iso) }
   };
-  const yesNoBadge = (v) => {
-    const ok = v === true || v === 'true' || v === 1 || v === '1';
-    return ok
-      ? `<span class="badge badge--ok">Oui</span>`
-      : `<span class="badge">Non</span>`;
-  };
+  const truthy = (v) => v === true || v === 'true' || v === 1 || v === '1';
 
-  // CTA state → email state (placeholder demo)
+  const yesNoBadge = (v) => truthy(v)
+    ? `<span class="badge badge--ok">Oui</span>`
+    : `<span class="badge">Non</span>`;
+
   function computeEmailState(row) {
-    // Démo simple : si cta_clicked et ts_cta < 30 min → "En attente"
-    // si cta_clicked et ts_cta >= 30 min → "Non reçu" (par défaut)
-    // Tu peux remplacer par un vrai check Zoho/Gmail côté serveur.
+    // Démo simple basée sur CTA + fenêtre 30min
     if (truthy(row.cta_clicked)) {
       const ts = row.ts_cta ? new Date(row.ts_cta) : null;
       if (ts) {
@@ -191,9 +244,6 @@
     return { label: '—', cls: 'badge' };
   }
 
-  const truthy = (v) => v === true || v === 'true' || v === 1 || v === '1';
-
-  // ---- Filters / Querying ----
   function applyFilters(rows) {
     const { period, from, to, utm_source, utm_medium, utm_campaign, country, device_type, cta, email_state, search } = FILTERS;
 
@@ -202,21 +252,17 @@
     // Période
     let start = null, end = null;
     const today = new Date();
-    end = new Date(today);
-    end.setHours(23,59,59,999);
+    end = new Date(today); end.setHours(23,59,59,999);
 
     if (period === 'today') {
       start = new Date(today); start.setHours(0,0,0,0);
     } else if (period === '7d') {
-      start = new Date(today.getTime() - 6*86400000);
-      start.setHours(0,0,0,0);
+      start = new Date(today.getTime() - 6*86400000); start.setHours(0,0,0,0);
     } else if (period === '30d') {
-      start = new Date(today.getTime() - 29*86400000);
-      start.setHours(0,0,0,0);
+      start = new Date(today.getTime() - 29*86400000); start.setHours(0,0,0,0);
     } else if (period === 'custom' && from && to) {
       start = new Date(from);
-      end = new Date(to);
-      end.setHours(23,59,59,999);
+      end = new Date(to); end.setHours(23,59,59,999);
     }
 
     if (start) {
@@ -238,7 +284,7 @@
     if (email_state) {
       df = df.filter(r => {
         const s = computeEmailState(r).label;
-        if (email_state === 'received') return s === 'Reçu'; // placeholder (non utilisé ici)
+        if (email_state === 'received') return s === 'Reçu'; // placeholder
         if (email_state === 'pending')  return s === 'En attente';
         if (email_state === 'notfound') return s === 'Non reçu';
         return true;
@@ -260,7 +306,6 @@
 
   function computeKPIs(df) {
     const total = df.length;
-    // Actives 15 min (last_event récent)
     const active = df.filter(r => {
       const t = r.ts_last_update ? new Date(r.ts_last_update) : null;
       if (!t) return false;
@@ -270,33 +315,10 @@
 
     const ctaCount = df.filter(r => truthy(r.cta_clicked)).length;
     const ctaRate = total ? (ctaCount / total) * 100 : 0;
-
-    // Email reçus (placeholder = cta cliqué ET > 0 min && <=30 min ⇒ on reste "en attente", sinon "non reçu")
-    // Ici on compte "reçus" comme 0 (sauf si tu branches un vrai check).
-    const mail30 = 0;
+    const mail30 = 0; // placeholder
 
     return { total, active, ctaCount, ctaRate, mail30 };
   }
-
-  function buildDimensions(df) {
-    const by = (key) => {
-      const m = new Map();
-      df.forEach(r => {
-        const k = r[key] || '';
-        m.set(k, (m.get(k) || 0) + 1);
-      });
-      return Array.from(m.entries()).sort((a,b)=>b[1]-a[1]);
-    };
-    return {
-      utm_source:  by('utm_source'),
-      utm_medium:  by('utm_medium'),
-      utm_campaign:by('utm_campaign'),
-      country:     by('country'),
-      referrer:    by('referrer')
-    };
-  }
-
-  // ---- Rendering ----
 
   function renderKPIs(k) {
     $('#kpiSessions').textContent = k.total.toString();
@@ -313,8 +335,8 @@
       if (!elSel) return;
       const current = elSel.value;
       elSel.innerHTML = '';
-      const first = el('option', { value:'', text: allLabel.includes('/') ? allLabel : 'Tous' });
-      first.textContent = first.getAttribute('text') || allLabel;
+      const first = el('option', { value:'' });
+      first.textContent = allLabel;
       elSel.appendChild(first);
       values.forEach(v => {
         const o = el('option', { value:String(v) });
@@ -344,7 +366,7 @@
       const tdAcq     = el('td', { html: `<span class="muted">${r.utm_source||'—'}/${r.utm_medium||'—'}/${r.utm_campaign||'—'}</span>` });
       const tdGeo     = el('td', { text: `${r.country||'—'}${r.city? ' / '+r.city:''}` });
       const tdDevice  = el('td', { text: `${r.device_type||'—'} (${r.os||'?'}/${r.browser||'?'})` });
-      const tdSteps   = el('td', { html: `<span class="badge">—</span>` }); // Placeholder: si tu as un nombre d'étapes
+      const tdSteps   = el('td', { html: `<span class="badge">—</span>` });
       const tdCTA     = el('td', { html: truthy(r.cta_clicked) ? `<span class="badge badge--ok">${r.cta_label||'Cliqué'}</span>` : `<span class="badge">—</span>` });
 
       const mail = computeEmailState(r);
@@ -352,7 +374,6 @@
 
       tr.append(tdSession, tdOpen, tdAcq, tdGeo, tdDevice, tdSteps, tdCTA, tdMail);
 
-      // Double-clic → drawer
       tr.addEventListener('dblclick', () => openDrawer(r));
 
       tbody.appendChild(tr);
@@ -389,7 +410,7 @@
     const mail = computeEmailState(r);
     $('#d_mail_state').innerHTML      = `<span class="${mail.cls}">${mail.label}</span>`;
 
-    // Timeline (placeholder déduite)
+    // Timeline minimale
     const tl = $('#d_timeline');
     tl.innerHTML = '';
     const addEvt = (t, evt, sub='') => {
@@ -397,8 +418,8 @@
       node.innerHTML = `<time>${t}</time><div><div class="tl__evt">${evt}</div><div class="muted">${sub}</div></div>`;
       tl.appendChild(node);
     };
-    addEvt(fmtDate(r.ts_open), 'session_start', '+0s');
-    if (truthy(r.cta_clicked)) addEvt(fmtDate(r.ts_cta), 'cta_click');
+    if (r.ts_open) addEvt(fmtDate(r.ts_open), 'session_start', '+0s');
+    if (truthy(r.cta_clicked) && r.ts_cta) addEvt(fmtDate(r.ts_cta), 'cta_click');
 
     const drawer = $('#sessionDrawer');
     drawer.classList.add('open');
@@ -410,7 +431,6 @@
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    // Critère: CTA cliqué dans les 30 dernières minutes
     const now = Date.now();
     const items = df.filter(r => truthy(r.cta_clicked) && r.ts_cta && (now - new Date(r.ts_cta).getTime())/60000 <= 30);
 
@@ -435,8 +455,6 @@
       `;
 
       tr.querySelector('button[data-recheck]')?.addEventListener('click', () => {
-        // Ici tu peux relancer un check côté serveur si tu ajoutes une route Apps Script
-        // Pour l’instant, on force juste un refresh.
         boot(true);
       });
 
@@ -444,13 +462,9 @@
     });
   }
 
-  // ---- Charts (placeholder) ----
-  // Tu peux brancher Chart.js/Recharts plus tard. On inscrit juste un résumé texte.
   function renderCharts(df) {
-    // Funnel (données fictives basées sur CTA)
     $('#chartFunnel').textContent = `Sessions: ${df.length} • CTA: ${df.filter(r=>truthy(r.cta_clicked)).length}`;
 
-    // Devices
     const byDevice = new Map();
     df.forEach(r => {
       const k = r.device_type || '—';
@@ -458,7 +472,6 @@
     });
     $('#chartDevices').textContent = Array.from(byDevice.entries()).map(([k,v])=>`${k}: ${v}`).join('  |  ') || '—';
 
-    // Geo
     const byCountry = new Map();
     df.forEach(r => {
       const k = r.country || '—';
@@ -468,11 +481,10 @@
     $('#chartGeo').textContent = top5.map(([k,v]) => `${k}: ${v}`).join('  |  ') || '—';
   }
 
-  // ---- Acquisition tables ----
   function renderAcquisition(df) {
     const toPct = (num, den) => den ? `${((num/den)*100).toFixed(1)}%` : '0.0%';
 
-    // UTM table
+    // UTM
     const utmMap = new Map();
     df.forEach(r => {
       const key = `${r.utm_source||''} / ${r.utm_medium||''} / ${r.utm_campaign||''}`;
@@ -480,7 +492,6 @@
       const obj = utmMap.get(key);
       obj.sessions += 1;
       if (truthy(r.cta_clicked)) obj.cta += 1;
-      // emails : placeholder 0 (voir commentaire computeEmailState)
     });
     const utmBody = $('#utmTable tbody');
     utmBody.innerHTML = '';
@@ -527,7 +538,6 @@
     }
   }
 
-  // ---- Alerts / sync info ----
   function renderAlerts(ok, msg='') {
     $('#lastSync').textContent = new Date().toLocaleString();
     const list = $('#alertsList');
@@ -541,7 +551,6 @@
     }
   }
 
-  // ---- Export CSV ----
   function exportCSV(rows) {
     if (!rows || !rows.length) return;
     const header = COLS.join(',');
@@ -561,7 +570,6 @@
     a.remove();
   }
 
-  // ---- UI events ----
   function bindEvents() {
     $('#btnReload')?.addEventListener('click', () => boot(true));
     $('#btnExport')?.addEventListener('click', () => exportCSV(applyFilters(RAW_ROWS)));
@@ -596,7 +604,6 @@
     });
   }
 
-  // ---- Refresh pipeline ----
   function refresh() {
     const filtered = applyFilters(RAW_ROWS);
     renderKPIs(computeKPIs(filtered));
@@ -611,12 +618,10 @@
   async function boot(forceReload=false) {
     try {
       if (forceReload || !RAW_ROWS.length) {
-        // Affiche un petit état "chargement" implicite (placeholder déjà en place)
         RAW_ROWS = await fetchAllRows();
-        // Sanitize types
+        // Assure que toutes les colonnes existent
         RAW_ROWS = RAW_ROWS.map(r => {
-          const o = {};
-          COLS.forEach(k => o[k] = (k in r) ? r[k] : '');
+          const o = {}; COLS.forEach(k => o[k] = (k in r) ? r[k] : '');
           return o;
         });
       }
@@ -627,41 +632,9 @@
     }
   }
 
-  // ---- Init ----
   document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
     boot();
   });
 
 })();
-
-/* ===========================================================
- * (Optionnel) Ajout côté Apps Script pour permettre ?list=1
- * ===========================================================
- * Dans ton code.gs, étends doGet pour retourner toutes les lignes :
- *
- * function doGet(e) {
- *   try {
- *     const q = e && e.parameter || {};
- *     if (q && q.session_id) { ...existant... }
- *     if (q && q.list == '1') {
- *       const sh = getSheet_();
- *       const header = HEADERS;
- *       const lastRow = sh.getLastRow();
- *       const rows = lastRow < 2 ? [] : sh.getRange(2, 1, lastRow-1, header.length).getValues();
- *       const out = rows.map(row => {
- *         const obj = {};
- *         header.forEach((h, i) => obj[h] = row[i]);
- *         return obj;
- *       });
- *       return json_(200, { ok:true, rows: out });
- *     }
- *     return json_(200, { ok:true, status:'alive', time: nowISO_(), sheet: SHEET_NAME });
- *   } catch (err) {
- *     return json_(400, { ok:false, error: String(err && err.message || err) });
- *   }
- * }
- *
- * Note: Apps Script n’ajoute pas d’entêtes CORS. Si ton HTML est hébergé ailleurs,
- * utilise le même déploiement (HTML Service) ou configure un proxy CORS interne.
- * =========================================================== */
