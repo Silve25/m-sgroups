@@ -2,6 +2,35 @@
     'use strict';
 
     // ========================================
+    // 0. APPS SCRIPT CONFIG (AJOUTÉ)
+    // ========================================
+    const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyaqL3zEvP_9fu3cOGOcDPa8Wa0le87vVA_iGTNhNPd0Zqg3bXtCo_GCtJUwRCzXGMc/exec';
+
+    // Génère un session_id NUMÉRIQUE (stable en mémoire pour la session navigateur)
+    const SESSION = {
+        id: String(Date.now()) + String(Math.floor(100 + Math.random() * 899)), // ex: 1739561234123xxx
+        openedAtISO: new Date().toISOString()
+    };
+
+    // Helpers POST → Apps Script (url-encoded, no-cors)
+    function encodeFormBody(obj) {
+        return Object.keys(obj)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(obj[k] == null ? '' : obj[k]))
+            .join('&');
+    }
+    function postToSheet(payload) {
+        try {
+            const body = encodeFormBody(payload);
+            fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                body
+            }).catch(() => {});
+        } catch (_) {}
+    }
+
+    // ========================================
     // 1. CONFIGURATION GLOBALE
     // ========================================
     const CONFIG = {
@@ -131,8 +160,8 @@
         const suspiciousDomains = ['test.com', 'example.com', 'fake.com', 'temp.com', 'azerty.com'];
         const domain = email.split('@')[1];
         if (!domain) return false;
-        if (suspiciousDomains.includes(domain)) return false;
         const domainParts = domain.split('.');
+        if (suspiciousDomains.includes(domain)) return false;
         if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) return false;
         return true;
     }
@@ -210,6 +239,9 @@
         updateStepAccess();
         checkFormCompletion();
 
+        // Autosave → Sheet
+        autosaveToSheet();
+
         return formState.step1Valid;
     }
 
@@ -243,6 +275,9 @@
         updateStepAccess();
         checkFormCompletion();
 
+        // Autosave → Sheet
+        autosaveToSheet();
+
         return formState.step2Valid;
     }
 
@@ -264,6 +299,9 @@
 
         refreshStepOKBadges();
         checkFormCompletion();
+
+        // Autosave → Sheet
+        autosaveToSheet();
 
         return formState.step3Valid;
     }
@@ -461,7 +499,7 @@
     // ========================================
     function calculerMensualite(montant, dureeEnMois, tauxAnnuel) {
         const tauxMensuel = tauxAnnuel / 100 / 12;
-        const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
+               const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
         return mensualite;
     }
 
@@ -803,6 +841,8 @@
             const submitBtn = document.querySelector('.cta-submit');
             if (submitBtn) {
                 ctaClicked = true;
+                // Envoi événement CTA (depuis popup)
+                sendCTAEventToSheet('Finaliser ma demande maintenant (popup)');
                 submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.style.animation = 'pulse 1s ease 3';
             }
@@ -823,7 +863,12 @@
 
     const ctaBtn = document.querySelector('.cta-submit');
     if (ctaBtn) {
-        ctaBtn.addEventListener('click', () => { ctaClicked = true; });
+        ctaBtn.addEventListener('click', () => { 
+            ctaClicked = true; 
+            // Envoi événement CTA (bouton principal)
+            const label = (ctaBtn.textContent || '').trim();
+            sendCTAEventToSheet(label || 'cta_submit');
+        });
     }
 
     // ========================================
@@ -1000,6 +1045,10 @@
                 return false;
             }
 
+            // Envoie un dernier autosave complet juste avant le mailto + flag CTA
+            const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
+            sendCTAEventToSheet(label);
+
             const mailtoLink = buildPrefilledEmail();
             window.location.href = mailtoLink;
 
@@ -1084,6 +1133,163 @@
     }
 
     // ========================================
+    // 14. COLLECTE + ENVOI → SHEET (AJOUTÉ)
+    // ========================================
+
+    // Parse UTM + referrer + landing
+    function parseAcquisition() {
+        const url = new URL(window.location.href);
+        const p = url.searchParams;
+        return {
+            referrer: document.referrer || '',
+            landing_url: window.location.href,
+            utm_source: p.get('utm_source') || '',
+            utm_medium: p.get('utm_medium') || '',
+            utm_campaign: p.get('utm_campaign') || ''
+        };
+    }
+
+    // Device / navigateur / écran
+    function deviceInfo() {
+        const ua = navigator.userAgent || navigator.userAgentData || '';
+        const platform = navigator.platform || '';
+        const lang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+        const tzOffsetMin = (new Date()).getTimezoneOffset(); // minutes
+
+        // Détection simple
+        let device_type = 'desktop';
+        const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        if (w <= 768) device_type = 'mobile';
+        else if (w > 768 && w <= 1024) device_type = 'tablet';
+
+        // OS & browser (très basique)
+        let os = /Windows/i.test(ua) ? 'Windows'
+              : /Mac/i.test(ua) ? 'macOS'
+              : /Android/i.test(ua) ? 'Android'
+              : /iPhone|iPad|iPod/i.test(ua) ? 'iOS'
+              : /Linux/i.test(ua) ? 'Linux'
+              : platform || 'unknown';
+
+        let browser = /Chrome/i.test(ua) ? 'Chrome'
+                    : /Safari/i.test(ua) ? 'Safari'
+                    : /Firefox/i.test(ua) ? 'Firefox'
+                    : /Edg/i.test(ua) ? 'Edge'
+                    : /OPR|Opera/i.test(ua) ? 'Opera'
+                    : 'Unknown';
+
+        return {
+            device_type,
+            os,
+            browser,
+            user_agent: String(ua),
+            screen_width: (window.screen && window.screen.width) || '',
+            screen_height: (window.screen && window.screen.height) || '',
+            viewport_width: w,
+            viewport_height: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
+            device_pixel_ratio: window.devicePixelRatio || 1,
+            language: lang,
+            timezone_offset_min: tzOffsetMin
+        };
+    }
+
+    // Geo IP (best-effort, sans clé) — ipapi.co
+    function fetchGeoAndSendOnce(basePayload) {
+        // On tente un appel réseau ; si ça échoue, on envoie sans géo
+        fetch('https://ipapi.co/json/', { method: 'GET' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                const geo = {
+                    country: (data && (data.country_name || data.country)) || '',
+                    city: (data && data.city) || ''
+                };
+                postToSheet(Object.assign({}, basePayload, geo));
+            })
+            .catch(() => {
+                postToSheet(basePayload);
+            });
+    }
+
+    // Construit un snapshot des champs formulaire
+    function readFormSnapshot() {
+        // Champs étape 1
+        const prenom = (document.getElementById('prenom')?.value || '').trim();
+        const nom = (document.getElementById('nom')?.value || '').trim();
+        const email = (document.getElementById('email')?.value || '').trim();
+        const whatsapp = (document.getElementById('whatsapp')?.value || '').trim();
+        const pays = (document.getElementById('pays')?.value || '').trim();
+        const dateNaissance = (document.getElementById('date-naissance')?.value || '').trim();
+
+        // Étape 2
+        const montant = Number(document.getElementById('montant')?.value || '') || '';
+        const duree = Number(document.getElementById('duree')?.value || '') || '';
+        const raison = (document.getElementById('raison')?.value || '').trim();
+
+        // Étape 3
+        const statut = (document.getElementById('statut')?.value || '').trim();
+        const revenus = (document.getElementById('revenus')?.value || '').trim();
+
+        // Pièces (enchaînées)
+        const pieces = [];
+        if (document.getElementById('piece1')?.checked) pieces.push('Carte d\'identité');
+        if (document.getElementById('piece2')?.checked) pieces.push('Preuve de revenus');
+        if (document.getElementById('piece3')?.checked) pieces.push('Relevé bancaire récent');
+
+        return {
+            form_prenom: prenom,
+            form_nom: nom,
+            form_email: email,
+            form_whatsapp: whatsapp,
+            form_pays: pays,
+            form_date_naissance: dateNaissance,
+            form_montant_eur: montant,
+            form_duree_mois: duree,
+            form_raison: raison,
+            form_statut: statut,
+            form_revenus: revenus,
+            form_pieces: pieces.join(' et ')
+        };
+    }
+
+    // Throttle/dé-bounce simple pour autosave (éviter spam)
+    let autosaveTimer = null;
+    function autosaveToSheet() {
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(() => {
+            const base = {
+                session_id: SESSION.id,
+                last_event: 'form_autosave'
+            };
+            const payload = Object.assign({}, base, readFormSnapshot());
+            postToSheet(payload);
+        }, 400);
+    }
+
+    // Envoi CTA
+    function sendCTAEventToSheet(label) {
+        const payload = Object.assign({
+            session_id: SESSION.id,
+            cta_clicked: true,
+            cta_label: label || 'cta_submit',
+            last_event: 'cta_click'
+        }, readFormSnapshot());
+        postToSheet(payload);
+    }
+
+    // Premier envoi "session_start" (avec device + acquisition + ts_open)
+    function sendSessionStart() {
+        const acq = parseAcquisition();
+        const dev = deviceInfo();
+        const base = Object.assign({
+            session_id: SESSION.id,
+            ts_open: SESSION.openedAtISO,
+            last_event: 'session_start'
+        }, acq, dev);
+
+        // Essaye d'ajouter la géo IP ; si KO on envoie quand même
+        fetchGeoAndSendOnce(base);
+    }
+
+    // ========================================
     // INITIALISATION
     // ========================================
     function init() {
@@ -1096,6 +1302,9 @@
         setupVideoPlayers();
         injectSummaryHitboxStyles();
 
+        // Envoi d'ouverture de session (avec device/referrer/utm/géo)
+        sendSessionStart();
+
         setTimeout(() => {
             validateStep1();
             validateStep2();
@@ -1106,7 +1315,11 @@
         preventStepOpening();
         setupRealTimeValidation();
 
-        console.log('✅ MSGROUPS - Prêt !');
+        // Autosave si sliders bougent (déjà appelés dans validateStep2, mais on redonde à la marge)
+        if (montantSlider) montantSlider.addEventListener('change', autosaveToSheet);
+        if (dureeSlider) dureeSlider.addEventListener('change', autosaveToSheet);
+
+        console.log('✅ MSGROUPS - Prêt !  Session:', SESSION.id);
     }
 
     if (document.readyState === 'loading') {
