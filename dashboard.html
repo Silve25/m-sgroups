@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MSGROUPS — Dashboard</title>
-  <meta name="description" content="Dashboard de suivi des sessions, formulaires et CTA basé sur Google Sheets." />
+  <meta name="description" content="Dashboard de suivi des sessions, formulaires et e-mails (30 min) basé sur Google Sheets." />
   <meta name="robots" content="noindex,nofollow" />
 
   <!-- Fonts -->
@@ -35,7 +35,7 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:'Inter',system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
       background: radial-gradient(1200px 800px at 10% -10%, #1b2460 0%, #0b1020 50%, #070a16 100%);
       color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
@@ -71,7 +71,7 @@
     /* Layout */
     .wrap{max-width:var(--maxw); margin:0 auto; padding:18px 14px 48px}
     .grid{display:grid; gap:14px;}
-    .grid--kpis{grid-template-columns:repeat(3,1fr)}
+    .grid--kpis{grid-template-columns:repeat(4,1fr)}
     .grid--two{grid-template-columns:2.1fr 1fr}
     .grid--two-rev{grid-template-columns:1fr 2fr}
     .grid--three{grid-template-columns:repeat(3,1fr)}
@@ -202,9 +202,18 @@
 
     /* Placeholder helpers */
     .placeholder{opacity:.8}
+    /* Screen-reader helpers */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   </style>
 </head>
 <body>
+  <!-- NoScript -->
+  <noscript>
+    <div style="background:#ffedd5;color:#7c2d12;padding:12px 16px;text-align:center">
+      Activez JavaScript pour charger les données du tableau de bord.
+    </div>
+  </noscript>
+
   <!-- Header -->
   <header class="header" role="banner">
     <div class="header__inner">
@@ -214,15 +223,17 @@
       </a>
       <div></div>
       <div class="header__actions">
-        <button class="btn btn--ghost" id="btnReload" title="Recharger">⟳ Recharger</button>
-        <button class="btn btn--brand" id="btnExport" title="Exporter la vue">⬇ Export CSV</button>
+        <button class="btn btn--ghost" id="btnReload" title="Recharger" aria-label="Recharger les données">⟳ Recharger</button>
+        <button class="btn btn--brand" id="btnExport" title="Exporter la vue" aria-label="Exporter la vue en CSV">⬇ Export CSV</button>
       </div>
     </div>
   </header>
 
   <main class="wrap" role="main">
-    <!-- KPIs (sans email) -->
+    <!-- KPIs -->
     <section aria-labelledby="kpis-title" class="grid grid--kpis">
+      <h2 id="kpis-title" class="sr-only">Indicateurs clés</h2>
+
       <div class="kpi" id="kpiSessionsCard">
         <div class="kpi__icon"><span>📊</span></div>
         <div class="kpi__meta">
@@ -230,6 +241,7 @@
           <div class="kpi__label">Sessions (période)</div>
         </div>
       </div>
+
       <div class="kpi" id="kpiActiveCard">
         <div class="kpi__icon"><span>⚡</span></div>
         <div class="kpi__meta">
@@ -237,11 +249,26 @@
           <div class="kpi__label">Actives (dernières 15 min)</div>
         </div>
       </div>
+
       <div class="kpi kpi--warn" id="kpiCTAcard">
         <div class="kpi__icon"><span>➡️</span></div>
         <div class="kpi__meta">
-          <div class="kpi__value"><span id="kpiCTA">—</span> <span class="kpi__label" style="margin-left:6px">(taux <span id="kpiCTARate">—</span>)</span></div>
+          <div class="kpi__value">
+            <span id="kpiCTA">—</span>
+            <span class="kpi__label" style="margin-left:6px">(taux <span id="kpiCTARate">—</span>)</span>
+          </div>
           <div class="kpi__label">CTA cliqués</div>
+        </div>
+      </div>
+
+      <div class="kpi kpi--ok" id="kpiMailCard">
+        <div class="kpi__icon"><span>✉️</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value">
+            <span id="kpiMail">—</span>
+            <span class="kpi__label" style="margin-left:6px">(30 min)</span>
+          </div>
+          <div class="kpi__label">E-mails reçus</div>
         </div>
       </div>
     </section>
@@ -253,7 +280,7 @@
         <div class="panel__sub">Affinez les données affichées ci-dessous</div>
       </div>
       <div class="panel__body">
-        <div class="filters">
+        <div class="filters" id="filters">
           <div class="field">
             <label for="fPeriod">Période</label>
             <select id="fPeriod">
@@ -307,6 +334,15 @@
               <option value="not">Non cliqué</option>
             </select>
           </div>
+          <div class="field">
+            <label for="fEmailState">État e-mail (30 min)</label>
+            <select id="fEmailState">
+              <option value="">Tous</option>
+              <option value="received">Reçu</option>
+              <option value="pending">En attente</option>
+              <option value="notfound">Non reçu</option>
+            </select>
+          </div>
 
           <div class="field" style="grid-column:span 2;">
             <label for="fSearch">Recherche (session, nom, email, WhatsApp)</label>
@@ -339,6 +375,7 @@
                   <th>Device</th>
                   <th>Étapes</th>
                   <th>CTA</th>
+                  <th>E-mail</th>
                 </tr>
               </thead>
               <tbody>
@@ -350,6 +387,7 @@
                   <td>—</td>
                   <td>—</td>
                   <td><span class="badge">1/3</span></td>
+                  <td><span class="badge">—</span></td>
                   <td><span class="badge">—</span></td>
                 </tr>
               </tbody>
@@ -407,12 +445,13 @@
                         <th>Sessions</th>
                         <th>CTA</th>
                         <th>Conv.</th>
+                        <th>E-mails</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr class="placeholder">
                         <td class="mono muted">utm_source / utm_medium / utm_campaign</td>
-                        <td>—</td><td>—</td><td>—</td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
                       </tr>
                     </tbody>
                   </table>
@@ -427,11 +466,12 @@
                         <th>Referrer</th>
                         <th>Sessions</th>
                         <th>CTA</th>
+                        <th>E-mails</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr class="placeholder">
-                        <td class="muted">—</td><td>—</td><td>—</td>
+                        <td class="muted">—</td><td>—</td><td>—</td><td>—</td>
                       </tr>
                     </tbody>
                   </table>
@@ -444,32 +484,63 @@
       </div>
     </section>
 
-    <!-- Alertes (sans file e-mail) -->
-    <section class="panel" style="margin-top:14px">
-      <div class="panel__head">
-        <div class="panel__title">Alertes</div>
-        <div class="panel__sub">Qualité & intégrité</div>
+    <!-- Queue 30 min & alertes -->
+    <section class="grid grid--two" style="margin-top:14px">
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">File “à vérifier” (CTA &lt; 30 min)</div>
+          <div class="panel__sub">Suivi automatique e-mails sur la fenêtre des 30 minutes</div>
+        </div>
+        <div class="panel__body">
+          <table class="table" id="queueTable" aria-label="File 30 min">
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>CTA</th>
+                <th>Deadline</th>
+                <th>Etat</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="placeholder">
+                <td class="mono">—</td>
+                <td>—</td>
+                <td>—</td>
+                <td><span class="badge">En attente</span></td>
+                <td><button class="btn" disabled>Rechecker</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="panel__body">
-        <ul id="alertsList" style="list-style:none; padding:0; margin:0; display:grid; gap:10px">
-          <li class="pill pill--brand">Aucune alerte active</li>
-        </ul>
-        <div class="divider"></div>
-        <div class="kv">
-          <b>Dernière synchro</b><span id="lastSync" class="mono muted">—</span>
-          <b>Erreurs ingestion</b><span id="ingestionErrors" class="mono muted">0</span>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">Alertes</div>
+          <div class="panel__sub">Qualité & intégrité</div>
+        </div>
+        <div class="panel__body">
+          <ul id="alertsList" style="list-style:none; padding:0; margin:0; display:grid; gap:10px">
+            <li class="pill pill--brand">Aucune alerte active</li>
+          </ul>
+          <div class="divider"></div>
+          <div class="kv">
+            <b>Dernière synchro</b><span id="lastSync" class="mono muted">—</span>
+            <b>Erreurs ingestion</b><span id="ingestionErrors" class="mono muted">0</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <p class="footer">© 2025 MSGROUPS — Dashboard interne (Google Sheets). UI prête pour branchement JS.</p>
+    <p class="footer">© 2025 MSGROUPS — Dashboard interne (Google Sheets + Zoho Mail). UI prête pour branchement JS.</p>
   </main>
 
   <!-- Drawer: Session details -->
   <aside class="drawer" id="sessionDrawer" aria-labelledby="drawer-title" aria-hidden="true">
     <div class="drawer__head">
       <div>
-        <div class="panel__title" id="drawer-title">Détails session</div>
+        <div class="panel__title" id="drawer-title" style="margin-bottom:2px">Détails session</div>
         <div class="panel__sub mono" id="drawerSessionId">session_id: —</div>
       </div>
       <button class="btn" id="drawerClose" aria-label="Fermer">✕</button>
@@ -518,10 +589,12 @@
 
       <div class="divider"></div>
 
-      <div class="panel__title" style="margin-bottom:8px">CTA</div>
+      <div class="panel__title" style="margin-bottom:8px">CTA & e-mail</div>
       <div class="kv">
-        <b>Libellé CTA</b><span id="d_cta_label">—</span>
+        <b>CTA</b><span id="d_cta_label">—</span>
         <b>Horodatage CTA</b><span id="d_ts_cta" class="mono">—</span>
+        <b>État e-mail (30 min)</b>
+        <span id="d_mail_state"><span class="pill">—</span></span>
       </div>
 
       <div class="divider"></div>
@@ -536,18 +609,25 @@
     </div>
   </aside>
 
-  <!-- JS -->
+  <!-- JS bootstrapping -->
   <script>
-    // Minimal : permet juste de fermer le drawer si ouvert (sans logique de données).
+    // Exposé pour dashboard.js
+    window.DASHBOARD_CONFIG = {
+      APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyaqL3zEvP_9fu3cOGOcDPa8Wa0le87vVA_iGTNhNPd0Zqg3bXtCo_GCtJUwRCzXGMc/exec'
+    };
+    // Petite aide UX: fermer le drawer (la logique de données reste dans dashboard.js)
     (function(){
       const drawer = document.getElementById('sessionDrawer');
       const closeBtn = document.getElementById('drawerClose');
       if(closeBtn){
-        closeBtn.addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
+        closeBtn.addEventListener('click', ()=>{
+          drawer.classList.remove('open');
+          drawer.setAttribute('aria-hidden','true');
+        });
       }
     })();
   </script>
-  <script src="dashboard.js"></script>
-  <script src="formulaire.js"></script>
+  <!-- Charge la logique (fetch Google Apps Script + rendu smart) -->
+  <script src="dashboard.js" defer></script>
 </body>
 </html>
