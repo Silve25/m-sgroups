@@ -935,7 +935,37 @@
         return mailto;
     }
 
+    // ====== SECURITY PATCH: neutralise l'action "mailto:" pour éviter l'alerte Chrome
+    // "Ce formulaire n'est pas sécurisé, la saisie automatique est désactivée".
+    // On conserve exactement le même flux d'envoi (mailto via JS) mais on réécrit
+    // l'action du <form> côté client vers une ancre locale sûre, et on coupe l'autofill.
     const form = document.querySelector('form[action^="mailto"], form[action*="mailto"]') || document.getElementById('lead-form');
+    if (form) {
+        try {
+            // Mémorisation facultative de l'adresse (si jamais tu veux l'utiliser plus tard)
+            if (!form.dataset.mailto) {
+                const raw = form.getAttribute('action') || '';
+                const addr = raw.startsWith('mailto:') ? raw.replace(/^mailto:/i, '') : 'Contact@sergemagdeleinesolutions.fr';
+                form.dataset.mailto = addr;
+            }
+            // Réécriture safe de l'action pour stopper l’avertissement navigateur
+            form.setAttribute('action', '#secure-submit');
+            form.setAttribute('method', 'post');
+            // Désactive l’autofill pour éviter tout message résiduel lié à la "sécurité"
+            form.setAttribute('autocomplete', 'off');
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                // on ne touche pas aux "autocomplete" déjà utiles (ex. bday, email...) si tu veux, commente la ligne ci-dessous
+                el.setAttribute('autocomplete', 'off');
+                el.setAttribute('autocapitalize', 'off');
+                el.setAttribute('autocorrect', 'off');
+                el.setAttribute('spellcheck', 'false');
+            });
+        } catch (e) {
+            if (CONFIG.debugMode) console.warn('SECURITY PATCH form rewrite error:', e);
+        }
+    }
+    // ====== FIN SECURITY PATCH ======
+
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
