@@ -1,38 +1,22 @@
 /* ================================
- * MSGROUPS — dashboard.js (CSV edition)
- * Lit la feuille Google Sheets via export CSV public
+ * MSGROUPS — dashboard.js (Public CSV)
+ * Lit la feuille "sessions" via l’URL CSV publiée
  * ================================ */
 
 (() => {
-  // ---- Config ----
-  // 1) On lit d’abord une URL de feuille (celle que tu as fournie) — format ".../d/<ID>/edit?gid=<GID>#gid=<GID>"
-  // 2) Si absente, on regarde window.DASHBOARD_CONFIG.SHEET_URL
-  // 3) Sinon, on essaie window.DASHBOARD_CONFIG.SHEET_ID + SHEET_GID
-  const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/10FmzIA0Ou9zsOn5m_-z7okCeWlhD7ZRhVyTDWmpa5K0/edit?gid=70713818#gid=70713818';
+  // --------- CONFIG ----------
+  const CSV_URL_DEFAULT =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Arza8xo4v4MNQA8cocGmQ7AHVj1yrj0ZBRjWSmbi33w1Sc24uI521xfZdwXon3nEzpo3S35A5kGO/pub?gid=70713818&single=true&output=csv';
 
   const CFG = {
-    SHEET_URL:
+    SHEET_CSV_URL:
       (typeof window !== 'undefined' &&
         window.DASHBOARD_CONFIG &&
-        window.DASHBOARD_CONFIG.SHEET_URL) ||
-      DEFAULT_SHEET_URL,
-    SHEET_ID:
-      (typeof window !== 'undefined' &&
-        window.DASHBOARD_CONFIG &&
-        window.DASHBOARD_CONFIG.SHEET_ID) || '',
-    SHEET_GID:
-      (typeof window !== 'undefined' &&
-        window.DASHBOARD_CONFIG &&
-        window.DASHBOARD_CONFIG.SHEET_GID) || '',
-    // On garde la possibilité d’un App Script en secours si tu veux plus tard
-    APP_SCRIPT_URL:
-      (typeof window !== 'undefined' &&
-        window.DASHBOARD_CONFIG &&
-        window.DASHBOARD_CONFIG.APP_SCRIPT_URL) ||
-      (typeof APP_SCRIPT_URL !== 'undefined' ? APP_SCRIPT_URL : '')
+        window.DASHBOARD_CONFIG.SHEET_CSV_URL) ||
+      CSV_URL_DEFAULT,
   };
 
-  // ---- Colonnes attendues (doivent matcher exactement les entêtes de la feuille) ----
+  // Colonnes attendues (doivent matcher l’entête de la feuille)
   const COLS = [
     'session_id','ts_open','referrer','landing_url','utm_source','utm_medium','utm_campaign',
     'country','city',
@@ -45,8 +29,8 @@
     'last_event','ts_last_update'
   ];
 
-  // ---- Helpers DOM ----
-  const $ = (sel, root=document) => root.querySelector(sel);
+  // --------- DOM helpers ----------
+  const $  = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const el = (tag, attrs={}) => {
     const n = document.createElement(tag);
@@ -58,7 +42,7 @@
     return n;
   };
 
-  // ---- State ----
+  // --------- State ----------
   let RAW_ROWS = [];
   let FILTERS = {
     period: '30d',
@@ -74,89 +58,39 @@
     search: ''
   };
 
-  // ------------------------------------------------------------------
-  //                FETCH GOOGLE SHEETS (CSV EXPORT)
-  // ------------------------------------------------------------------
-  function getCsvExportUrl() {
-    // Tente d’extraire ID et GID depuis SHEET_URL
-    // Ex: https://docs.google.com/spreadsheets/d/<ID>/edit?gid=<GID>#gid=<GID>
-    const m = String(CFG.SHEET_URL || '').match(/\/d\/([a-zA-Z0-9-_]+)\/.*?[?&]gid=(\d+)/);
-    const sheetId = m ? m[1] : (CFG.SHEET_ID || '');
-    const gid = m ? m[2] : (CFG.SHEET_GID || '');
-    if (!sheetId || !gid) return '';
-    return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+  // --------- CSV fetch & parse ----------
+  async function fetchCsvText() {
+    const res = await fetch(CFG.SHEET_CSV_URL, { method:'GET' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} sur l’URL CSV (assure-toi qu’elle est bien publiée).`);
+    return await res.text();
   }
 
-  // CSV parser tolérant (gère guillemets et virgules)
+  // Parser CSV tolérant (gère guillemets et ,)
   function parseCSV(text) {
     const rows = [];
     let i = 0, field = '', row = [], inQuotes = false;
     while (i < text.length) {
       const char = text[i];
-
       if (inQuotes) {
         if (char === '"') {
-          if (text[i+1] === '"') { // escape ""
-            field += '"'; i += 2; continue;
-          } else {
-            inQuotes = false; i++; continue;
-          }
-        } else {
-          field += char; i++; continue;
+          if (text[i+1] === '"') { field += '"'; i += 2; continue; }
+          inQuotes = false; i++; continue;
         }
+        field += char; i++; continue;
       } else {
-        if (char === '"') {
-          inQuotes = true; i++; continue;
-        }
-        if (char === ',') {
-          row.push(field); field = ''; i++; continue;
-        }
+        if (char === '"') { inQuotes = true; i++; continue; }
+        if (char === ',') { row.push(field); field=''; i++; continue; }
         if (char === '\r') { i++; continue; }
-        if (char === '\n') {
-          row.push(field); rows.push(row); field = ''; row = []; i++; continue;
-        }
+        if (char === '\n') { row.push(field); rows.push(row); field=''; row=[]; i++; continue; }
         field += char; i++;
       }
     }
-    // dernier champ
-    row.push(field);
-    rows.push(row);
+    row.push(field); rows.push(row);
     return rows;
   }
 
   function normalizeHeaderKey(k) {
-    return String(k || '')
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '_');
-  }
-
-  function mapCsvToObjects(rows2d) {
-    if (!rows2d || !rows2d.length) return [];
-    const header = rows2d[0].map(h => String(h || '').trim());
-    const idxByHeader = new Map(); // clé exacte
-    header.forEach((h, i) => idxByHeader.set(h, i));
-
-    // aussi un mapping normalisé (au cas où il y aurait des petits écarts d’espaces/casse)
-    const idxByNorm = new Map();
-    header.forEach((h, i) => idxByNorm.set(normalizeHeaderKey(h), i));
-
-    const out = [];
-    for (let r = 1; r < rows2d.length; r++) {
-      const row = rows2d[r];
-      if (!row || row.length === 0) continue;
-      const obj = {};
-      COLS.forEach(col => {
-        // priorité: match exact, sinon match normalisé
-        let i = idxByHeader.get(col);
-        if (typeof i !== 'number') {
-          i = idxByNorm.get(normalizeHeaderKey(col));
-        }
-        obj[col] = (typeof i === 'number') ? row[i] : '';
-      });
-      out.push(cleanTypes(obj));
-    }
-    return out;
+    return String(k || '').trim().toLowerCase().replace(/\s+/g, '_');
   }
 
   function cleanTypes(o) {
@@ -170,69 +104,58 @@
       return (s === 'true' || s === '1' || s === 'oui' || s === 'yes');
     };
 
-    // nombres
     ['timezone_offset_min','screen_width','screen_height','viewport_width','viewport_height','device_pixel_ratio','form_montant_eur','form_duree_mois'].forEach(k=>{
       o[k] = asNumber(o[k]);
     });
-    // bool
     o['cta_clicked'] = asBool(o['cta_clicked']);
-
-    // dates: on ne force pas de parsing ici; on garde la string ISO/texte pour fmtDate()
     return o;
   }
 
-  async function fetchRowsFromCSV() {
-    const url = getCsvExportUrl();
-    if (!url) throw new Error('URL de CSV Google Sheets invalide (id/gid manquants).');
-    const res = await fetch(url, { method:'GET' });
-    if (!res.ok) {
-      throw new Error(`Impossible de lire la feuille (HTTP ${res.status}). Vérifie que la feuille est partagée en lecture publique.`);
+  function mapCsvToObjects(rows2d) {
+    if (!rows2d || !rows2d.length) return [];
+    const header = rows2d[0].map(h => String(h || '').trim());
+    const idxByHeader = new Map();
+    header.forEach((h, i) => idxByHeader.set(h, i));
+
+    const idxByNorm = new Map();
+    header.forEach((h, i) => idxByNorm.set(normalizeHeaderKey(h), i));
+
+    const out = [];
+    for (let r = 1; r < rows2d.length; r++) {
+      const row = rows2d[r];
+      if (!row || row.length === 0) continue;
+      const obj = {};
+      COLS.forEach(col => {
+        let i = idxByHeader.get(col);
+        if (typeof i !== 'number') i = idxByNorm.get(normalizeHeaderKey(col));
+        obj[col] = (typeof i === 'number') ? row[i] : '';
+      });
+      out.push(cleanTypes(obj));
     }
-    const text = await res.text();
-    const rows2d = parseCSV(text);
-    return mapCsvToObjects(rows2d);
+    return out;
   }
 
   async function fetchAllRows() {
-    // On privilégie la feuille CSV
-    const viaCsv = await fetchRowsFromCSV();
-    if (viaCsv && viaCsv.length) return viaCsv;
-
-    // (Fallback optionnel) — si tu veux tenter App Script ensuite
-    if (CFG.APP_SCRIPT_URL) {
-      try {
-        const res = await fetch(CFG.APP_SCRIPT_URL + '?list=1');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && Array.isArray(data.rows)) return data.rows;
-        }
-      } catch {}
-    }
-    throw new Error('Aucune donnée trouvée dans la feuille.');
+    const csv = await fetchCsvText();
+    const rows2d = parseCSV(csv);
+    const objs = mapCsvToObjects(rows2d);
+    if (!objs.length) throw new Error('CSV vide ou entêtes non reconnues.');
+    return objs;
   }
 
-  // ------------------------------------------------------------------
-  //                          RENDERING
-  // ------------------------------------------------------------------
+  // --------- Utils / rendering helpers ----------
   const fmtDate = (iso) => {
     if (!iso) return '—';
     try {
       const d = new Date(iso);
       if (isNaN(d)) return String(iso);
-      return d.toLocaleString(undefined, {
-        year:'numeric', month:'2-digit', day:'2-digit',
-        hour:'2-digit', minute:'2-digit'
-      });
+      return d.toLocaleString(undefined, { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
     } catch { return String(iso) }
   };
   const truthy = (v) => v === true || v === 'true' || v === 1 || v === '1';
 
-  const yesNoBadge = (v) => truthy(v)
-    ? `<span class="badge badge--ok">Oui</span>`
-    : `<span class="badge">Non</span>`;
-
   function computeEmailState(row) {
-    // Démo simple basée sur CTA + fenêtre 30min
+    // Démo: si CTA < 30min => En attente ; sinon Non reçu ; si pas de CTA => —
     if (truthy(row.cta_clicked)) {
       const ts = row.ts_cta ? new Date(row.ts_cta) : null;
       if (ts) {
@@ -244,9 +167,9 @@
     return { label: '—', cls: 'badge' };
   }
 
+  // --------- Filters / compute ----------
   function applyFilters(rows) {
     const { period, from, to, utm_source, utm_medium, utm_campaign, country, device_type, cta, email_state, search } = FILTERS;
-
     let df = rows.slice();
 
     // Période
@@ -320,6 +243,7 @@
     return { total, active, ctaCount, ctaRate, mail30 };
   }
 
+  // --------- RENDER ---------
   function renderKPIs(k) {
     $('#kpiSessions').textContent = k.total.toString();
     $('#kpiActive').textContent   = k.active.toString();
@@ -366,7 +290,7 @@
       const tdAcq     = el('td', { html: `<span class="muted">${r.utm_source||'—'}/${r.utm_medium||'—'}/${r.utm_campaign||'—'}</span>` });
       const tdGeo     = el('td', { text: `${r.country||'—'}${r.city? ' / '+r.city:''}` });
       const tdDevice  = el('td', { text: `${r.device_type||'—'} (${r.os||'?'}/${r.browser||'?'})` });
-      const tdSteps   = el('td', { html: `<span class="badge">—</span>` });
+      const tdSteps   = el('td', { html: `<span class="badge">—</span>` }); // placeholder
       const tdCTA     = el('td', { html: truthy(r.cta_clicked) ? `<span class="badge badge--ok">${r.cta_label||'Cliqué'}</span>` : `<span class="badge">—</span>` });
 
       const mail = computeEmailState(r);
@@ -375,7 +299,6 @@
       tr.append(tdSession, tdOpen, tdAcq, tdGeo, tdDevice, tdSteps, tdCTA, tdMail);
 
       tr.addEventListener('dblclick', () => openDrawer(r));
-
       tbody.appendChild(tr);
     });
   }
@@ -410,7 +333,6 @@
     const mail = computeEmailState(r);
     $('#d_mail_state').innerHTML      = `<span class="${mail.cls}">${mail.label}</span>`;
 
-    // Timeline minimale
     const tl = $('#d_timeline');
     tl.innerHTML = '';
     const addEvt = (t, evt, sub='') => {
@@ -453,11 +375,7 @@
         <td><span class="${state.cls}">${state.label}</span></td>
         <td><button class="btn" data-recheck="${r.session_id||''}">Rechecker</button></td>
       `;
-
-      tr.querySelector('button[data-recheck]')?.addEventListener('click', () => {
-        boot(true);
-      });
-
+      tr.querySelector('button[data-recheck]')?.addEventListener('click', () => boot(true));
       tbody.appendChild(tr);
     });
   }
@@ -570,6 +488,7 @@
     a.remove();
   }
 
+  // --------- Events ----------
   function bindEvents() {
     $('#btnReload')?.addEventListener('click', () => boot(true));
     $('#btnExport')?.addEventListener('click', () => exportCSV(applyFilters(RAW_ROWS)));
@@ -604,6 +523,7 @@
     });
   }
 
+  // --------- Refresh pipeline ----------
   function refresh() {
     const filtered = applyFilters(RAW_ROWS);
     renderKPIs(computeKPIs(filtered));
@@ -619,7 +539,6 @@
     try {
       if (forceReload || !RAW_ROWS.length) {
         RAW_ROWS = await fetchAllRows();
-        // Assure que toutes les colonnes existent
         RAW_ROWS = RAW_ROWS.map(r => {
           const o = {}; COLS.forEach(k => o[k] = (k in r) ? r[k] : '');
           return o;
