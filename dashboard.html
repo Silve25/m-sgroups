@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MSGROUPS — Dashboard</title>
+  <meta name="description" content="Dashboard de suivi des sessions, formulaires et CTA basé sur Google Sheets." />
+  <meta name="robots" content="noindex,nofollow" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#111834;
+      --soft:#0f1630;
+      --muted:#98a2b3;
+      --text:#eaeef9;
+      --line:#1d2443;
+      --brand:#4f7cff;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --accent:#22c55e;
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 10px 30px rgba(0,0,0,.25);
+      --header-h:64px;
+      --maxw:1150px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Inter',system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 10% -10%, #1b2460 0%, #0b1020 50%, #070a16 100%);
+      color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:inherit}
+
+    /* Header */
+    .header{
+      position:sticky; top:0; z-index:50; height:var(--header-h);
+      backdrop-filter:saturate(140%) blur(6px);
+      background:linear-gradient(to bottom, rgba(7,10,22,.75), rgba(7,10,22,.35));
+      border-bottom:1px solid var(--line);
+    }
+    .header__inner{
+      max-width:var(--maxw); margin:0 auto; height:100%; padding:0 14px;
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; text-decoration:none;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .brand img{width:30px;height:30px;border-radius:8px;box-shadow:0 6px 20px rgba(79,124,255,.35)}
+    .brand__name{font-size:16px; background:linear-gradient(90deg,#fff,#9db6ff); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .header__actions{display:flex; gap:8px}
+    .btn{
+      appearance:none; border:none; border-radius:10px; padding:.6rem .9rem; font-weight:700; cursor:pointer;
+      color:#fff; background:#1b2553; border:1px solid #27306a;
+      transition:.18s transform, .18s box-shadow, .18s background;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 22px rgba(18,24,54,.4)}
+    .btn--brand{background:var(--brand); border-color:#3e67d6}
+    .btn--ghost{background:transparent; border-color:#2a356b}
+
+    /* Layout */
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:18px 14px 48px}
+    .grid{display:grid; gap:14px;}
+    .grid--kpis{grid-template-columns:repeat(3,1fr)}
+    .grid--two{grid-template-columns:2.1fr 1fr}
+    .grid--two-rev{grid-template-columns:1fr 2fr}
+    .grid--three{grid-template-columns:repeat(3,1fr)}
+    .grid--four{grid-template-columns:repeat(4,1fr)}
+    @media (max-width:1100px){
+      .grid--kpis{grid-template-columns:repeat(2,1fr)}
+      .grid--two,.grid--two-rev{grid-template-columns:1fr}
+      .grid--three{grid-template-columns:repeat(2,1fr)}
+      .grid--four{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .grid--kpis,.grid--three,.grid--four{grid-template-columns:1fr}
+    }
+
+    /* Panels */
+    .panel{
+      background:linear-gradient(180deg,#0f1630 0%, #0c1228 100%);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .panel__head{
+      padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+    }
+    .panel__title{font-size:14px; font-weight:800; color:#dfe6ff; letter-spacing:.3px}
+    .panel__body{padding:14px 16px}
+    .panel__sub{font-size:12px; color:var(--muted)}
+
+    /* KPI cards */
+    .kpi{
+      display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center;
+      padding:14px 16px;
+      background:linear-gradient(180deg,#11193a,#0f1630);
+      border:1px solid #1f274d; border-radius:var(--radius);
+      box-shadow:0 12px 30px rgba(28,34,74,.35);
+      position:relative; overflow:hidden;
+    }
+    .kpi::after{
+      content:""; position:absolute; right:-50px; top:-60px; width:160px; height:160px; border-radius:50%;
+      background:radial-gradient(closest-side,rgba(79,124,255,.25), transparent 70%);
+      filter:blur(6px); pointer-events:none;
+    }
+    .kpi__icon{width:42px;height:42px;border-radius:12px; display:grid;place-items:center;
+      background:rgba(79,124,255,.12); border:1px solid #2b3a7b}
+    .kpi__icon span{font-size:20px}
+    .kpi__meta{display:flex; flex-direction:column}
+    .kpi__value{font-size:22px; font-weight:800; line-height:1.1}
+    .kpi__label{font-size:12px; color:var(--muted)}
+    .kpi--ok .kpi__icon{background:rgba(34,197,94,.12); border-color:#256f49}
+    .kpi--warn .kpi__icon{background:rgba(245,158,11,.12); border-color:#8a5d14}
+    .kpi--err .kpi__icon{background:rgba(239,68,68,.12); border-color:#7a1c1c}
+
+    /* Filters */
+    .filters{display:grid; grid-template-columns:repeat(8,1fr); gap:10px;}
+    @media (max-width:1100px){ .filters{grid-template-columns:repeat(4,1fr)} }
+    @media (max-width:640px){ .filters{grid-template-columns:repeat(2,1fr)} }
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      background:linear-gradient(180deg,#0c1228 0%, #0a1021 100%);
+      border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px;
+    }
+    .field label{font-size:11px; color:#b7c3ff; font-weight:700; letter-spacing:.25px}
+    .field input,.field select{
+      width:100%; padding:8px 10px; border-radius:10px; border:1px solid #2a356b; background:#0f1630; color:var(--text);
+      outline:none; transition:border .18s;
+    }
+    .field input::placeholder{color:#7480a5}
+    .field input:focus,.field select:focus{border-color:#3b53b6}
+
+    /* Tables */
+    .table{
+      width:100%; border-collapse:separate; border-spacing:0; font-size:13px;
+      border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    }
+    .table thead th{
+      text-align:left; padding:12px 12px; background:#0d142c; color:#cfe0ff; font-weight:700; letter-spacing:.2px;
+      border-bottom:1px solid var(--line); position:sticky; top:calc(var(--header-h) + 8px); z-index:1;
+    }
+    .table tbody td{padding:10px 12px; border-bottom:1px solid #14204a; color:#dbe2ff}
+    .table tbody tr:hover{background:#0e1531}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:700;
+      background:#11193a; border:1px solid #27306a; color:#cfe0ff;
+    }
+    .badge--ok{background:rgba(34,197,94,.1); border-color:#1a6a45; color:#b6f3cd}
+    .badge--warn{background:rgba(245,158,11,.1); border-color:#6f4d12; color:#ffe4b5}
+    .badge--err{background:rgba(239,68,68,.1); border-color:#7a1c1c; color:#ffc8c8}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace, Menlo, Consolas, monospace; letter-spacing:.2px}
+
+    /* Canvas blocks */
+    .chart{
+      width:100%; height:280px; border-radius:12px; border:1px dashed #243067; display:grid; place-items:center; color:#7e8cc5;
+      background:linear-gradient(180deg,#0b1229,#0a1123);
+    }
+    .chart--lg{height:360px}
+
+    /* Drawer (session details) */
+    .drawer{
+      position:fixed; top:0; right:-560px; width:560px; max-width:100%; height:100%;
+      background:linear-gradient(180deg,#0e1531,#0b1229); border-left:1px solid var(--line);
+      box-shadow:-20px 0 40px rgba(0,0,0,.45);
+      transition:right .28s ease; z-index:70;
+      display:flex; flex-direction:column;
+    }
+    .drawer.open{right:0}
+    .drawer__head{
+      padding:14px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .drawer__body{padding:14px 16px; overflow:auto}
+    .kv{display:grid; grid-template-columns:160px 1fr; gap:8px 12px; font-size:13px}
+    .kv b{color:#bcd0ff; font-weight:700}
+    .divider{height:1px; background:var(--line); margin:14px 0}
+    .timeline{display:grid; gap:10px; margin-top:6px}
+    .tl{
+      display:grid; grid-template-columns:90px 1fr; gap:8px 12px; align-items:start;
+      background:#0f1630; border:1px solid #222c57; border-radius:10px; padding:10px 12px;
+    }
+    .tl time{font-size:12px; color:#9fb1ff}
+    .tl__evt{font-weight:700}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#11193a; border:1px solid #27306a; font-size:11px}
+    .pill--brand{background:rgba(79,124,255,.12); border-color:#2b3a7b; color:#cfe0ff}
+    .pill--ok{background:rgba(34,197,94,.12); border-color:#256f49; color:#c8ffd9}
+
+    /* Footer */
+    .footer{opacity:.7; text-align:center; font-size:12px; color:#9aa7d6; margin-top:22px}
+
+    /* Placeholder helpers */
+    .placeholder{opacity:.8}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a class="brand" href="#" aria-label="MSGROUPS - Dashboard">
+        <img src="https://sergemagdeleinesolutions.fr/logoMsg.png" alt="MSGROUPS" />
+        <span class="brand__name">MSGROUPS • Dashboard</span>
+      </a>
+      <div></div>
+      <div class="header__actions">
+        <button class="btn btn--ghost" id="btnReload" title="Recharger">⟳ Recharger</button>
+        <button class="btn btn--brand" id="btnExport" title="Exporter la vue">⬇ Export CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" role="main">
+    <!-- KPIs (sans email) -->
+    <section aria-labelledby="kpis-title" class="grid grid--kpis">
+      <div class="kpi" id="kpiSessionsCard">
+        <div class="kpi__icon"><span>📊</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value" id="kpiSessions">—</div>
+          <div class="kpi__label">Sessions (période)</div>
+        </div>
+      </div>
+      <div class="kpi" id="kpiActiveCard">
+        <div class="kpi__icon"><span>⚡</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value" id="kpiActive">—</div>
+          <div class="kpi__label">Actives (dernières 15 min)</div>
+        </div>
+      </div>
+      <div class="kpi kpi--warn" id="kpiCTAcard">
+        <div class="kpi__icon"><span>➡️</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value"><span id="kpiCTA">—</span> <span class="kpi__label" style="margin-left:6px">(taux <span id="kpiCTARate">—</span>)</span></div>
+          <div class="kpi__label">CTA cliqués</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="panel" style="margin-top:14px" aria-labelledby="filters-title">
+      <div class="panel__head">
+        <div class="panel__title" id="filters-title">Filtres & recherche</div>
+        <div class="panel__sub">Affinez les données affichées ci-dessous</div>
+      </div>
+      <div class="panel__body">
+        <div class="filters">
+          <div class="field">
+            <label for="fPeriod">Période</label>
+            <select id="fPeriod">
+              <option value="today">Aujourd’hui</option>
+              <option value="7d">7 jours</option>
+              <option value="30d" selected>30 jours</option>
+              <option value="custom">Personnalisée…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fFrom">Du</label>
+            <input type="date" id="fFrom" disabled />
+          </div>
+          <div class="field">
+            <label for="fTo">Au</label>
+            <input type="date" id="fTo" disabled />
+          </div>
+
+          <div class="field">
+            <label for="fUTMsource">UTM Source</label>
+            <select id="fUTMsource"><option value="">Toutes</option></select>
+          </div>
+          <div class="field">
+            <label for="fUTMmedium">UTM Medium</label>
+            <select id="fUTMmedium"><option value="">Tous</option></select>
+          </div>
+          <div class="field">
+            <label for="fUTMcampaign">UTM Campaign</label>
+            <select id="fUTMcampaign"><option value="">Toutes</option></select>
+          </div>
+
+          <div class="field">
+            <label for="fCountry">Pays</label>
+            <select id="fCountry"><option value="">Tous</option></select>
+          </div>
+          <div class="field">
+            <label for="fDevice">Appareil</label>
+            <select id="fDevice">
+              <option value="">Tous</option>
+              <option value="mobile">Mobile</option>
+              <option value="tablet">Tablet</option>
+              <option value="desktop">Desktop</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="fCTA">CTA</label>
+            <select id="fCTA">
+              <option value="">Tous</option>
+              <option value="clicked">Cliqué</option>
+              <option value="not">Non cliqué</option>
+            </select>
+          </div>
+
+          <div class="field" style="grid-column:span 2;">
+            <label for="fSearch">Recherche (session, nom, email, WhatsApp)</label>
+            <input id="fSearch" type="search" placeholder="Ex: 180203918, Dupont, jean@..., +33..." />
+          </div>
+          <div class="field" style="align-items:flex-end">
+            <button class="btn" id="btnClearFilters">↺ Réinitialiser</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main grids -->
+    <section class="grid grid--two" style="margin-top:14px">
+      <!-- Left column -->
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">Sessions (liste)</div>
+          <div class="panel__sub"><span id="listCount" class="mono">—</span> affichées • double-clic pour détails</div>
+        </div>
+        <div class="panel__body" style="padding:0">
+          <div style="overflow:auto; max-height:60vh;">
+            <table class="table" id="sessionsTable" aria-label="Table des sessions">
+              <thead>
+                <tr>
+                  <th>Session</th>
+                  <th>Ouverture</th>
+                  <th>Acquisition</th>
+                  <th>Pays / Ville</th>
+                  <th>Device</th>
+                  <th>Étapes</th>
+                  <th>CTA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- JS: lignes injectées -->
+                <tr class="placeholder">
+                  <td class="mono">—</td>
+                  <td>—</td>
+                  <td><span class="muted">utm_source/medium/campaign</span></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span class="badge">1/3</span></td>
+                  <td><span class="badge">—</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="grid grid--three">
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Funnel & complétion</div>
+            <div class="panel__sub">% par étape et conversion CTA</div>
+          </div>
+          <div class="panel__body">
+            <div class="chart" id="chartFunnel">Funnel (canvas)</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Devices / OS / Navigateur</div>
+            <div class="panel__sub">Répartition</div>
+          </div>
+          <div class="panel__body">
+            <div class="chart" id="chartDevices">Devices (canvas)</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Géographie</div>
+            <div class="panel__sub">Sessions par pays</div>
+          </div>
+          <div class="panel__body">
+            <div class="chart" id="chartGeo">Carte / barres (canvas)</div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:span 3;">
+          <div class="panel__head">
+            <div class="panel__title">Performance acquisition (UTM & referrers)</div>
+            <div class="panel__sub">Classements</div>
+          </div>
+          <div class="panel__body">
+            <div class="grid grid--two-rev" style="gap:12px">
+              <div>
+                <h3 class="panel__title" style="margin:0 0 8px 0">UTM (source / medium / campaign)</h3>
+                <div style="overflow:auto; max-height:260px; border:1px solid var(--line); border-radius:12px">
+                  <table class="table" id="utmTable">
+                    <thead>
+                      <tr>
+                        <th>UTM</th>
+                        <th>Sessions</th>
+                        <th>CTA</th>
+                        <th>Conv.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="placeholder">
+                        <td class="mono muted">utm_source / utm_medium / utm_campaign</td>
+                        <td>—</td><td>—</td><td>—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <h3 class="panel__title" style="margin:0 0 8px 0">Referrers</h3>
+                <div style="overflow:auto; max-height:260px; border:1px solid var(--line); border-radius:12px">
+                  <table class="table" id="refTable">
+                    <thead>
+                      <tr>
+                        <th>Referrer</th>
+                        <th>Sessions</th>
+                        <th>CTA</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="placeholder">
+                        <td class="muted">—</td><td>—</td><td>—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alertes (sans file e-mail) -->
+    <section class="panel" style="margin-top:14px">
+      <div class="panel__head">
+        <div class="panel__title">Alertes</div>
+        <div class="panel__sub">Qualité & intégrité</div>
+      </div>
+      <div class="panel__body">
+        <ul id="alertsList" style="list-style:none; padding:0; margin:0; display:grid; gap:10px">
+          <li class="pill pill--brand">Aucune alerte active</li>
+        </ul>
+        <div class="divider"></div>
+        <div class="kv">
+          <b>Dernière synchro</b><span id="lastSync" class="mono muted">—</span>
+          <b>Erreurs ingestion</b><span id="ingestionErrors" class="mono muted">0</span>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">© 2025 MSGROUPS — Dashboard interne (Google Sheets). UI prête pour branchement JS.</p>
+  </main>
+
+  <!-- Drawer: Session details -->
+  <aside class="drawer" id="sessionDrawer" aria-labelledby="drawer-title" aria-hidden="true">
+    <div class="drawer__head">
+      <div>
+        <div class="panel__title" id="drawer-title">Détails session</div>
+        <div class="panel__sub mono" id="drawerSessionId">session_id: —</div>
+      </div>
+      <button class="btn" id="drawerClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="drawer__body">
+      <div class="panel__title" style="margin-bottom:8px">Identité</div>
+      <div class="kv">
+        <b>Ouverture</b><span id="d_ts_open" class="mono">—</span>
+        <b>Dernier évènement</b><span id="d_last_event" class="mono">—</span>
+        <b>MAJ</b><span id="d_ts_update" class="mono">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Acquisition</div>
+      <div class="kv">
+        <b>Referrer</b><span id="d_referrer" class="mono">—</span>
+        <b>Landing</b><span id="d_landing" class="mono">—</span>
+        <b>UTM</b><span id="d_utm" class="mono">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Contexte</div>
+      <div class="kv">
+        <b>Localisation</b><span id="d_geo">—</span>
+        <b>Device</b><span id="d_device">—</span>
+        <b>OS / Navigateur</b><span id="d_os_browser">—</span>
+        <b>Écran</b><span id="d_screen" class="mono">—</span>
+        <b>Langue / TZ</b><span id="d_lang_tz" class="mono">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Formulaire (snapshot)</div>
+      <div class="kv">
+        <b>Prénom / Nom</b><span id="d_name">—</span>
+        <b>Email</b><span id="d_email" class="mono">—</span>
+        <b>WhatsApp</b><span id="d_whatsapp" class="mono">—</span>
+        <b>Pays / Naissance</b><span id="d_pays_naiss" class="mono">—</span>
+        <b>Montant / Durée</b><span id="d_montant_duree" class="mono">—</span>
+        <b>Raison</b><span id="d_raison">—</span>
+        <b>Statut / Revenus</b><span id="d_statut_revenus">—</span>
+        <b>Pièces</b><span id="d_pieces">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">CTA</div>
+      <div class="kv">
+        <b>Libellé CTA</b><span id="d_cta_label">—</span>
+        <b>Horodatage CTA</b><span id="d_ts_cta" class="mono">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Timeline</div>
+      <div class="timeline" id="d_timeline">
+        <div class="tl placeholder">
+          <time>—</time>
+          <div><div class="tl__evt">session_start</div><div class="muted">+0s</div></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- JS -->
+  <script>
+    // Minimal : permet juste de fermer le drawer si ouvert (sans logique de données).
+    (function(){
+      const drawer = document.getElementById('sessionDrawer');
+      const closeBtn = document.getElementById('drawerClose');
+      if(closeBtn){
+        closeBtn.addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
+      }
+    })();
+  </script>
+  <script src="dashboard.js"></script>
+  <script src="formulaire.js"></script>
+</body>
+</html>
