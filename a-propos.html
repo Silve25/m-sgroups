@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>À propos — MSGROUPS</title>
-  <meta name="description" content="Accompagnement simple et transparent 100 % e-mail. Découvrez nos services de financement, nos processus et nos contacts.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://sergemagdeleinesolutions.fr/a-propos.html">
+  <!-- SEO -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Over ons — MSGROUPS</title>
+  <meta name="description" content="Over MSGROUPS: helder, snel en volledig per e-mail. Lees hoe wij werken, onze beloften en hoe u ons bereikt." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://sergemagdeleinesolutions.fr/over-ons.html" />
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="À propos — MSGROUPS">
-  <meta property="og:description" content="Accompagnement simple et transparent 100 % e-mail. Notre démarche, nos engagements et nos coordonnées.">
-  <meta property="og:url" content="https://sergemagdeleinesolutions.fr/a-propos.html">
-  <meta property="og:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
-  <meta property="og:site_name" content="MSGROUPS">
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Over ons — MSGROUPS" />
+  <meta property="og:description" content="Helder, snel en volledig per e-mail. Onze werkwijze, onze beloften en onze contactgegevens." />
+  <meta property="og:url" content="https://sergemagdeleinesolutions.fr/over-ons.html" />
+  <meta property="og:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png" />
+  <meta property="og:site_name" content="MSGROUPS" />
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="À propos — MSGROUPS">
-  <meta name="twitter:description" content="Accompagnement simple et transparent 100 % e-mail. Notre démarche, nos engagements et nos coordonnées.">
-  <meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Over ons — MSGROUPS" />
+  <meta name="twitter:description" content="Helder, snel en volledig per e-mail. Onze werkwijze, onze beloften en onze contactgegevens." />
+  <meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png" />
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17600708002"></script>
@@ -37,582 +38,331 @@
   </script>
 
   <style>
-    /* ================= Variables et reset ================= */
-    :root {
-      --bg: #fff;
-      --bg-soft: #f7f8fb;
-      --text: #0f172a;
-      --muted: #5b647a;
-      --line: #e6e8ef;
-      --brand: #1e66ff;
-      --accent: #16a34a;
-      --focus: #94b6ff;
-      --header-h: auto;
-      --container: 1200px;
-      --font-size-base: 14px; /* Base pour la taille du texte */
-      --transition: all 0.3s ease;
-      --border-radius: 10px;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --radius-lg: 12px;
+    /* ================= Variabelen ================= */
+    :root{
+      --bg:#fff;
+      --bg-soft:#f7f8fb;
+      --text:#0f172a;
+      --muted:#5b647a;
+      --line:#e6e8ef;
+      --brand:#1e66ff;
+      --accent:#16a34a;
+      --focus:#94b6ff;
+      --header-h:64px;
+      --container:1200px;
+      --radius:12px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* ================= Basis ================= */
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      font-size: clamp(14px, 1.1vw, 16px);
+      line-height:1.65;color:var(--text);background:var(--bg);
+      -webkit-font-smoothing:antialiased
+    }
+    img{max-width:100%;height:auto;display:block}
+    a{color:inherit}
+    a:focus,button:focus,input:focus,select:focus,textarea:focus,summary:focus{
+      outline:4px solid var(--focus);outline-offset:2px
+    }
+    .container{max-width:var(--container);margin:0 auto;padding:0 1rem}
+
+    /* ================= Infobanner (bovenaan) ================= */
+    .topbar{
+      background:#0b1220;color:#fff; font-weight:600;
+      padding:.55rem .75rem; font-size:.9rem; text-align:center
+    }
+    .topbar small{opacity:.9; font-weight:500}
+
+    /* ================= Header (zonder menu) ================= */
+    .header{
+      position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);
+      z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.04)
+    }
+    .header-container{
+      min-height:var(--header-h);
+      display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"logo cta spacer";
+      align-items:center;gap:.5rem
+    }
+    .logo{
+      grid-area:logo;display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;
+      color:var(--brand);font-weight:700;font-size:1rem;
+    }
+    .logo img{height:28px;width:auto;border-radius:8px}
+    .brand-badge{width:16px;height:16px}
+    .cta-header{
+      grid-area:cta;justify-self:center;
+      background:var(--brand);color:#fff;padding:.6rem .95rem;border-radius:10px;text-decoration:none;
+      font-weight:700;font-size:.95rem;border:none;display:inline-flex;align-items:center;gap:.4rem;transition:.2s
+    }
+    .cta-header:hover{background:#1557e0;transform:translateY(-1px)}
+    .spacer{grid-area:spacer}
+
+    @media (min-width:901px){
+      .cta-header{justify-self:end}
     }
 
-    html {
-      scroll-behavior: smooth;
+    /* ================= Hero ================= */
+    .hero{
+      background:linear-gradient(180deg, rgba(15,23,42,.03), rgba(15,23,42,.06));
+      padding:clamp(1.4rem, 4vw, 2.4rem) 0
+    }
+    .hero h1{
+      font-size:clamp(1.6rem, 2.2vw + 1rem, 2.4rem);
+      font-weight:700;text-align:center;margin-bottom:.45rem;color:var(--text)
+    }
+    .hero p{
+      text-align:center;color:var(--muted);max-width:880px;margin:.25rem auto 0
     }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: var(--font-size-base);
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      -webkit-font-smoothing: antialiased;
-      padding-bottom: 2rem;
+    /* ================= Secties ================= */
+    .section{padding:clamp(1.6rem, 4.5vw, 2.6rem) 0}
+    .section h2{
+      font-size:clamp(1.2rem, 1.2vw + .8rem, 1.45rem);font-weight:700;text-align:left;margin-bottom:1rem;color:var(--text)
+    }
+    .lead{color:var(--muted)}
+    .grid{display:grid;gap:1rem}
+    .grid-2{grid-template-columns:1fr}
+    .grid-3{grid-template-columns:1fr}
+
+    @media (min-width:760px){
+      .grid-2{grid-template-columns:1fr 1fr}
+      .grid-3{grid-template-columns:repeat(3,1fr)}
     }
 
-    a:focus, button:focus {
-      outline: 4px solid var(--focus);
-      outline-offset: 2px;
-      transition: var(--transition);
+    /* ================= Kaarten / Blokken ================= */
+    .card{
+      background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);
+      padding:clamp(.9rem, 2vw, 1.1rem)
+    }
+    .check{
+      display:flex;align-items:flex-start;gap:.6rem;margin:.35rem 0
+    }
+    .check b{color:var(--text)}
+    .check::before{
+      content:"";width:18px;height:18px;border-radius:50%;background:var(--accent);
+      display:inline-block;margin-top:.15rem;flex:0 0 18px;
+      mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
+      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
+      background-color:var(--accent)
+    }
+    ul.clean{list-style:none;padding-left:0}
+    ul.clean li{margin:.35rem 0}
+    .muted{color:var(--muted)}
+    .note{
+      background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;
+      padding:.75rem;margin-top:.75rem;color:var(--muted)
     }
 
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 1rem;
+    /* ================= Footer ================= */
+    .footer{
+      background:var(--bg-soft);border-top:1px solid var(--line);padding:1.75rem 0;text-align:center
     }
+    .footer-links{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+    .footer a{color:var(--muted);text-decoration:none}
+    .footer a:hover{color:var(--brand)}
+    .footer small{color:var(--muted)}
 
-    /* ================= Responsive Breakpoints ================= */
-    :not(pre) > :not(p) > * {
-      box-sizing: border-box;
-    }
-
-    /* Hero section adjustment */
-    .hero {
-      padding: 3rem 0;
-    }
-
-    /* Component styles */
-    .btn {
-      background: var(--brand);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--border-radius);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-family: inherit;
-    }
-
-    .btn:hover {
-      background: #1557e0;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--brand);
-    }
-
-    .btn-secondary:hover {
-      background: var(--bg-soft);
-      transform: translateY(-2px);
-    }
-
-    .section {
-      padding: 3rem 0;
-    }
-
-    .section-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      text-align: left;
-      margin-bottom: 1rem;
-      color: var(--text);
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 1.05rem;
-    }
-
-    /* Grid system */
-    .grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .grid-cols-1, .grid-cols-2, .grid-cols-3 {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-    }
-
-    .grid-cols-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .grid-cols-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    /* Header styles */
-    .header {
-      position: relative;
-      background: var(--bg);
-      border-bottom: 1px solid var(--line);
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .header-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 0;
-    }
-
-    .header-container-sm {
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      color: var(--brand);
-      font-weight: 700;
-      font-size: 1.1rem;
-      font-family: inherit;
-    }
-
-    .logo img {
-      height: 40px;
-      width: auto;
-      border-radius: var(--border-radius);
-    }
-
-    .brand-badge {
-      width: 24px;
-      height: 24px;
-    }
-
-    .mobile-links {
-      display: none;
-    }
-
-    .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    /* Card Styles */
-    .card {
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-    }
-
-    h2 {
-      color: var(--brand);
-      margin-bottom: 1rem;
-    }
-
-    /* List Styles */
-    ul {
-      list-style: none;
-      padding-left: 1rem;
-      margin: 0;
-    }
-
-    ul li {
-      margin-bottom: 0.5rem;
-    }
-
-    ul li:before {
-      content: "•";
-      color: var(--brand);
-      font-weight: bold;
-      display: inline-block;
-      width: 1rem;
-      margin-right: 0.5rem;
-      display: inline-block;
-    }
-
-    ol {
-      padding-left: 1.5rem;
-      margin: 1rem 0;
-    }
-
-    ol li {
-      margin-bottom: 0.5rem;
-    }
-
-    /* Favicon */
-    [rel="icon"] {
-      height: 16px;
-      width: 16px;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-      body {
-        font-size: 0.9rem;
-      }
-      
-      .section {
-        padding: 2rem 0;
-      }
-      
-      .hero {
-        padding: 2rem 0;
-      }
-      
-      .header-container {
-        padding: 0.5rem 0;
-      }
-      
-      .logo {
-        font-size: 1rem;
-      }
-      
-      .btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-      }
-      
-      .mobile-links {
-        display: flex;
-        gap: 1rem;
-      }
-      
-      .mobile-menu-toggle {
-        display: block;
-      }
-      
-      .grid-cols-2 {
-        grid-template-columns: 1fr;
-      }
-      
-      .hero p.clamp-text {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        height: auto;
-      }
-
-      /* Responsive adjustments for CTA */
-      .cta-header {
-        justify-self: auto !important;
-      }
-
-      @media (min-width: 901px) {
-        .cta-header {
-          justify-self: end;
-        }
-      }
-    }
-
-    /* Checkmarks */
-    .check {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-      margin: 0.5rem 0;
-    }
-
-    .check b {
-      color: var(--text);
-    }
-
-    .check::before {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
-      margin-top: 0.15rem;
-      flex: 0 0 20px;
-      position: relative;
-      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
-      -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
-      background-color: var(--accent);
-    }
-
-    /* Footer */
-    .footer {
-      background: var(--bg-soft);
-      border-top: 1px solid var(--line);
-      padding: 2rem 0;
-      text-align: center;
-      margin-top: 3rem;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .footer a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .footer a:hover {
-      color: var(--brand);
-    }
-
-    .footer small {
-      color: var(--muted);
-      font-size: 0.85rem;
-      display: block;
-    }
-
-    /* Note styling */
-    .note {
-      background: var(--bg-soft);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      margin-top: 1rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    /* Contact section */
-    .cta-section {
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.03), rgba(15, 23, 42, 0.06));
-    }
-
-    @media (max-width: 480px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .section-title {
-        font-size: 1.2rem;
-      }
-      
-      .btn {
-        display: block;
-        margin: 1rem 0;
-      }
-    }
-
-    /* Ensure images don't break */
-    img {
-      max-width: 100%;
-      height: auto;
+    /* ================= Toegankelijkheid ================= */
+    @media (prefers-reduced-motion:reduce){
+      *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important;}
     }
   </style>
 </head>
 <body>
-  <!-- ========== Header with Mobile Toggle ========== -->
+
+  <!-- ========== Infobanner (alleen plaatsen als juridisch correct) ==========
+       LET OP: Wij kunnen geen onjuiste affiliatie claimen. Pas onderstaande tekst enkel toe als dit feitelijk klopt.
+       Indien niet van toepassing, gebruik de standaardzin "MSGROUPS is een onafhankelijke dienstverlener." -->
+  <div class="topbar">
+    <!-- VEILIGE, NEUTRALE VERSIE (standaard): -->
+    MSGROUPS is een onafhankelijke dienstverlener. <small>Sofinco is een dochteronderneming van Crédit Agricole Consumer Finance (Crédit Agricole-groep).</small>
+    <!-- ALS (ENKEL ALS) JULLIE JURIDISCH ECHT EEN DOCHTER ZIJN: vervang bovenstaande regel door:
+    MSGROUPS is een dochteronderneming van Sofinco — zelf onderdeel van Crédit Agricole Consumer Finance (Crédit Agricole-groep).
+    -->
+  </div>
+
+  <!-- ========== Header (zonder menu) ========== -->
   <header class="header">
-    <div class="container header-container header-container-sm">
-      <a href="index.html" class="logo" aria-label="MSGROUPS - Accueil">
+    <div class="container header-container">
+      <a href="index.html" class="logo" aria-label="MSGROUPS - Start">
         <img src="https://sergemagdeleinesolutions.fr/logoMsg.png" alt="Logo MSGROUPS" />
         MSGROUPS
-        <img class="brand-badge" src="https://img.icons8.com/?size=150&id=98A4yZTt9abw&format=png&color=1e66ff" alt="Certifié" />
+        <img class="brand-badge" src="https://img.icons8.com/?size=100&id=98A4yZTt9abw&format=png&color=000000" alt="Geverifieerd" />
       </a>
-      
-      <button class="mobile-menu-toggle" aria-label="Menu mobile">&#9776;</button>
-      
-      <div class="mobile-links">
-        <a class="btn" href="formulaire.html">Demander un prêt</a>
-      </div>
-      
+
+      <a href="formulier.html" class="cta-header" aria-label="Een lening aanvragen">Lening aanvragen</a>
+
       <span class="spacer" aria-hidden="true"></span>
     </div>
   </header>
 
-  <!-- ========== Hero Section ========== -->
+  <!-- ========== Hero ========== -->
   <section class="hero">
     <div class="container">
-      <h1>À propos de MSGROUPS</h1>
-      <p class="lead clamp-text">Un accompagnement clair, 100&nbsp;% e-mail, pour des décisions rapides et compréhensibles — sans jargon.</p>
+      <h1>Over MSGROUPS</h1>
+      <p class="lead">Helder en snel, 100% per e-mail. U krijgt duidelijke stappen, concrete voorbeelden en beslissingen die u kunt volgen — zonder jargon.</p>
     </div>
   </section>
 
-  <!-- ========== Qui nous sommes ========== -->
+  <!-- ========== Wie wij zijn ========== -->
   <section class="section">
-    <div class="container">
-      <h2 class="section-title">Notre identité</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre mission</h2>
-          <p>À MSGROUPS, nous accompagnons particuliers et professionnels dans leurs projets de financement avec sincérité. Notre promesse est simple : un parcours de demande 100&nbsp;% par e-mail avec des échanges transparents, clairs et rapides. Nous étudions chaque dossier soigneusement, en fonctionnant uniquement du courriel, pour proposer une solution adaptée ou expliquer pourquoi nous ne pouvons pas vous aider.</p>
-          <ul>
-            <li class="check"><b>100&nbsp;% e-mail</b> : pas besoin de calendrier ni d'appel</li>
-            <li class="check"><b>Échanges transparents</b> : pas de jargon, uniquement ce qui compte pour vous</li>
-            <li class="check"><b>Délibération rapide</b> : prise de décision fondée sur des critères objectifs</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h2>Notre équipe</h2>
-          <p>Notre structure s'articule autour d'un modèle simple et humain : la direction opérationnelle est assurée par <b>Serge Magdeleine</b>, qui est très présent dans les processus et répond personnellement à une large part des messages ou supervise directement nos conseillers.</p>
-          <ul>
-            <li class="check"><b>Contact principal :</b> <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
-            <li class="check"><b>Objet recommandé :</b> "Demande d'information – [Votre nom]"</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== Zone de prestation de services ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Nos domaines d'expertise</h2>
-      <div class="grid grid-cols-1 grid-cols-3">
-        <div class="card">
-          <h2>Tétrasorerie</h2>
-          <p>Financez vos besoins à court terme pour un projet d'urgence ou d'opportunité spécifique.</p>
-        </div>
-        <div class="card">
-          <h2>Financement auto</h2>
-          <p>Réalisez le financement de votre auto avec des conditions transparentes et un processus simplifié.</p>
-        </div>
-        <div class="card">
-          <h2>Projets importants</h2>
-          <p>Que ce soit pour des travaux, acquisition immobilière ou besoin professionnel, nous adaptons nos études à la taille de votre projet.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== Notre approche ========== -->
-  <section class="section cta-section">
-    <div class="container">
-      <h2 class="section-title">Notre méthode unique (100&nbsp;% e-mail)</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre processus</h2>
-          <ol>
-            <li><b>Écrivez-nous</b> et décivez clairement votre besoin</li>
-            <li><b>Nous répondons</b> avec la liste des pièces nécessaire</li>
-            <li><b>Échangez par écrit</b> pour garder le suivi complet</li>
-            <li><b>Finalisation simple</b> par accord et signature électronique</li>
-            <li><b>Access au fonds</b> conforme aux délais convenus</li>
-          </ol>
-        </div>
-        <div class="card">
-          <h2>Ci-dessous, nos engagements</h2>
-          <ul>
-            <li class="check"><b>Taux clairement présentés</b> : sans fioritures</li>
-            <li class="check"><b>Coût total détaillé</b> : avant toute signature</li>
-            <li class="check"><b>Langage simple</b> : pour l'inclusion et la compréhension</li>
-            <li class="check"><b>Droit de rétractation</b> : 14 jours calendaires pour révisiter votre décision</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== Processus et tarification ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Transparence et tarification</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre promesse de transparence</h2>
-          <ul>
-            <li class="check"><b>Étude détaillée</b> incluant tous les aspects de votre dossier</li>
-            <li class="check"><b>Comparaison claire</b> si plusieurs propositions sont possibles</li>
-            <li class="check"><b>Remboursement garanti</b> si financement non déblocable pour cause de conditions insuffisantes</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h2>Nos tarifs</h2>
-          <p>Notre objectif est d'offrir les meilleures conditions sur le marché, en transparence totale.</p>
-          <ul>
-            <li class="check"><b>Possibilité d'avantages</b> selon la complexité du dossier</li>
-            <li class="check"><b>Indication claire</b> des frais applicable avant toute étude sérieuse</li>
-            <li class="check"><b>Cas exceptionnels</b> de exonération pour certaines situations</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== Contact et informations légales ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Nous joindre</h2>
+    <div class="container grid grid-2">
       <div class="card">
-        <h3>Le plus simple : e-mail</h3>
-        <p>Nous préférons la simplicité du courriel. Voici comment nous contacter :</p>
-        <ul>
-          <li class="check"><b>Addresse e-mail :</b> <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
-          <li class="check"><b>Object recommandé :</b> "Demande d'information – [Votre nom]"</li>
-          <li class="check"><b>Informations utiles :</b> décrivez votre projet et ajoutez les documents pertinents</li>
+        <h2>Wie wij zijn</h2>
+        <p>MSGROUPS begeleidt particulieren en ondernemers bij financiering. Onze belofte is eenvoudig: <b>volledig per e-mail</b>, <b>duidelijke communicatie</b> en <b>strakke doorlooptijden</b>. We bekijken elk dossier zorgvuldig (inkomen, stabiliteit, lopende verplichtingen) om <b>een passende oplossing</b> voor te stellen — of helder uit te leggen wanneer het niet verantwoord is.</p>
+      </div>
+      <div class="card">
+        <h2>Directie &amp; contact</h2>
+        <p>De operationele aansturing ligt bij <b>Serge Magdeleine</b>. Hij is nauw betrokken, reageert vaak zelf per e-mail of overziet rechtstreeks de correspondentie met onze adviseurs.</p>
+        <ul class="clean" style="margin-top:.5rem">
+          <li class="check"><b>E-mail:</b>&nbsp;<a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
+          <li class="check"><b>Aanbevolen onderwerp:</b>&nbsp;Informatieaanvraag – [Uw naam]</li>
         </ul>
-        <div class="btn-group" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-          <a href="formulaire.html" class="btn">Cliquez ici pour le formulaire</a>
-          <a href="mailto:contact@sergemagdeleinesolutions.fr" class="btn btn-secondary">Envoyez-nous un e-mail directement</a>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- ========== Footer with Legal Information ========== -->
+  <!-- ========== Waar en voor wie ========== -->
+  <section class="section">
+    <div class="container grid grid-2">
+      <div class="card">
+        <h2>Waar wij actief zijn</h2>
+        <p>We behandelen vooral aanvragen in <b>Nederland</b>, <b>België</b> en <b>Frankrijk</b>. Criteria, benodigde documenten en plafonds kunnen verschillen per woonland.</p>
+      </div>
+      <div class="card">
+        <h2>Voor wie onze oplossingen zijn</h2>
+        <p>We bekijken aanvragen voor <b>liquiditeit</b>, <b>auto</b>, <b>verbouwing</b>, <b>vastgoed</b> (afhankelijk van het dossier), <b>schuldconsolidatie</b> en <b>zakelijke financiering</b>. Bij gevoelige situaties (bv. betalingsachterstanden) blijft de beoordeling <b>geval per geval</b> met één kernpunt: uw <b>reële terugbetalingscapaciteit</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Onze werkwijze ========== -->
+  <section class="section">
+    <div class="container grid grid-2">
+      <div class="card">
+        <h2>Onze werkwijze (100% per e-mail)</h2>
+        <ul class="clean">
+          <li class="check"><b>U mailt ons</b> en beschrijft uw behoefte.</li>
+          <li class="check"><b>Wij antwoorden</b> met een korte lijst van relevante stukken.</li>
+          <li class="check"><b>We schakelen schriftelijk</b> zodat alles helder en traceerbaar blijft.</li>
+          <li class="check"><b>Altijd per e-mail bereikbaar</b> voor vragen of toelichting.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>De 5 stappen</h2>
+        <ol style="margin-left:1rem">
+          <li><b>Contact per e-mail.</b></li>
+          <li><b>Benodigde stukken.</b> Alleen wat nodig is (identiteit, inkomsten, recent afschrift …).</li>
+          <li><b>Beoordeling &amp; antwoord.</b> Schriftelijk voorstel indien u in aanmerking komt.</li>
+          <li><b>Akkoord &amp; ondertekening.</b> Eenvoudig en veilig.</li>
+          <li><b>Uitbetaling van de middelen.</b> Na finale validatie, volgens de gekozen aanbieding.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Beloften & Voorwaarden ========== -->
+  <section class="section">
+    <div class="container grid grid-2">
+      <div class="card">
+        <h2>Onze beloften</h2>
+        <ul class="clean">
+          <li class="check"><b>Volledige transparantie</b>: <b>rente</b>, <b>looptijd</b>, <b>totale kosten</b> en <b>aflossingsschema</b> staan zwart op wit vóór u beslist.</li>
+          <li class="check"><b>Rekenvoorbeelden</b> en duidelijke taal — zodat iedereen kan volgen.</li>
+          <li class="check"><b>Herroepingsrecht</b> (consumentenkrediet): <b>14 kalenderdagen</b> conform toepasselijke regelgeving.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Tarieven &amp; kosten</h2>
+        <p>We streven ernaar <b>kosten te beperken</b> en <b>ze duidelijk toe te lichten</b>.</p>
+        <ul class="clean" style="margin-top:.5rem">
+          <li class="check"><b>Er kunnen kosten zijn</b> afhankelijk van het dossier.</li>
+          <li class="check"><b>In dat geval</b> vermelden we ze <b>in het voorstel</b> vóór uw akkoord.</li>
+          <li class="check"><b>Veel dossiers kennen geen kosten</b> — dat geven we even duidelijk aan.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Terugbetalingen & Klachten ========== -->
+  <section class="section">
+    <div class="container">
+      <div class="card">
+        <h2>Terugbetalingen &amp; klachten (per e-mail)</h2>
+        <p>Als – nadat eventuele contractueel voorziene kosten zijn voldaan – <b>de financiering uiteindelijk niet kan worden gerealiseerd</b>, kunt u verzoeken om een <b>terugbetaling</b>.</p>
+        <p><b>Hoe?</b> Mail ons via <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a> (onderwerp: <i>Terugbetalingsverzoek – [Naam Voornaam]</i>) en voeg toe:</p>
+        <ul style="margin-left:1rem;margin-top:.35rem">
+          <li>het voorstel/contract waarin eventuele kosten staan,</li>
+          <li>het betalingsbewijs,</li>
+          <li>de uitwisseling die bevestigt dat het niet kan doorgaan,</li>
+          <li>uw <b>IBAN</b> voor een eventuele overboeking.</li>
+        </ul>
+        <p class="note">We sturen een ontvangstbevestiging en komen daarna terug met een reactie na controle.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Publieke marktverwijzingen ========== -->
+  <section class="section">
+    <div class="container grid grid-2">
+      <div class="card">
+        <h2>Publieke referenties in de sector</h2>
+        <p>Ter duiding van bekende marktpartijen:</p>
+        <ul style="margin-left:1rem;margin-top:.35rem">
+          <li><b>Crédit Agricole Consumer Finance</b> (Frankrijk) — <b>SIREN</b>&nbsp;542&nbsp;097&nbsp;522 — <b>SIRET hoofdkantoor (Massy)</b>&nbsp;542&nbsp;097&nbsp;522&nbsp;03309.</li>
+          <li><b>SOFINCO PARTICIPATIONS</b> — <b>SIREN</b>&nbsp;326&nbsp;508&nbsp;074 — <b>SIRET</b>&nbsp;326&nbsp;508&nbsp;074&nbsp;00035.</li>
+        </ul>
+        <p class="muted" style="margin-top:.5rem"><i>Deze referenties zijn publiek en louter ter marktduiding. MSGROUPS is een zelfstandige entiteit.</i></p>
+      </div>
+      <div class="card">
+        <h2>Gegevens &amp; privacy</h2>
+        <p>We vragen enkel de <b>minimale informatie</b> die nodig is voor de beoordeling. U kunt uw rechten uitoefenen (inzage, rectificatie, verwijdering) via e-mail: <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a>. We lichten u desgevraagd de procedure toe. (Conform AVG/GDPR.)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Contact ========== -->
+  <section class="section">
+    <div class="container grid grid-2">
+      <div class="card">
+        <h2>Ons schrijven</h2>
+        <p>De eenvoudigste weg is e-mail:</p>
+        <ul class="clean" style="margin-top:.5rem">
+          <li class="check"><b>E-mail:</b> <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
+          <li class="check"><b>Onderwerp:</b> Informatieaanvraag – [Uw naam]</li>
+          <li class="check"><b>Nuttige stukken (indien beschikbaar):</b> identiteitsbewijs, inkomensbewijs, recent afschrift, korte beschrijving van uw project.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Direct starten</h2>
+        <p>U kunt uw aanvraag meteen opstarten.</p>
+        <p style="margin-top:.6rem">
+          <a class="cta-header" href="formulier.html" aria-label="Formulier openen">Naar het formulier</a>
+        </p>
+        <p class="muted" style="margin-top:.6rem">U ontvangt per e-mail welke stukken exact nodig zijn en hoe het verder gaat.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Footer ========== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-links">
-        <a href="index.html">Accueil</a>
+        <a href="index.html">Start</a>
         <span aria-hidden="true">·</span>
-        <a href="form.html">Formulaire</a>
+        <a href="formulier.html">Formulier</a>
         <span aria-hidden="true">·</span>
-        <a href="a-propos.html">À propos</a>
+        <a href="over-ons.html">Over ons</a>
         <span aria-hidden="true">·</span>
         <a href="mailto:contact@sergemagdeleinesolutions.fr">Contact</a>
       </div>
-      <small>© 2025 MSGROUPS - Tous droits réservés</small>
-      <div><small class="muted">Les taux et conditions de financement varient selon le pays de résidence et des études individuelles sont nécessaires.</small></div>
+      <small>© 2025 MSGROUPS</small>
+      <div><small class="muted">Rente en voorwaarden afhankelijk van dossier en woonland.</small></div>
     </div>
   </footer>
-  <script>
-    // Simple mobile menu toggle
-    document.querySelector('.mobile-menu-toggle')?.addEventListener('click', function() {
-      const mobileLinks = document.querySelector('.mobile-links');
-      mobileLinks.classList.toggle('show');
-    });
-    
-    // Mobile link close function (optional, needs JavaScript)
-  </script>
+
 </body>
 </html>
