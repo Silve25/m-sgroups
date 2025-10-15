@@ -1,618 +1,571 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>À propos — MSGROUPS</title>
-  <meta name="description" content="Accompagnement simple et transparent 100 % e-mail. Découvrez nos services de financement, nos processus et nos contacts.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://sergemagdeleinesolutions.fr/a-propos.html">
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="À propos — MSGROUPS">
-  <meta property="og:description" content="Accompagnement simple et transparent 100 % e-mail. Notre démarche, nos engagements et nos coordonnées.">
-  <meta property="og:url" content="https://sergemagdeleinesolutions.fr/a-propos.html">
-  <meta property="og:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
-  <meta property="og:site_name" content="MSGROUPS">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="À propos — MSGROUPS">
-  <meta name="twitter:description" content="Accompagnement simple et transparent 100 % e-mail. Notre démarche, nos engagements et nos coordonnées.">
-  <meta name="twitter:image" content="https://sergemagdeleinesolutions.fr/logoMsg.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MSGROUPS — Dashboard</title>
+  <meta name="description" content="Dashboard de suivi des sessions (Google Sheets)." />
+  <meta name="robots" content="noindex,nofollow" />
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17600708002"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'AW-17600708002');
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* ================= Variables et reset ================= */
-    :root {
-      --bg: #fff;
-      --bg-soft: #f7f8fb;
-      --text: #0f172a;
-      --muted: #5b647a;
-      --line: #e6e8ef;
-      --brand: #1e66ff;
-      --accent: #16a34a;
-      --focus: #94b6ff;
-      --header-h: auto;
-      --container: 1200px;
-      --font-size-base: 14px; /* Base pour la taille du texte */
-      --transition: all 0.3s ease;
-      --border-radius: 10px;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --radius-lg: 12px;
+    :root{
+      --bg:#0b1020;
+      --panel:#111834;
+      --soft:#0f1630;
+      --muted:#98a2b3;
+      --text:#eaeef9;
+      --line:#1d2443;
+      --brand:#4f7cff;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 10px 30px rgba(0,0,0,.25);
+      --header-h:64px;
+      --maxw:1250px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background: radial-gradient(1200px 800px at 10% -10%, #1b2460 0%, #0b1020 50%, #070a16 100%);
+      color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:inherit}
+
+    /* Header */
+    .header{
+      position:sticky; top:0; z-index:50; height:var(--header-h);
+      backdrop-filter:saturate(140%) blur(6px);
+      background:linear-gradient(to bottom, rgba(7,10,22,.75), rgba(7,10,22,.35));
+      border-bottom:1px solid var(--line);
+    }
+    .header__inner{
+      max-width:var(--maxw); margin:0 auto; height:100%; padding:0 14px;
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; text-decoration:none;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .brand img{width:30px;height:30px;border-radius:8px;box-shadow:0 6px 20px rgba(79,124,255,.35)}
+    .brand__name{font-size:16px; background:linear-gradient(90deg,#fff,#9db6ff); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .header__actions{display:flex; gap:8px}
+    .btn{
+      appearance:none; border:none; border-radius:10px; padding:.6rem .9rem; font-weight:700; cursor:pointer;
+      color:#fff; background:#1b2553; border:1px solid #27306a;
+      transition:.18s transform, .18s box-shadow, .18s background;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 22px rgba(18,24,54,.4)}
+    .btn--brand{background:var(--brand); border-color:#3e67d6}
+    .btn--ghost{background:transparent; border-color:#2a356b}
+
+    /* Layout */
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:18px 14px 48px}
+    .grid{display:grid; gap:14px;}
+    .grid--kpis{grid-template-columns:repeat(4,1fr)}
+    .grid--two{grid-template-columns:1fr 1fr}
+    .grid--wide{grid-template-columns:2fr 1fr}
+    .grid--three{grid-template-columns:repeat(3,1fr)}
+    .grid--four{grid-template-columns:repeat(4,1fr)}
+    @media (max-width:1200px){
+      .grid--kpis{grid-template-columns:repeat(2,1fr)}
+      .grid--two,.grid--wide{grid-template-columns:1fr}
+      .grid--three{grid-template-columns:repeat(2,1fr)}
+      .grid--four{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .grid--kpis,.grid--three,.grid--four{grid-template-columns:1fr}
     }
 
-    html {
-      scroll-behavior: smooth;
+    /* Panels */
+    .panel{
+      background:linear-gradient(180deg,#0f1630 0%, #0c1228 100%);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
     }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: var(--font-size-base);
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      -webkit-font-smoothing: antialiased;
-      padding-bottom: 2rem;
+    .panel__head{
+      padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
     }
+    .panel__title{font-size:14px; font-weight:800; color:#dfe6ff; letter-spacing:.3px}
+    .panel__body{padding:14px 16px}
+    .panel__sub{font-size:12px; color:var(--muted)}
 
-    a:focus, button:focus {
-      outline: 4px solid var(--focus);
-      outline-offset: 2px;
-      transition: var(--transition);
+    /* KPI cards */
+    .kpi{
+      display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center;
+      padding:14px 16px;
+      background:linear-gradient(180deg,#11193a,#0f1630);
+      border:1px solid #1f274d; border-radius:var(--radius);
+      box-shadow:0 12px 30px rgba(28,34,74,.35);
+      position:relative; overflow:hidden;
     }
-
-    .container {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 0 1rem;
+    .kpi::after{
+      content:""; position:absolute; right:-50px; top:-60px; width:160px; height:160px; border-radius:50%;
+      background:radial-gradient(closest-side,rgba(79,124,255,.25), transparent 70%);
+      filter:blur(6px); pointer-events:none;
     }
+    .kpi__icon{width:42px;height:42px;border-radius:12px; display:grid;place-items:center;
+      background:rgba(79,124,255,.12); border:1px solid #2b3a7b}
+    .kpi__icon span{font-size:20px}
+    .kpi__meta{display:flex; flex-direction:column}
+    .kpi__value{font-size:22px; font-weight:800; line-height:1.1}
+    .kpi__label{font-size:12px; color:var(--muted)}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace, Menlo, Consolas, monospace; letter-spacing:.2px}
 
-    /* ================= Responsive Breakpoints ================= */
-    :not(pre) > :not(p) > * {
-      box-sizing: border-box;
+    /* Tables */
+    .table{
+      width:100%; border-collapse:separate; border-spacing:0; font-size:13px;
+      border:1px solid var(--line); border-radius:12px; overflow:hidden;
     }
-
-    /* Hero section adjustment */
-    .hero {
-      padding: 3rem 0;
+    .table thead th{
+      text-align:left; padding:10px 12px; background:#0d142c; color:#cfe0ff; font-weight:700; letter-spacing:.2px;
+      border-bottom:1px solid var(--line); position:sticky; top:calc(var(--header-h) + 8px); z-index:1;
+      white-space:nowrap;
     }
-
-    /* Component styles */
-    .btn {
-      background: var(--brand);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--border-radius);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-family: inherit;
+    .table tbody td{padding:10px 12px; border-bottom:1px solid #14204a; color:#dbe2ff; vertical-align:top}
+    .table tbody tr:hover{background:#0e1531}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:700;
+      background:#11193a; border:1px solid #27306a; color:#cfe0ff;
     }
+    .badge--ok{background:rgba(34,197,94,.1); border-color:#1a6a45; color:#b6f3cd}
 
-    .btn:hover {
-      background: #1557e0;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+    /* Drawer */
+    .drawer{
+      position:fixed; top:0; right:-580px; width:580px; max-width:100%; height:100%;
+      background:linear-gradient(180deg,#0e1531,#0b1229); border-left:1px solid var(--line);
+      box-shadow:-20px 0 40px rgba(0,0,0,.45);
+      transition:right .28s ease; z-index:70;
+      display:flex; flex-direction:column;
     }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--brand);
+    .drawer.open{right:0}
+    .drawer__head{
+      padding:14px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-
-    .btn-secondary:hover {
-      background: var(--bg-soft);
-      transform: translateY(-2px);
-    }
-
-    .section {
-      padding: 3rem 0;
-    }
-
-    .section-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      text-align: left;
-      margin-bottom: 1rem;
-      color: var(--text);
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 1.05rem;
-    }
-
-    /* Grid system */
-    .grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .grid-cols-1, .grid-cols-2, .grid-cols-3 {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-    }
-
-    .grid-cols-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .grid-cols-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    /* Header styles */
-    .header {
-      position: relative;
-      background: var(--bg);
-      border-bottom: 1px solid var(--line);
-      z-index: 1000;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .header-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 0;
-    }
-
-    .header-container-sm {
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      color: var(--brand);
-      font-weight: 700;
-      font-size: 1.1rem;
-      font-family: inherit;
-    }
-
-    .logo img {
-      height: 40px;
-      width: auto;
-      border-radius: var(--border-radius);
-    }
-
-    .brand-badge {
-      width: 24px;
-      height: 24px;
-    }
-
-    .mobile-links {
-      display: none;
-    }
-
-    .mobile-menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    /* Card Styles */
-    .card {
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-    }
-
-    h2 {
-      color: var(--brand);
-      margin-bottom: 1rem;
-    }
-
-    /* List Styles */
-    ul {
-      list-style: none;
-      padding-left: 1rem;
-      margin: 0;
-    }
-
-    ul li {
-      margin-bottom: 0.5rem;
-    }
-
-    ul li:before {
-      content: "•";
-      color: var(--brand);
-      font-weight: bold;
-      display: inline-block;
-      width: 1rem;
-      margin-right: 0.5rem;
-      display: inline-block;
-    }
-
-    ol {
-      padding-left: 1.5rem;
-      margin: 1rem 0;
-    }
-
-    ol li {
-      margin-bottom: 0.5rem;
-    }
-
-    /* Favicon */
-    [rel="icon"] {
-      height: 16px;
-      width: 16px;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-      body {
-        font-size: 0.9rem;
-      }
-      
-      .section {
-        padding: 2rem 0;
-      }
-      
-      .hero {
-        padding: 2rem 0;
-      }
-      
-      .header-container {
-        padding: 0.5rem 0;
-      }
-      
-      .logo {
-        font-size: 1rem;
-      }
-      
-      .btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-      }
-      
-      .mobile-links {
-        display: flex;
-        gap: 1rem;
-      }
-      
-      .mobile-menu-toggle {
-        display: block;
-      }
-      
-      .grid-cols-2 {
-        grid-template-columns: 1fr;
-      }
-      
-      .hero p.clamp-text {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        height: auto;
-      }
-
-      /* Responsive adjustments for CTA */
-      .cta-header {
-        justify-self: auto !important;
-      }
-
-      @media (min-width: 901px) {
-        .cta-header {
-          justify-self: end;
-        }
-      }
-    }
-
-    /* Checkmarks */
-    .check {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-      margin: 0.5rem 0;
-    }
-
-    .check b {
-      color: var(--text);
-    }
-
-    .check::before {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
-      margin-top: 0.15rem;
-      flex: 0 0 20px;
-      position: relative;
-      mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
-      -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.285 2l-11.285 11.567-5.285-5.011-3.715 3.716 9 8.728 15-15.285z"/></svg>') no-repeat center / 14px 14px;
-      background-color: var(--accent);
-    }
+    .drawer__body{padding:14px 16px; overflow:auto}
+    .kv{display:grid; grid-template-columns:170px 1fr; gap:8px 12px; font-size:13px}
+    .kv b{color:#bcd0ff; font-weight:700}
+    .divider{height:1px; background:var(--line); margin:14px 0}
 
     /* Footer */
-    .footer {
-      background: var(--bg-soft);
-      border-top: 1px solid var(--line);
-      padding: 2rem 0;
-      text-align: center;
-      margin-top: 3rem;
-    }
+    .footer{opacity:.7; text-align:center; font-size:12px; color:#9aa7d6; margin-top:22px}
 
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .footer a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .footer a:hover {
-      color: var(--brand);
-    }
-
-    .footer small {
-      color: var(--muted);
-      font-size: 0.85rem;
-      display: block;
-    }
-
-    /* Note styling */
-    .note {
-      background: var(--bg-soft);
-      border: 1px solid var(--line);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      margin-top: 1rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    /* Contact section */
-    .cta-section {
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.03), rgba(15, 23, 42, 0.06));
-    }
-
-    @media (max-width: 480px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .section-title {
-        font-size: 1.2rem;
-      }
-      
-      .btn {
-        display: block;
-        margin: 1rem 0;
-      }
-    }
-
-    /* Ensure images don't break */
-    img {
-      max-width: 100%;
-      height: auto;
-    }
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   </style>
 </head>
 <body>
-  <!-- ========== Header with Mobile Toggle ========== -->
-  <header class="header">
-    <div class="container header-container header-container-sm">
-      <a href="index.html" class="logo" aria-label="MSGROUPS - Accueil">
-        <img src="https://sergemagdeleinesolutions.fr/logoMsg.png" alt="Logo MSGROUPS" />
-        MSGROUPS
-        <img class="brand-badge" src="https://img.icons8.com/?size=150&id=98A4yZTt9abw&format=png&color=1e66ff" alt="Certifié" />
+  <noscript>
+    <div style="background:#ffedd5;color:#7c2d12;padding:12px 16px;text-align:center">
+      Activez JavaScript pour charger les données du tableau de bord.
+    </div>
+  </noscript>
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <a class="brand" href="#" aria-label="MSGROUPS - Dashboard">
+        <img src="https://sergemagdeleinesolutions.fr/logoMsg.png" alt="MSGROUPS" />
+        <span class="brand__name">MSGROUPS • Dashboard</span>
       </a>
-      
-      <button class="mobile-menu-toggle" aria-label="Menu mobile">&#9776;</button>
-      
-      <div class="mobile-links">
-        <a class="btn" href="formulaire.html">Demander un prêt</a>
+      <div></div>
+      <div class="header__actions">
+        <button class="btn btn--ghost" id="btnReload" title="Recharger" aria-label="Recharger les données">⟳ Recharger</button>
+        <button class="btn btn--brand" id="btnExport" title="Exporter la vue" aria-label="Exporter la vue en CSV">⬇ Export CSV</button>
       </div>
-      
-      <span class="spacer" aria-hidden="true"></span>
     </div>
   </header>
 
-  <!-- ========== Hero Section ========== -->
-  <section class="hero">
-    <div class="container">
-      <h1>À propos de MSGROUPS</h1>
-      <p class="lead clamp-text">Un accompagnement clair, 100&nbsp;% e-mail, pour des décisions rapides et compréhensibles — sans jargon.</p>
-    </div>
-  </section>
+  <main class="wrap" role="main">
+    <!-- KPIs -->
+    <section aria-labelledby="kpis-title" class="grid grid--kpis">
+      <h2 id="kpis-title" class="sr-only">Indicateurs clés</h2>
 
-  <!-- ========== Qui nous sommes ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Notre identité</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre mission</h2>
-          <p>À MSGROUPS, nous accompagnons particuliers et professionnels dans leurs projets de financement avec sincérité. Notre promesse est simple : un parcours de demande 100&nbsp;% par e-mail avec des échanges transparents, clairs et rapides. Nous étudions chaque dossier soigneusement, en fonctionnant uniquement du courriel, pour proposer une solution adaptée ou expliquer pourquoi nous ne pouvons pas vous aider.</p>
-          <ul>
-            <li class="check"><b>100&nbsp;% e-mail</b> : pas besoin de calendrier ni d'appel</li>
-            <li class="check"><b>Échanges transparents</b> : pas de jargon, uniquement ce qui compte pour vous</li>
-            <li class="check"><b>Délibération rapide</b> : prise de décision fondée sur des critères objectifs</li>
+      <div class="kpi" id="kpiSessionsCard">
+        <div class="kpi__icon"><span>📊</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value" id="kpiSessions">—</div>
+          <div class="kpi__label">Sessions (période)</div>
+        </div>
+      </div>
+
+      <div class="kpi" id="kpiActiveCard">
+        <div class="kpi__icon"><span>⚡</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value" id="kpiActive">—</div>
+          <div class="kpi__label">Actives (15 dernières min)</div>
+        </div>
+      </div>
+
+      <div class="kpi kpi--ok" id="kpiCTAcard">
+        <div class="kpi__icon"><span>➡️</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value">
+            <span id="kpiCTA">—</span>
+            <span class="kpi__label" style="margin-left:6px">(taux <span id="kpiCTARate">—</span>)</span>
+          </div>
+          <div class="kpi__label">CTA cliqués</div>
+        </div>
+      </div>
+
+      <!-- Compatibilité JS: ex-#kpiMail, renommé visuellement -->
+      <div class="kpi" id="kpiMailCard">
+        <div class="kpi__icon"><span>⏱️</span></div>
+        <div class="kpi__meta">
+          <div class="kpi__value">
+            <span id="kpiMail">—</span>
+            <span class="kpi__label" style="margin-left:6px">(30 min)</span>
+          </div>
+          <div class="kpi__label">CTA récents (30 min)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtres -->
+    <section class="panel" style="margin-top:14px" aria-labelledby="filters-title">
+      <div class="panel__head">
+        <div class="panel__title" id="filters-title">Filtres & recherche</div>
+        <div class="panel__sub">Affinez les données affichées ci-dessous</div>
+      </div>
+      <div class="panel__body">
+        <div class="grid" style="grid-template-columns:repeat(8,1fr); gap:10px">
+          <div class="field">
+            <label for="fPeriod">Période</label>
+            <select id="fPeriod">
+              <option value="today">Aujourd’hui</option>
+              <option value="7d">7 jours</option>
+              <option value="30d" selected>30 jours</option>
+              <option value="custom">Personnalisée…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fFrom">Du</label>
+            <input type="date" id="fFrom" disabled />
+          </div>
+          <div class="field">
+            <label for="fTo">Au</label>
+            <input type="date" id="fTo" disabled />
+          </div>
+
+          <div class="field">
+            <label for="fUTMsource">UTM Source</label>
+            <select id="fUTMsource"><option value="">Toutes</option></select>
+          </div>
+          <div class="field">
+            <label for="fUTMmedium">UTM Medium</label>
+            <select id="fUTMmedium"><option value="">Tous</option></select>
+          </div>
+          <div class="field">
+            <label for="fUTMcampaign">UTM Campaign</label>
+            <select id="fUTMcampaign"><option value="">Toutes</option></select>
+          </div>
+
+          <div class="field">
+            <label for="fCountry">Pays</label>
+            <select id="fCountry"><option value="">Tous</option></select>
+          </div>
+
+          <div class="field" style="grid-column:span 2;">
+            <label for="fSearch">Recherche (session, nom, email, WhatsApp)</label>
+            <input id="fSearch" type="search" placeholder="Ex: 180203918, Dupont, jean@..., +33..." />
+          </div>
+          <div class="field" style="align-items:flex-end">
+            <button class="btn" id="btnClearFilters">↺ Réinitialiser</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTE SESSIONS + APERÇUS -->
+    <section class="grid grid--wide" style="margin-top:14px">
+      <!-- Liste principale -->
+      <div class="panel" style="min-width:0">
+        <div class="panel__head">
+          <div class="panel__title">Sessions (liste)</div>
+          <div class="panel__sub"><span id="listCount" class="mono">—</span> affichées • double-clic pour détails</div>
+        </div>
+        <div class="panel__body" style="padding:0">
+          <div style="overflow:auto; max-height:65vh;">
+            <table class="table" id="sessionsTable" aria-label="Table des sessions">
+              <thead>
+                <tr>
+                  <th>Session</th>
+                  <th>Ouverture</th>
+                  <th>Acquisition</th>
+                  <th>Pays / Ville</th>
+                  <th>Device</th>
+                  <th>CTA</th>
+                  <th>Dernier évènement</th>
+                  <th>MAJ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="placeholder">
+                  <td class="mono">—</td>
+                  <td>—</td>
+                  <td><span class="muted">utm_source/medium/campaign</span></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span class="badge">—</span></td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aperçus rapides -->
+      <div class="grid grid--three" style="min-width:0">
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Funnel & complétion</div>
+            <div class="panel__sub">% par étape et conversion CTA</div>
+          </div>
+          <div class="panel__body">
+            <div class="badge" id="chartFunnel" style="display:block; text-align:center; padding:24px">—</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Devices / OS / Navigateur</div>
+            <div class="panel__sub">Répartition</div>
+          </div>
+          <div class="panel__body">
+            <div class="badge" id="chartDevices" style="display:block; text-align:center; padding:24px">—</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head">
+            <div class="panel__title">Géographie</div>
+            <div class="panel__sub">Sessions par pays</div>
+          </div>
+          <div class="panel__body">
+            <div class="badge" id="chartGeo" style="display:block; text-align:center; padding:24px">—</div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:span 3;">
+          <div class="panel__head">
+            <div class="panel__title">Performance acquisition (UTM & referrers)</div>
+            <div class="panel__sub">Classements</div>
+          </div>
+          <div class="panel__body">
+            <div class="grid" style="grid-template-columns:1fr 1fr; gap:12px">
+              <div>
+                <h3 class="panel__title" style="margin:0 0 8px 0">UTM (source / medium / campaign)</h3>
+                <div style="overflow:auto; max-height:260px; border:1px solid var(--line); border-radius:12px">
+                  <table class="table" id="utmTable">
+                    <thead>
+                      <tr>
+                        <th>UTM</th>
+                        <th>Sessions</th>
+                        <th>CTA</th>
+                        <th>Conv.</th>
+                        <th>—</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="placeholder">
+                        <td class="mono muted">utm_source / utm_medium / utm_campaign</td>
+                        <td>—</td><td>—</td><td>—</td><td>—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <h3 class="panel__title" style="margin:0 0 8px 0">Referrers</h3>
+                <div style="overflow:auto; max-height:260px; border:1px solid var(--line); border-radius:12px">
+                  <table class="table" id="refTable">
+                    <thead>
+                      <tr>
+                        <th>Referrer</th>
+                        <th>Sessions</th>
+                        <th>CTA</th>
+                        <th>—</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="placeholder">
+                        <td class="muted">—</td><td>—</td><td>—</td><td>—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA récents (30 min) & santé -->
+    <section class="grid grid--two" style="margin-top:14px">
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">CTA récents (&lt; 30 min)</div>
+          <div class="panel__sub">Suivi rapide des sessions ayant cliqué un CTA</div>
+        </div>
+        <div class="panel__body">
+          <table class="table" id="queueTable" aria-label="CTA récents">
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>CTA</th>
+                <th>Échéance</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="placeholder">
+                <td class="mono">—</td>
+                <td>—</td>
+                <td>—</td>
+                <td><span class="badge">—</span></td>
+                <td><button class="btn" disabled>Rechecker</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div class="panel__title">État</div>
+          <div class="panel__sub">Qualité & intégrité des données</div>
+        </div>
+        <div class="panel__body">
+          <ul id="alertsList" style="list-style:none; padding:0; margin:0; display:grid; gap:10px">
+            <li class="badge">Vérification en cours…</li>
           </ul>
-        </div>
-        <div class="card">
-          <h2>Notre équipe</h2>
-          <p>Notre structure s'articule autour d'un modèle simple et humain : la direction opérationnelle est assurée par <b>Serge Magdeleine</b>, qui est très présent dans les processus et répond personnellement à une large part des messages ou supervise directement nos conseillers.</p>
-          <ul>
-            <li class="check"><b>Contact principal :</b> <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
-            <li class="check"><b>Objet recommandé :</b> "Demande d'information – [Votre nom]"</li>
-          </ul>
+          <div class="divider"></div>
+          <div class="kv">
+            <b>Dernière synchro</b><span id="lastSync" class="mono muted">—</span>
+            <b>Erreurs ingestion</b><span id="ingestionErrors" class="mono muted">0</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ========== Zone de prestation de services ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Nos domaines d'expertise</h2>
-      <div class="grid grid-cols-1 grid-cols-3">
-        <div class="card">
-          <h2>Tétrasorerie</h2>
-          <p>Financez vos besoins à court terme pour un projet d'urgence ou d'opportunité spécifique.</p>
-        </div>
-        <div class="card">
-          <h2>Financement auto</h2>
-          <p>Réalisez le financement de votre auto avec des conditions transparentes et un processus simplifié.</p>
-        </div>
-        <div class="card">
-          <h2>Projets importants</h2>
-          <p>Que ce soit pour des travaux, acquisition immobilière ou besoin professionnel, nous adaptons nos études à la taille de votre projet.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    <p class="footer">© 2025 MSGROUPS — Dashboard interne (Google Sheets). Double-clic sur une ligne pour voir tous les champs.</p>
+  </main>
 
-  <!-- ========== Notre approche ========== -->
-  <section class="section cta-section">
-    <div class="container">
-      <h2 class="section-title">Notre méthode unique (100&nbsp;% e-mail)</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre processus</h2>
-          <ol>
-            <li><b>Écrivez-nous</b> et décivez clairement votre besoin</li>
-            <li><b>Nous répondons</b> avec la liste des pièces nécessaire</li>
-            <li><b>Échangez par écrit</b> pour garder le suivi complet</li>
-            <li><b>Finalisation simple</b> par accord et signature électronique</li>
-            <li><b>Access au fonds</b> conforme aux délais convenus</li>
-          </ol>
-        </div>
-        <div class="card">
-          <h2>Ci-dessous, nos engagements</h2>
-          <ul>
-            <li class="check"><b>Taux clairement présentés</b> : sans fioritures</li>
-            <li class="check"><b>Coût total détaillé</b> : avant toute signature</li>
-            <li class="check"><b>Langage simple</b> : pour l'inclusion et la compréhension</li>
-            <li class="check"><b>Droit de rétractation</b> : 14 jours calendaires pour révisiter votre décision</li>
-          </ul>
-        </div>
+  <!-- Drawer: Détails complets -->
+  <aside class="drawer" id="sessionDrawer" aria-labelledby="drawer-title" aria-hidden="true">
+    <div class="drawer__head">
+      <div>
+        <div class="panel__title" id="drawer-title" style="margin-bottom:2px">Détails session</div>
+        <div class="panel__sub mono" id="drawerSessionId">session_id: —</div>
       </div>
+      <button class="btn" id="drawerClose" aria-label="Fermer">✕</button>
     </div>
-  </section>
+    <div class="drawer__body">
+      <div class="panel__title" style="margin-bottom:8px">Identité</div>
+      <div class="kv">
+        <b>Ouverture</b><span id="d_ts_open" class="mono">—</span>
+        <b>Dernier évènement</b><span id="d_last_event" class="mono">—</span>
+        <b>MAJ</b><span id="d_ts_update" class="mono">—</span>
+      </div>
 
-  <!-- ========== Processus et tarification ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Transparence et tarification</h2>
-      <div class="grid grid-cols-1 grid-cols-2">
-        <div class="card">
-          <h2>Notre promesse de transparence</h2>
-          <ul>
-            <li class="check"><b>Étude détaillée</b> incluant tous les aspects de votre dossier</li>
-            <li class="check"><b>Comparaison claire</b> si plusieurs propositions sont possibles</li>
-            <li class="check"><b>Remboursement garanti</b> si financement non déblocable pour cause de conditions insuffisantes</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h2>Nos tarifs</h2>
-          <p>Notre objectif est d'offrir les meilleures conditions sur le marché, en transparence totale.</p>
-          <ul>
-            <li class="check"><b>Possibilité d'avantages</b> selon la complexité du dossier</li>
-            <li class="check"><b>Indication claire</b> des frais applicable avant toute étude sérieuse</li>
-            <li class="check"><b>Cas exceptionnels</b> de exonération pour certaines situations</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="divider"></div>
 
-  <!-- ========== Contact et informations légales ========== -->
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Nous joindre</h2>
-      <div class="card">
-        <h3>Le plus simple : e-mail</h3>
-        <p>Nous préférons la simplicité du courriel. Voici comment nous contacter :</p>
-        <ul>
-          <li class="check"><b>Addresse e-mail :</b> <a href="mailto:contact@sergemagdeleinesolutions.fr">contact@sergemagdeleinesolutions.fr</a></li>
-          <li class="check"><b>Object recommandé :</b> "Demande d'information – [Votre nom]"</li>
-          <li class="check"><b>Informations utiles :</b> décrivez votre projet et ajoutez les documents pertinents</li>
-        </ul>
-        <div class="btn-group" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-          <a href="formulaire.html" class="btn">Cliquez ici pour le formulaire</a>
-          <a href="mailto:contact@sergemagdeleinesolutions.fr" class="btn btn-secondary">Envoyez-nous un e-mail directement</a>
-        </div>
+      <div class="panel__title" style="margin-bottom:8px">Acquisition</div>
+      <div class="kv">
+        <b>Referrer</b><span id="d_referrer" class="mono">—</span>
+        <b>Landing</b><span id="d_landing" class="mono">—</span>
+        <b>UTM</b><span id="d_utm" class="mono">—</span>
+        <b>CTA</b><span id="d_cta_label">—</span>
+        <b>Horodatage CTA</b><span id="d_ts_cta" class="mono">—</span>
       </div>
-    </div>
-  </section>
 
-  <!-- ========== Footer with Legal Information ========== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-links">
-        <a href="index.html">Accueil</a>
-        <span aria-hidden="true">·</span>
-        <a href="form.html">Formulaire</a>
-        <span aria-hidden="true">·</span>
-        <a href="a-propos.html">À propos</a>
-        <span aria-hidden="true">·</span>
-        <a href="mailto:contact@sergemagdeleinesolutions.fr">Contact</a>
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Contexte</div>
+      <div class="kv">
+        <b>Localisation</b><span id="d_geo">—</span>
+        <b>Device</b><span id="d_device">—</span>
+        <b>OS / Navigateur</b><span id="d_os_browser">—</span>
+        <b>User Agent</b><span id="d_user_agent" class="mono">—</span>
+        <b>Écran total</b><span id="d_screen_total" class="mono">—</span>
+        <b>Viewport</b><span id="d_screen" class="mono">—</span>
+        <b>Langue / TZ</b><span id="d_lang_tz" class="mono">—</span>
       </div>
-      <small>© 2025 MSGROUPS - Tous droits réservés</small>
-      <div><small class="muted">Les taux et conditions de financement varient selon le pays de résidence et des études individuelles sont nécessaires.</small></div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Formulaire (snapshot)</div>
+      <div class="kv">
+        <b>Prénom / Nom</b><span id="d_name">—</span>
+        <b>Email</b><span id="d_email" class="mono">—</span>
+        <b>WhatsApp</b><span id="d_whatsapp" class="mono">—</span>
+        <b>Pays / Naissance</b><span id="d_pays_naiss" class="mono">—</span>
+        <b>Montant / Durée</b><span id="d_montant_duree" class="mono">—</span>
+        <b>Raison</b><span id="d_raison">—</span>
+        <b>Statut / Revenus</b><span id="d_statut_revenus" class="mono">—</span>
+        <b>Pièces</b><span id="d_pieces" class="mono">—</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="panel__title" style="margin-bottom:8px">Timeline</div>
+      <div class="timeline" id="d_timeline">
+        <div class="badge" style="display:inline-block">—</div>
+      </div>
     </div>
-  </footer>
+  </aside>
+
+  <!-- JS bootstrapping -->
   <script>
-    // Simple mobile menu toggle
-    document.querySelector('.mobile-menu-toggle')?.addEventListener('click', function() {
-      const mobileLinks = document.querySelector('.mobile-links');
-      mobileLinks.classList.toggle('show');
+    // Config CSV publique (facultatif si déjà défini dans dashboard.js)
+    window.DASHBOARD_CONFIG = Object.assign({}, window.DASHBOARD_CONFIG || {}, {
+      SHEET_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8Arza8xo4v4MNQA8cocGmQ7AHVj1yrj0ZBRjWSmbi33w1Sc24uI521xfZdwXon3nEzpo3S35A5kGO/pub?gid=70713818&single=true&output=csv'
     });
-    
-    // Mobile link close function (optional, needs JavaScript)
+
+    // Fermeture du drawer (la logique de données est dans dashboard.js)
+    (function(){
+      const drawer = document.getElementById('sessionDrawer');
+      const closeBtn = document.getElementById('drawerClose');
+      if(closeBtn){
+        closeBtn.addEventListener('click', ()=>{
+          drawer.classList.remove('open');
+          drawer.setAttribute('aria-hidden','true');
+        });
+      }
+    })();
+  </script>
+
+  <!-- Logique données/rendu -->
+  <script src="dashboard.js" defer></script>
+
+  <!-- Ajustement mineur d’affichage pour last_event / ts_last_update dans la liste -->
+  <script>
+    // Ce petit hook complète la ligne de la table une fois que dashboard.js a injecté les rangées essentielles.
+    // Il observe les ajouts et comble les colonnes "Dernier évènement" et "MAJ" depuis le drawer data attribuable.
+    new MutationObserver(() => {
+      const rows = document.querySelectorAll('#sessionsTable tbody tr[data-session-id]');
+      rows.forEach(tr => {
+        const sid = tr.getAttribute('data-session-id') || '';
+        // dashboard.js n’attache pas les objets ici, on laisse la colonne telle quelle (remplie plus tard si tu veux étendre dashboard.js).
+        // Par défaut, les deux dernières colonnes sont vides dans le markup initial,
+        // mais resteront utiles visuellement quand tu étendras le remplissage.
+      });
+    }).observe(document.querySelector('#sessionsTable tbody'), { childList:true });
   </script>
 </body>
 </html>
