@@ -1,30 +1,42 @@
-<!-- Event snippet for Contact (1) conversion page
-In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
 <script>
-  // === Google Ads conversion helper (fourni) ===
-  function gtag_report_conversion(url) {
-    try {
-      var callback = function () {
-        if (typeof url !== 'undefined' && url) {
-          window.location = url;
-        }
-      };
-      if (typeof gtag === 'function') {
-        gtag('event', 'conversion', {
-          'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
-          'event_callback': callback
-        });
-      } else {
-        // Fallback si gtag n'est pas disponible: on navigue quand même
-        callback();
+// ===============================
+// Google Ads - Conversion helpers
+// ===============================
+
+// Snippet officiel adapté : on n'appelle ceci QUE lors du submit validé,
+// et on lui passe l'URL "mailto:" pour que la redirection se fasse
+// DANS le callback, garantissant que l'event part bien avant le départ.
+window.gtag_report_conversion = function(url) {
+  try {
+    var callback = function () {
+      if (typeof url !== 'undefined' && url) {
+        window.location = url;
       }
-    } catch (_) {
-      // En cas d'erreur inattendue, on n'empêche pas l'ouverture de la boîte mail
-      if (typeof url !== 'undefined' && url) window.location = url;
+    };
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
+        'event_callback': callback
+      });
+    } else {
+      // Si gtag n'est pas prêt: on redirige immédiatement pour ne pas bloquer l'utilisateur
+      callback();
     }
-    // On retourne false pour empêcher les actions par défaut si besoin
-    return false;
+  } catch (_) {
+    // Sécurité: ne jamais bloquer l'envoi de l'email
+    if (typeof url !== 'undefined' && url) window.location = url;
   }
+  return false;
+};
+
+// Utilitaire sûr: envoie un event gtag si disponible (évite erreurs console)
+function safeGtagEvent(eventName, params) {
+  try {
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, params || {});
+    }
+  } catch (_) {}
+}
 </script>
 
 <script>
@@ -1027,7 +1039,7 @@ In your html page, add the snippet and call gtag_report_conversion when someone 
         return mailto;
     }
 
-    // ====== SECURITY PATCH: neutraliseert de "mailto:"-actie om Chrome-alerts te vermijden
+    // ====== SECURITY PATCH: neutraliseert de "mailto:"-actie zonder bloquer l’autocomplétion
     const form = document.querySelector('form[action^="mailto"], form[action*="mailto"]') || document.getElementById('lead-form');
     if (form) {
         try {
@@ -1036,31 +1048,11 @@ In your html page, add the snippet and call gtag_report_conversion when someone 
                 const addr = raw.startsWith('mailto:') ? raw.replace(/^mailto:/i, '') : 'Contact@sergemagdeleinesolutions.fr';
                 form.dataset.mailto = addr;
             }
+            // On garde l’autocomplete actif pour éviter les warnings du navigateur
             form.setAttribute('action', '#secure-submit');
             form.setAttribute('method', 'post');
-
-            // ⚠️ Anti-message Chrome: si HTTPS, on évite de forcer la désactivation d’autofill
-            const isHTTPS = window.location.protocol === 'https:';
-            const inputs = form.querySelectorAll('input, select, textarea');
-            if (isHTTPS) {
-                // En HTTPS, laisser le navigateur gérer l’autocomplete (pas de warning)
-                // (On ne change pas la structure ni les options visuelles du site)
-                inputs.forEach(el => {
-                    el.removeAttribute('autocapitalize');
-                    el.removeAttribute('autocorrect');
-                    el.removeAttribute('spellcheck');
-                    el.removeAttribute('autocomplete'); // laisser le défaut navigateur
-                });
-            } else {
-                // En HTTP, on conserve ton patch existant
-                form.setAttribute('autocomplete', 'off');
-                inputs.forEach(el => {
-                    el.setAttribute('autocomplete', 'off');
-                    el.setAttribute('autocapitalize', 'off');
-                    el.setAttribute('autocorrect', 'off');
-                    el.setAttribute('spellcheck', 'false');
-                });
-            }
+            form.setAttribute('autocomplete', 'on'); // <-- éviter "saisie auto désactivée"
+            // NE PAS forcer les champs à désactiver l’autofill (on laisse tels quels)
         } catch (e) {
             if (CONFIG.debugMode) console.warn('SECURITY PATCH form rewrite error:', e);
         }
@@ -1093,28 +1085,36 @@ In your html page, add the snippet and call gtag_report_conversion when someone 
                 return false;
             }
 
-            // Laatste autosave vlak voor mailto + CTA-vlag
+            // Dernier autosave + marquage CTA (feuille Google Apps Script)
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
 
-            // === CONVERSION GOOGLE ADS UNIQUEMENT SI LA BOÎTE MAIL SE LANCE ===
+            // Construction du mailto
             const mailtoLink = buildPrefilledEmail();
 
-            // Utiliser gtag_report_conversion pour signaler la conversion
-            // et n’ouvrir la boîte mail que dans le callback.
-            try {
-                // On passe l'URL mailto au callback de conversion
-                gtag_report_conversion(mailtoLink);
-            } catch (_) {
-                // Fallback ultime: ouvrir quand même l’email si quelque chose cloche
-                window.location.href = mailtoLink;
-            }
+            // ==============================
+            // CONVERSIONS GOOGLE ADS (AJOUT)
+            // ==============================
+            // 1) Conversion "lead" valeur 1 EUR
+            safeGtagEvent('conversion', {
+              'send_to': 'AW-17656608344/SQ5vCIPgr64bENjsqeNB',
+              'value': 1.0,
+              'currency': 'EUR'
+            });
 
-            setTimeout(() => {
+            // 2) Conversion avec callback + redirection vers mailto
+            // On déclenche UNIQUEMENT ici (CTA principal, formulaire valide)
+            if (typeof window.gtag_report_conversion === 'function') {
+              // Utilise le callback pour ouvrir la boîte mail (lancement garanti après l'event)
+              return window.gtag_report_conversion(mailtoLink);
+            } else {
+              // Fallback (si gtag non prêt), on redirige quand même
+              window.location.href = mailtoLink;
+              setTimeout(() => {
                 showNotification('✅ Aanvraag klaar in uw e-mail', 'Controleer uw e-mailapp (concept geopend).', 'success');
-            }, 600);
-
-            return false;
+              }, 600);
+              return true;
+            }
         });
     }
 
