@@ -1,45 +1,3 @@
-<script>
-// ===============================
-// Google Ads - Conversion helpers
-// ===============================
-
-// Snippet officiel adapté : on n'appelle ceci QUE lors du submit validé,
-// et on lui passe l'URL "mailto:" pour que la redirection se fasse
-// DANS le callback, garantissant que l'event part bien avant le départ.
-window.gtag_report_conversion = function(url) {
-  try {
-    var callback = function () {
-      if (typeof url !== 'undefined' && url) {
-        window.location = url;
-      }
-    };
-    if (typeof gtag === 'function') {
-      gtag('event', 'conversion', {
-        'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
-        'event_callback': callback
-      });
-    } else {
-      // Si gtag n'est pas prêt: on redirige immédiatement pour ne pas bloquer l'utilisateur
-      callback();
-    }
-  } catch (_) {
-    // Sécurité: ne jamais bloquer l'envoi de l'email
-    if (typeof url !== 'undefined' && url) window.location = url;
-  }
-  return false;
-};
-
-// Utilitaire sûr: envoie un event gtag si disponible (évite erreurs console)
-function safeGtagEvent(eventName, params) {
-  try {
-    if (typeof gtag === 'function') {
-      gtag('event', eventName, params || {});
-    }
-  } catch (_) {}
-}
-</script>
-
-<script>
 (function() {
     'use strict';
 
@@ -1039,7 +997,7 @@ function safeGtagEvent(eventName, params) {
         return mailto;
     }
 
-    // ====== SECURITY PATCH: neutraliseert de "mailto:"-actie zonder bloquer l’autocomplétion
+    // ====== SECURITY PATCH: neutraliseert de "mailto:"-actie om Chrome-alerts te vermijden
     const form = document.querySelector('form[action^="mailto"], form[action*="mailto"]') || document.getElementById('lead-form');
     if (form) {
         try {
@@ -1048,11 +1006,15 @@ function safeGtagEvent(eventName, params) {
                 const addr = raw.startsWith('mailto:') ? raw.replace(/^mailto:/i, '') : 'Contact@sergemagdeleinesolutions.fr';
                 form.dataset.mailto = addr;
             }
-            // On garde l’autocomplete actif pour éviter les warnings du navigateur
             form.setAttribute('action', '#secure-submit');
             form.setAttribute('method', 'post');
-            form.setAttribute('autocomplete', 'on'); // <-- éviter "saisie auto désactivée"
-            // NE PAS forcer les champs à désactiver l’autofill (on laisse tels quels)
+            form.setAttribute('autocomplete', 'off');
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                el.setAttribute('autocomplete', 'off');
+                el.setAttribute('autocapitalize', 'off');
+                el.setAttribute('autocorrect', 'off');
+                el.setAttribute('spellcheck', 'false');
+            });
         } catch (e) {
             if (CONFIG.debugMode) console.warn('SECURITY PATCH form rewrite error:', e);
         }
@@ -1085,36 +1047,16 @@ function safeGtagEvent(eventName, params) {
                 return false;
             }
 
-            // Dernier autosave + marquage CTA (feuille Google Apps Script)
+            // Laatste autosave vlak voor mailto + CTA-vlag
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
 
-            // Construction du mailto
             const mailtoLink = buildPrefilledEmail();
+            window.location.href = mailtoLink;
 
-            // ==============================
-            // CONVERSIONS GOOGLE ADS (AJOUT)
-            // ==============================
-            // 1) Conversion "lead" valeur 1 EUR
-            safeGtagEvent('conversion', {
-              'send_to': 'AW-17656608344/SQ5vCIPgr64bENjsqeNB',
-              'value': 1.0,
-              'currency': 'EUR'
-            });
-
-            // 2) Conversion avec callback + redirection vers mailto
-            // On déclenche UNIQUEMENT ici (CTA principal, formulaire valide)
-            if (typeof window.gtag_report_conversion === 'function') {
-              // Utilise le callback pour ouvrir la boîte mail (lancement garanti après l'event)
-              return window.gtag_report_conversion(mailtoLink);
-            } else {
-              // Fallback (si gtag non prêt), on redirige quand même
-              window.location.href = mailtoLink;
-              setTimeout(() => {
+            setTimeout(() => {
                 showNotification('✅ Aanvraag klaar in uw e-mail', 'Controleer uw e-mailapp (concept geopend).', 'success');
-              }, 600);
-              return true;
-            }
+            }, 600);
         });
     }
 
@@ -1389,4 +1331,3 @@ function safeGtagEvent(eventName, params) {
     }
 
 })();
-</script>
