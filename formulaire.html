@@ -37,29 +37,24 @@
     gtag('config', 'AW-17656608344');
   </script>
 
-  <!-- Google Ads Conversion: gtag_report_conversion (ajouté) -->
-  <!-- Event snippet for Envoi de formulaire pour leads (1) conversion page
+  <!-- Google Ads Conversion: gtag_report_conversion (2) — ajouté pour repérer le clic CTA -->
+  <!-- Event snippet for Envoi de formulaire pour leads (2) conversion page
        In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
   <script>
-    function gtag_report_conversion(url) {
-      var callback = function () {
-        if (typeof(url) != 'undefined') {
-          window.location = url;
-        }
-      };
-      try {
-        gtag('event', 'conversion', {
-          'send_to': 'AW-17656608344/SQ5vCIPgr64bENjsqeNB',
-          'value': 1.0,
-          'currency': 'EUR',
-          'event_callback': callback
-        });
-      } catch (e) {
-        // Si gtag n'est pas prêt, on laisse la redirection se faire ci-dessous (fallback dans JS).
-        if (typeof url !== 'undefined') window.location = url;
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') {
+        window.location = url;
       }
-      return false;
-    }
+    };
+    gtag('event', 'conversion', {
+        'send_to': 'AW-17656608344/W3ImCKm3xa4bENjsqeNB',
+        'value': 1.0,
+        'currency': 'EUR',
+        'event_callback': callback
+    });
+    return false;
+  }
   </script>
 
   <style>
@@ -113,7 +108,7 @@
     .promo-banner{background:#000;color:#fff;border-bottom:1px dashed var(--line);padding:.6rem 1rem;text-align:center;font-weight:600;font-size:.9rem}
 
     /* ========== Hero ========== */
-    .hero{position:relative;padding:2rem 1rem 1.8rem;max-width:1200px;margin:0 auto;text-align:center;background:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/pexels-olly-3760067.jpg') center/cover no-repeat;border-bottom:1px solid var(--line)}
+    .hero{position:relative;padding:2rem 1rem 1.8rem;max-width:1200px;margin:0 auto;text-align:center;background:url('https://raw.githubusercontent.com/Silve25/m-sgroups/main/Testimon%20images/pexels-olly-3760067.jpg') center/cover no-repeat;border-bottom:1px solid var(--line')}
     .hero::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.15);pointer-events:none}
     .hero-inner{position:relative;max-width:1000px;margin:0 auto;background:rgba(255,255,255,.77);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);border-radius:16px;padding:1.4rem 1rem 1.25rem;box-shadow:0 8px 24px rgba(0,0,0,.08)}
     .hero h1{font-size:clamp(1.5rem,2.8vw,2rem);font-weight:700;margin-bottom:.45rem;color:var(--text);line-height:1.2}
