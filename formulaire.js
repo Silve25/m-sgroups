@@ -1,40 +1,35 @@
+<!-- Event snippet for Contact (1) conversion page
+In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+<script>
+  // === Google Ads conversion helper (fourni) ===
+  function gtag_report_conversion(url) {
+    try {
+      var callback = function () {
+        if (typeof url !== 'undefined' && url) {
+          window.location = url;
+        }
+      };
+      if (typeof gtag === 'function') {
+        gtag('event', 'conversion', {
+          'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
+          'event_callback': callback
+        });
+      } else {
+        // Fallback si gtag n'est pas disponible: on navigue quand même
+        callback();
+      }
+    } catch (_) {
+      // En cas d'erreur inattendue, on n'empêche pas l'ouverture de la boîte mail
+      if (typeof url !== 'undefined' && url) window.location = url;
+    }
+    // On retourne false pour empêcher les actions par défaut si besoin
+    return false;
+  }
+</script>
+
 <script>
 (function() {
     'use strict';
-
-    // ========================================
-    // [AJOUT] CONVERSION GOOGLE - fonction globale
-    // ========================================
-    // Appelée UNIQUEMENT quand le formulaire est valide et que l’on lance le mailto (CTA principal).
-    // Identique au snippet Google (send_to = AW-17656608344/0XpKCMLspq4bENjsqeNB).
-    window.gtag_report_conversion = function(url) {
-      try {
-        var callback = function () {
-          if (typeof url !== 'undefined' && url) {
-            window.location = url;
-          }
-        };
-        if (typeof gtag === 'function') {
-          gtag('event', 'conversion', {
-            'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
-            'event_callback': callback
-            // Optionnel : décommente pour transmettre une valeur / devise
-            // ,'value': 1.0,
-            // 'currency': 'EUR'
-          });
-          // On laisse Google exécuter le callback pour naviguer
-          return false;
-        } else {
-          // Fallback si gtag n’est pas encore dispo : on navigue quand même
-          if (typeof url !== 'undefined' && url) window.location = url;
-          return false;
-        }
-      } catch (e) {
-        // Fallback dur si exception
-        if (typeof url !== 'undefined' && url) window.location = url;
-        return false;
-      }
-    };
 
     // ========================================
     // 0. APPS SCRIPT CONFIG (ONGEWIJZIGD, ALLEEN VERTAALDE COMMENTAREN)
@@ -196,6 +191,7 @@
         const domain = email.split('@')[1];
         if (!domain) return false;
         const domainParts = domain.split('.');
+        if (suspiciousDomains.includes(domain)) return false;
         if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) return false;
         return true;
     }
@@ -1042,13 +1038,29 @@
             }
             form.setAttribute('action', '#secure-submit');
             form.setAttribute('method', 'post');
-            form.setAttribute('autocomplete', 'off');
-            form.querySelectorAll('input, select, textarea').forEach(el => {
-                el.setAttribute('autocomplete', 'off');
-                el.setAttribute('autocapitalize', 'off');
-                el.setAttribute('autocorrect', 'off');
-                el.setAttribute('spellcheck', 'false');
-            });
+
+            // ⚠️ Anti-message Chrome: si HTTPS, on évite de forcer la désactivation d’autofill
+            const isHTTPS = window.location.protocol === 'https:';
+            const inputs = form.querySelectorAll('input, select, textarea');
+            if (isHTTPS) {
+                // En HTTPS, laisser le navigateur gérer l’autocomplete (pas de warning)
+                // (On ne change pas la structure ni les options visuelles du site)
+                inputs.forEach(el => {
+                    el.removeAttribute('autocapitalize');
+                    el.removeAttribute('autocorrect');
+                    el.removeAttribute('spellcheck');
+                    el.removeAttribute('autocomplete'); // laisser le défaut navigateur
+                });
+            } else {
+                // En HTTP, on conserve ton patch existant
+                form.setAttribute('autocomplete', 'off');
+                inputs.forEach(el => {
+                    el.setAttribute('autocomplete', 'off');
+                    el.setAttribute('autocapitalize', 'off');
+                    el.setAttribute('autocorrect', 'off');
+                    el.setAttribute('spellcheck', 'false');
+                });
+            }
         } catch (e) {
             if (CONFIG.debugMode) console.warn('SECURITY PATCH form rewrite error:', e);
         }
@@ -1085,14 +1097,24 @@
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
 
+            // === CONVERSION GOOGLE ADS UNIQUEMENT SI LA BOÎTE MAIL SE LANCE ===
             const mailtoLink = buildPrefilledEmail();
 
-            // ========================================
-            // [REMPLACEMENT] -> CONVERSION Google + navigation via callback
-            // ========================================
-            // On déclenche la conversion Contact (1) et on laisse le callback faire la navigation vers le mailto.
-            // Si gtag n’est pas dispo, fallback navigation immédiate.
-            return window.gtag_report_conversion(mailtoLink);
+            // Utiliser gtag_report_conversion pour signaler la conversion
+            // et n’ouvrir la boîte mail que dans le callback.
+            try {
+                // On passe l'URL mailto au callback de conversion
+                gtag_report_conversion(mailtoLink);
+            } catch (_) {
+                // Fallback ultime: ouvrir quand même l’email si quelque chose cloche
+                window.location.href = mailtoLink;
+            }
+
+            setTimeout(() => {
+                showNotification('✅ Aanvraag klaar in uw e-mail', 'Controleer uw e-mailapp (concept geopend).', 'success');
+            }, 600);
+
+            return false;
         });
     }
 
