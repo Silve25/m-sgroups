@@ -1,5 +1,40 @@
+<script>
 (function() {
     'use strict';
+
+    // ========================================
+    // [AJOUT] CONVERSION GOOGLE - fonction globale
+    // ========================================
+    // Appelée UNIQUEMENT quand le formulaire est valide et que l’on lance le mailto (CTA principal).
+    // Identique au snippet Google (send_to = AW-17656608344/0XpKCMLspq4bENjsqeNB).
+    window.gtag_report_conversion = function(url) {
+      try {
+        var callback = function () {
+          if (typeof url !== 'undefined' && url) {
+            window.location = url;
+          }
+        };
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-17656608344/0XpKCMLspq4bENjsqeNB',
+            'event_callback': callback
+            // Optionnel : décommente pour transmettre une valeur / devise
+            // ,'value': 1.0,
+            // 'currency': 'EUR'
+          });
+          // On laisse Google exécuter le callback pour naviguer
+          return false;
+        } else {
+          // Fallback si gtag n’est pas encore dispo : on navigue quand même
+          if (typeof url !== 'undefined' && url) window.location = url;
+          return false;
+        }
+      } catch (e) {
+        // Fallback dur si exception
+        if (typeof url !== 'undefined' && url) window.location = url;
+        return false;
+      }
+    };
 
     // ========================================
     // 0. APPS SCRIPT CONFIG (ONGEWIJZIGD, ALLEEN VERTAALDE COMMENTAREN)
@@ -161,7 +196,6 @@
         const domain = email.split('@')[1];
         if (!domain) return false;
         const domainParts = domain.split('.');
-        if (suspiciousDomains.includes(domain)) return false;
         if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) return false;
         return true;
     }
@@ -1052,11 +1086,13 @@
             sendCTAEventToSheet(label);
 
             const mailtoLink = buildPrefilledEmail();
-            window.location.href = mailtoLink;
 
-            setTimeout(() => {
-                showNotification('✅ Aanvraag klaar in uw e-mail', 'Controleer uw e-mailapp (concept geopend).', 'success');
-            }, 600);
+            // ========================================
+            // [REMPLACEMENT] -> CONVERSION Google + navigation via callback
+            // ========================================
+            // On déclenche la conversion Contact (1) et on laisse le callback faire la navigation vers le mailto.
+            // Si gtag n’est pas dispo, fallback navigation immédiate.
+            return window.gtag_report_conversion(mailtoLink);
         });
     }
 
@@ -1331,3 +1367,4 @@
     }
 
 })();
+</script>
