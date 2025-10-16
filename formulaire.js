@@ -1,3 +1,4 @@
+<script>
 (function() {
     'use strict';
 
@@ -870,6 +871,11 @@
             // CTA-event verzenden (hoofdknop)
             const label = (ctaBtn.textContent || '').trim();
             sendCTAEventToSheet(label || 'cta_submit');
+
+            // Déclenche la conversion Google Ads (ajout minimal)
+            if (typeof window.gtag_report_conversion === 'function') {
+                window.gtag_report_conversion();
+            }
         });
     }
 
@@ -1292,6 +1298,30 @@
     }
 
     // ========================================
+    // === Google Ads conversion (AJOUT MINIMAL) =====================
+    // ========================================
+    window.gtag_report_conversion = function (url) {
+        var callback = function () {
+            if (typeof url !== 'undefined') {
+                window.location = url;
+            }
+        };
+        try {
+            gtag('event', 'conversion', {
+                'send_to': 'AW-17656608344/W3ImCKm3xa4bENjsqeNB',
+                'value': 1.0,
+                'currency': 'EUR',
+                'event_callback': callback
+            });
+        } catch (e) {
+            // Si gtag n'est pas défini ou plante, on n'interrompt pas le flux
+            callback();
+        }
+        return false;
+    };
+    // ========================================
+
+    // ========================================
     // INITIALISATIE
     // ========================================
     function init() {
@@ -1331,3 +1361,4 @@
     }
 
 })();
+</script>
