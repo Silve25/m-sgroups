@@ -28,15 +28,39 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17656608344"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17656608344"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17656608344');
+  </script>
 
-  gtag('config', 'AW-17656608344');
-</script>
+  <!-- Google Ads Conversion: gtag_report_conversion (ajouté) -->
+  <!-- Event snippet for Envoi de formulaire pour leads (1) conversion page
+       In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+  <script>
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      try {
+        gtag('event', 'conversion', {
+          'send_to': 'AW-17656608344/SQ5vCIPgr64bENjsqeNB',
+          'value': 1.0,
+          'currency': 'EUR',
+          'event_callback': callback
+        });
+      } catch (e) {
+        // Si gtag n'est pas prêt, on laisse la redirection se faire ci-dessous (fallback dans JS).
+        if (typeof url !== 'undefined') window.location = url;
+      }
+      return false;
+    }
+  </script>
 
   <style>
     /* ========== CSS-variabelen ========== */
@@ -577,13 +601,6 @@
         </div>
         <div class="step-title">Wij ontvangen uw aanvraag</div>
         <div class="step-desc">Uw dossier wordt in behandeling genomen.</div>
-      </div>
-      <div class="step-card">
-        <div class="step-icon" aria-hidden="true">
-          <img src="https://img.icons8.com/?size=100&id=53388&format=png&color=000000" alt="" />
-        </div>
-        <div class="step-title">We communiceren via e-mail</div>
-        <div class="step-desc">Vragen, toelichtingen en opties.</div>
       </div>
       <div class="step-card">
         <div class="step-icon" aria-hidden="true">
