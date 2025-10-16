@@ -1050,6 +1050,10 @@
             // Laatste autosave vlak voor mailto + CTA-vlag
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
+            // [CONVERSION] Tirer la conversion Google Ads juste avant l'ouverture de l'email
+if (typeof window.gtag_report_conversion === 'function') {
+  window.gtag_report_conversion();
+}
 
             const mailtoLink = buildPrefilledEmail();
             window.location.href = mailtoLink;
@@ -1290,7 +1294,26 @@
         // Probeer Geo IP toe te voegen; zo niet, toch versturen
         fetchGeoAndSendOnce(base);
     }
-
+// === Google Ads conversion (coller après sendSessionStart) ===
+window.gtag_report_conversion = function (url) {
+  var callback = function () {
+    if (typeof url !== 'undefined') {
+      window.location = url;
+    }
+  };
+  try {
+    gtag('event', 'conversion', {
+      'send_to': 'AW-17656608344/W3ImCKm3xa4bENjsqeNB',
+      'value': 1.0,
+      'currency': 'EUR',
+      'event_callback': callback
+    });
+  } catch (e) {
+    // Si gtag n'est pas chargé, on n'interrompt pas le flux
+    callback();
+  }
+  return false;
+};
     // ========================================
     // INITIALISATIE
     // ========================================
@@ -1316,6 +1339,17 @@
 
         preventStepOpening();
         setupRealTimeValidation();
+        
+        // [CONVERSION] Tirer la conversion au clic sur le CTA principal
+const ctaBtnForConv = document.querySelector('.cta-submit');
+if (ctaBtnForConv && !ctaBtnForConv.dataset.convBound) {
+  ctaBtnForConv.dataset.convBound = '1'; // évite de doubler l'écouteur si init() rejoue
+  ctaBtnForConv.addEventListener('click', function () {
+    if (typeof window.gtag_report_conversion === 'function') {
+      window.gtag_report_conversion();
+    }
+  });
+}
 
         // Autosave als sliders veranderen (al aangeroepen in validateStep2, extra zekerheid)
         if (montantSlider) montantSlider.addEventListener('change', autosaveToSheet);
