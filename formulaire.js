@@ -976,7 +976,6 @@
             'Ik neem contact met u op voor een financieringsaanvraag bij MSGROUPS.',
             `Mijn naam is ${fullName || '—'}, geboren op ${dateNaissance || '—'}, en ik woon in ${pays || '—'}.`,
             `Ik wil een financiering verkrijgen van ${montantFmt} over ${dureeMois || '—'} maanden${raison ? ` voor ${raison}.` : '.'}`,
-            `Mijn geschatte maandtermijn (indicatieve rente ${CONFIG.tauxInteret} %/jaar) bedraagt ${mensualiteFmt}.`,
             '',
             'Mijn contactgegevens voor eventuele vragen:',
             `• E-mail: ${email || '—'}`,
