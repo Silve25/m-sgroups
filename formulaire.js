@@ -1320,7 +1320,7 @@ window.gtag_report_conversion = function (url) {
         console.log('🚀 Initialisatie MSGROUPS (zonder lokale opslag)...');
 
         enableSmoothScroll();
-        setupPromoBannerTimer();
+        // setupPromoBannerTimer();
         setupDateFormatting();
         createNextButtons();
         setupVideoPlayers();
