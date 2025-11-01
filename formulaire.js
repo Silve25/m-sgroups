@@ -227,130 +227,127 @@
         return '€ ' + s;
     }
 
-    // Stap 1
-    function validateStep1() {
-        formState.validationErrors.step1 = [];
+    // ===== Sélecteurs de champs (montant & durée) =====
+    const montantInput = document.getElementById('montant');      // ⬅️ champ libre
+    const montantMirror = document.getElementById('montant-value'); // facultatif (affichage à côté du label)
+    let   dureeInput   = document.getElementById('duree');          // sera transformé en <input type="number">
+    const dureeValue   = document.getElementById('duree-value');
 
-        const prenom = document.getElementById('prenom')?.value.trim() || '';
-        const nom = document.getElementById('nom')?.value.trim() || '';
-        const dateNaissance = document.getElementById('date-naissance')?.value.trim() || '';
-        const email = document.getElementById('email')?.value.trim() || '';
-        const whatsapp = document.getElementById('whatsapp')?.value.trim() || '';
-        const pays = document.getElementById('pays')?.value || '';
-
-        const prenomValidation = validateName(prenom);
-        if (!prenom) formState.validationErrors.step1.push('Voornaam: leeg veld');
-        else if (!prenomValidation.valid) formState.validationErrors.step1.push(`Voornaam: ${prenomValidation.error}`);
-
-        const nomValidation = validateName(nom);
-        if (!nom) formState.validationErrors.step1.push('Achternaam: leeg veld');
-        else if (!nomValidation.valid) formState.validationErrors.step1.push(`Achternaam: ${nomValidation.error}`);
-
-        const dateValidation = validateBirthDate(dateNaissance);
-        if (!dateNaissance) formState.validationErrors.step1.push('Geboortedatum: leeg veld');
-        else if (!dateValidation.valid) formState.validationErrors.step1.push(`Geboortedatum: ${dateValidation.error}`);
-
-        if (!email) formState.validationErrors.step1.push('E-mail: leeg veld');
-        else if (!isValidEmail(email)) formState.validationErrors.step1.push('E-mail: ongeldig of verdacht adres');
-
-        if (!whatsapp) formState.validationErrors.step1.push('WhatsApp: leeg veld');
-        else if (!isValidPhone(whatsapp)) formState.validationErrors.step1.push('WhatsApp: ongeldig nummer (internationaal formaat vereist)');
-
-        if (!pays) formState.validationErrors.step1.push('Land: niet geselecteerd');
-
-        formState.step1Valid = formState.validationErrors.step1.length === 0;
-
-        if (CONFIG.debugMode && !formState.step1Valid) {
-            console.log('❌ Stap 1 - Fouten:', formState.validationErrors.step1);
-        }
-
-        refreshStepOKBadges();
-        updateStepAccess();
-        checkFormCompletion();
-
-        // Autosave → Sheet
-        autosaveToSheet();
-
-        return formState.step1Valid;
-    }
-
-    // Stap 2
-    function validateStep2() {
-        formState.validationErrors.step2 = [];
-
-        // ⤵️ Montant vient d'un champ texte : on normalise et on borne
-        const montantInput = document.getElementById('montant');
-        const montantRaw = montantInput ? montantInput.value : '';
-        let montantParsed = normalizeAmount(montantRaw);
-
-        if (isNaN(montantParsed)) {
-            formState.validationErrors.step2.push('Bedrag: voer een geldig cijferbedrag in (min. € 2.000)');
+    // ===== Remplacer le slider durée par un input number =====
+    function replaceDurationSliderWithNumber() {
+        if (!dureeInput) return;
+        // Si ce n’est pas déjà un number, on remplace l’élément
+        const isNumber = (dureeInput.tagName === 'INPUT' && (dureeInput.type || '').toLowerCase() === 'number');
+        if (isNumber) {
+            // S'assurer des attributs
+            dureeInput.min = '6';
+            dureeInput.max = '120';
+            dureeInput.step = '1';
         } else {
-            if (montantParsed < MONTANT_MIN || montantParsed > MONTANT_MAX) {
-                formState.validationErrors.step2.push(`Bedrag: moet tussen € 2.000 en € 200.000 liggen (huidig: € ${montantParsed})`);
-            }
+            const currentValue = parseInt(dureeInput.value || '48', 10);
+            const numberEl = document.createElement('input');
+            numberEl.type  = 'number';
+            numberEl.id    = 'duree';
+            numberEl.name  = dureeInput.getAttribute('name') || 'duree';
+            numberEl.min   = '6';
+            numberEl.max   = '120';
+            numberEl.step  = '1';
+            numberEl.className = dureeInput.className || '';
+            numberEl.value = (!isNaN(currentValue) ? currentValue : 48);
+
+            // Remplacement dans le DOM, même id conservé
+            dureeInput.parentNode.replaceChild(numberEl, dureeInput);
+            dureeInput = numberEl;
         }
 
-        const duree = parseInt(document.getElementById('duree')?.value);
-        const raison = document.getElementById('raison')?.value.trim() || '';
-
-        if (isNaN(duree) || duree < 6 || duree > 120) {
-            formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${duree} maanden)`);
+        // Affichage texte initial
+        if (dureeValue) {
+            const val = parseInt(dureeInput.value || '48', 10);
+            dureeValue.textContent = `${val} maanden`;
         }
 
-        const raisonValidation = validateRaison(raison);
-        if (!raison) formState.validationErrors.step2.push('Reden van het project: leeg veld');
-        else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Reden van het project: ${raisonValidation.error}`);
+        // Listeners sur le champ number
+        dureeInput.addEventListener('input', function() {
+            let v = parseInt(this.value, 10);
+            if (isNaN(v)) v = 6;
+            if (v < 6) v = 6;
+            if (v > 120) v = 120;
+            this.value = v;
+            if (dureeValue) dureeValue.textContent = `${v} maanden`;
+            validateStep2();
+        });
 
-        formState.step2Valid = formState.validationErrors.step2.length === 0;
-
-        // Style visuel du montant (rouge si invalide)
-        if (montantInput) {
-            if (formState.validationErrors.step2.some(e => e.startsWith('Bedrag'))) {
-                montantInput.classList.add('invalid', 'shake');
-                setTimeout(() => montantInput.classList.remove('shake'), 350);
-            } else {
-                montantInput.classList.remove('invalid');
-            }
-        }
-
-        if (CONFIG.debugMode && !formState.step2Valid) {
-            console.log('❌ Stap 2 - Fouten:', formState.validationErrors.step2);
-        }
-
-        refreshStepOKBadges();
-        updateStepAccess();
-        checkFormCompletion();
-
-        // Autosave → Sheet
-        autosaveToSheet();
-
-        return formState.step2Valid;
+        dureeInput.addEventListener('blur', function() {
+            let v = parseInt(this.value, 10);
+            if (isNaN(v)) v = 6;
+            if (v < 6) v = 6;
+            if (v > 120) v = 120;
+            this.value = v;
+            if (dureeValue) dureeValue.textContent = `${v} maanden`;
+            validateStep2();
+            autosaveToSheet();
+        });
     }
 
-    // Stap 3
-    function validateStep3() {
-        formState.validationErrors.step3 = [];
+    // ===== Comportement du champ montant (saisie libre robuste) =====
+    if (montantInput) {
+        // Valeur initiale : clamp & miroir
+        (function initAmount() {
+            const n = clampAmount(normalizeAmount(montantInput.value));
+            if (!isNaN(n)) montantInput.value = String(n);
+            if (montantMirror) montantMirror.textContent = formatMontant(montantInput.value || MONTANT_MIN);
+        })();
 
-        const statut = document.getElementById('statut')?.value || '';
-        const revenus = document.getElementById('revenus')?.value || '';
+        // Filtrage temps réel (chiffres uniquement), mise à jour du miroir
+        montantInput.addEventListener('input', function() {
+            const before = this.value;
+            const digits = before.replace(/[^\d]/g, '');
+            if (before !== digits) this.value = digits;
 
-        if (!statut) formState.validationErrors.step3.push('Professionele status: niet geselecteerd');
-        if (!revenus) formState.validationErrors.step3.push('Regelmatig inkomen: niet geselecteerd');
+            if (montantMirror) {
+                const n = normalizeAmount(this.value);
+                montantMirror.textContent = formatMontant(isNaN(n) ? 0 : n);
+            }
 
-        formState.step3Valid = formState.validationErrors.step3.length === 0;
+            validateStep2();
+        });
 
-        if (CONFIG.debugMode && !formState.step3Valid) {
-            console.log('❌ Stap 3 - Fouten:', formState.validationErrors.step3);
-        }
+        // À la sortie du champ : bornage + feedback si < 2 000 €
+        montantInput.addEventListener('blur', function() {
+            let n = normalizeAmount(this.value);
+            if (isNaN(n)) {
+                this.value = '';
+                this.classList.add('invalid');
+                showNotification('Bedrag ontbreekt', 'Voer een geldig bedrag in cijfers in (minimaal € 2.000).', 'warning');
+                return;
+            }
+            const clamped = clampAmount(n);
+            if (clamped !== n) {
+                if (n < MONTANT_MIN) {
+                    showNotification('Minimum bedrag aangepast', `Het ingevoerde bedrag is onder de minimumgrens. We hebben het aangepast naar € ${MONTANT_MIN.toLocaleString('nl-NL')}.`, 'info');
+                }
+                if (n > MONTANT_MAX) {
+                    showNotification('Maximum overschreden', `Voor deze simulatie is het maximum € ${MONTANT_MAX.toLocaleString('nl-NL')}. Het bedrag is aangepast.`, 'info');
+                }
+            }
+            this.value = String(clamped);
+            this.classList.remove('invalid');
 
-        refreshStepOKBadges();
-        checkFormCompletion();
+            if (montantMirror) {
+                montantMirror.textContent = formatMontant(clamped);
+            }
+            validateStep2();
+            autosaveToSheet();
+        });
 
-        // Autosave → Sheet
-        autosaveToSheet();
-
-        return formState.step3Valid;
+        // Enter = passe directement au champ suivant (UX)
+        montantInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const next = document.getElementById('raison');
+                if (next) next.focus();
+            }
+        });
     }
 
     // ========================================
@@ -542,160 +539,12 @@
     }
 
     // ========================================
-    // 8. CALCULATOR & SAISIE MONTANT
+    // 8. CALCULATOR (utilisée uniquement pour l’e-mail)
     // ========================================
     function calculerMensualite(montant, dureeEnMois, tauxAnnuel) {
         const tauxMensuel = tauxAnnuel / 100 / 12;
         const mensualite = (montant * tauxMensuel) / (1 - Math.pow(1 + tauxMensuel, -dureeEnMois));
         return mensualite;
-    }
-
-    function getDateFin(dureeEnMois) {
-        const dateFin = new Date();
-        dateFin.setMonth(dateFin.getMonth() + parseInt(dureeEnMois, 10));
-        const options = { year: 'numeric', month: 'long' };
-        return dateFin.toLocaleDateString('nl-NL', options);
-    }
-
-    function afficherResumePret() {
-        // Montant issu de l’input libre (borné)
-        let montantVal = normalizeAmount(document.getElementById('montant')?.value);
-        if (isNaN(montantVal)) montantVal = MONTANT_MIN; // défaut pour l’aperçu
-        montantVal = clampAmount(montantVal);
-
-        const duree = parseInt(document.getElementById('duree')?.value, 10);
-        const taux = CONFIG.tauxInteret;
-
-        if (!isFinite(montantVal) || isNaN(duree)) return;
-
-        const mensualite = calculerMensualite(montantVal, duree, taux);
-        const coutTotal = mensualite * duree;
-        const coutCredit = coutTotal - montantVal;
-        const dateFin = getDateFin(duree);
-
-        let resumeElement = document.getElementById('resume-pret');
-        if (!resumeElement) {
-            resumeElement = document.createElement('div');
-            resumeElement.id = 'resume-pret';
-            resumeElement.style.cssText = `
-                margin-top: 1.5rem; padding: 1.25rem;
-                background: linear-gradient(135deg, #f7f8fb 0%, #e6e8ef 100%);
-                border-left: 4px solid var(--brand); border-radius: 10px;
-                font-size: 0.9rem; line-height: 1.8;`;
-            const raisonGroup = document.getElementById('raison')?.closest('.form-group');
-            if (raisonGroup && raisonGroup.parentNode) {
-                raisonGroup.parentNode.insertBefore(resumeElement, raisonGroup.nextSibling);
-            }
-        }
-
-        resumeElement.innerHTML = `
-            <div style="font-weight:600;color:var(--brand);margin-bottom:.75rem;font-size:1rem;">📊 Schatting van uw lening</div>
-            <div style="color:var(--text);">
-                <strong>U wilt ${formatEuros(montantVal)}</strong> lenen over <strong>${duree} maanden</strong>.
-            </div>
-            <div style="margin-top:.5rem;color:var(--muted);font-size:.85rem;">
-                Met een indicatieve rente van <strong>${taux}%</strong> per jaar:
-            </div>
-            <div style="margin-top:.75rem;padding:.75rem;background:#fff;border-radius:8px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-                    <span style="color:var(--muted);">Maandtermijn:</span>
-                    <strong style="color:var(--brand);font-size:1.1rem;">${formatEuros(mensualite)}</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;padding-top:.5rem;border-top:1px dashed var(--line);">
-                    <span style="color:var(--muted);">Totale kredietkosten:</span>
-                    <strong style="color:var(--text);">${formatEuros(coutCredit)}</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding-top:.5rem;border-top:1px dashed var(--line);">
-                    <span style="color:var(--muted);">Totaal terug te betalen:</span>
-                    <strong style="color:var(--text);">${formatEuros(coutTotal)}</strong>
-                </div>
-            </div>
-            <div style="margin-top:.75rem;color:var(--muted);font-size:.85rem;">
-                Laatste betaling voorzien in <strong>${dateFin}</strong>
-            </div>
-            <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;font-style:italic;">
-                ⚠️ Indicatieve schatting op basis van een rente van ${taux}%. De definitieve rente wordt bepaald op basis van uw dossier.
-            </div>`;
-    }
-
-    // ===== Sélecteurs de champs =====
-    const montantInput = document.getElementById('montant');      // ⬅️ champ libre
-    const montantMirror = document.getElementById('montant-value'); // facultatif (affichage à côté du label)
-    const dureeSlider = document.getElementById('duree');
-    const dureeValue = document.getElementById('duree-value');
-
-    // ===== Comportement du champ montant (saisie libre robuste) =====
-    if (montantInput) {
-        // Valeur initiale : clamp & miroir
-        (function initAmount() {
-            const n = clampAmount(normalizeAmount(montantInput.value));
-            if (!isNaN(n)) montantInput.value = String(n);
-            if (montantMirror) montantMirror.textContent = formatMontant(montantInput.value || MONTANT_MIN);
-        })();
-
-        // Filtrage temps réel (chiffres uniquement), mise à jour du miroir & résumé
-        montantInput.addEventListener('input', function() {
-            const before = this.value;
-            const digits = before.replace(/[^\d]/g, '');
-            if (before !== digits) this.value = digits;
-
-            if (montantMirror) {
-                const n = normalizeAmount(this.value);
-                montantMirror.textContent = formatMontant(isNaN(n) ? 0 : n);
-            }
-
-            afficherResumePret();
-            validateStep2();
-        });
-
-        // À la sortie du champ : bornage + feedback si < 2 000 €
-        montantInput.addEventListener('blur', function() {
-            let n = normalizeAmount(this.value);
-            if (isNaN(n)) {
-                this.value = '';
-                this.classList.add('invalid');
-                showNotification('Bedrag ontbreekt', 'Voer een geldig bedrag in cijfers in (minimaal € 2.000).', 'warning');
-                return;
-            }
-            const clamped = clampAmount(n);
-            if (clamped !== n) {
-                // Feedback discret si on remonte jusqu’au minimum
-                if (n < MONTANT_MIN) {
-                    showNotification('Minimum bedrag aangepast', `Het ingevoerde bedrag is onder de minimumgrens. We hebben het aangepast naar € ${MONTANT_MIN.toLocaleString('nl-NL')}.`, 'info');
-                }
-                if (n > MONTANT_MAX) {
-                    showNotification('Maximum overschreden', `Voor deze simulatie is het maximum € ${MONTANT_MAX.toLocaleString('nl-NL')}. Het bedrag is aangepast.`, 'info');
-                }
-            }
-            this.value = String(clamped);
-            this.classList.remove('invalid');
-
-            if (montantMirror) {
-                montantMirror.textContent = formatMontant(clamped);
-            }
-            afficherResumePret();
-            validateStep2();
-            autosaveToSheet();
-        });
-
-        // Enter = passe directement au champ suivant (UX)
-        montantInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const next = document.getElementById('raison');
-                if (next) next.focus();
-            }
-        });
-    }
-
-    // ===== Durée (slider existant inchangé) =====
-    if (dureeSlider && dureeValue) {
-        dureeSlider.addEventListener('input', function() {
-            dureeValue.textContent = this.value + ' maanden';
-            afficherResumePret();
-            validateStep2();
-        });
-        dureeValue.textContent = dureeSlider.value + ' maanden';
     }
 
     // ========================================
@@ -1078,6 +927,8 @@
             `Situatie: ik ben momenteel ${statut || '—'}${revenus ? ` en ${revenus.toLowerCase()}` : ''}.`,
             `Beschikbare documenten: ${pieces.length ? pieces.join(' en ') : 'op verzoek beschikbaar'}.`,
             '',
+            `Indicatieve maandtermijn (niet bindend): ${mensualiteFmt}.`,
+            '',
             'Ik sta natuurlijk ter beschikking voor verdere informatie of aanvullende documenten.',
             '',
             'Met vriendelijke groet,',
@@ -1412,6 +1263,130 @@
     // ========================================
     // INITIALISATIE
     // ========================================
+    function validateStep1() {
+        formState.validationErrors.step1 = [];
+
+        const prenom = document.getElementById('prenom')?.value.trim() || '';
+        const nom = document.getElementById('nom')?.value.trim() || '';
+        const dateNaissance = document.getElementById('date-naissance')?.value.trim() || '';
+        const email = document.getElementById('email')?.value.trim() || '';
+        const whatsapp = document.getElementById('whatsapp')?.value.trim() || '';
+        const pays = document.getElementById('pays')?.value || '';
+
+        const prenomValidation = validateName(prenom);
+        if (!prenom) formState.validationErrors.step1.push('Voornaam: leeg veld');
+        else if (!prenomValidation.valid) formState.validationErrors.step1.push(`Voornaam: ${prenomValidation.error}`);
+
+        const nomValidation = validateName(nom);
+        if (!nom) formState.validationErrors.step1.push('Achternaam: leeg veld');
+        else if (!nomValidation.valid) formState.validationErrors.step1.push(`Achternaam: ${nomValidation.error}`);
+
+        const dateValidation = validateBirthDate(dateNaissance);
+        if (!dateNaissance) formState.validationErrors.step1.push('Geboortedatum: leeg veld');
+        else if (!dateValidation.valid) formState.validationErrors.step1.push(`Geboortedatum: ${dateValidation.error}`);
+
+        if (!email) formState.validationErrors.step1.push('E-mail: leeg veld');
+        else if (!isValidEmail(email)) formState.validationErrors.step1.push('E-mail: ongeldig of verdacht adres');
+
+        if (!whatsapp) formState.validationErrors.step1.push('WhatsApp: leeg veld');
+        else if (!isValidPhone(whatsapp)) formState.validationErrors.step1.push('WhatsApp: ongeldig nummer (internationaal formaat vereist)');
+
+        if (!pays) formState.validationErrors.step1.push('Land: niet geselecteerd');
+
+        formState.step1Valid = formState.validationErrors.step1.length === 0;
+
+        if (CONFIG.debugMode && !formState.step1Valid) {
+            console.log('❌ Stap 1 - Fouten:', formState.validationErrors.step1);
+        }
+
+        refreshStepOKBadges();
+        updateStepAccess();
+        checkFormCompletion();
+
+        // Autosave → Sheet
+        autosaveToSheet();
+
+        return formState.step1Valid;
+    }
+
+    function validateStep2() {
+        formState.validationErrors.step2 = [];
+
+        // Montant
+        const montantInputEl = document.getElementById('montant');
+        const montantRaw = montantInputEl ? montantInputEl.value : '';
+        let montantParsed = normalizeAmount(montantRaw);
+
+        if (isNaN(montantParsed)) {
+            formState.validationErrors.step2.push('Bedrag: voer een geldig cijferbedrag in (min. € 2.000)');
+        } else {
+            if (montantParsed < MONTANT_MIN || montantParsed > MONTANT_MAX) {
+                formState.validationErrors.step2.push(`Bedrag: moet tussen € 2.000 en € 200.000 liggen (huidig: € ${montantParsed})`);
+            }
+        }
+
+        // Durée (désormais champ number)
+        const duree = parseInt(document.getElementById('duree')?.value, 10);
+        const raison = document.getElementById('raison')?.value.trim() || '';
+
+        if (isNaN(duree) || duree < 6 || duree > 120) {
+            formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${duree} maanden)`);
+        }
+
+        const raisonValidation = validateRaison(raison);
+        if (!raison) formState.validationErrors.step2.push('Reden van het project: leeg veld');
+        else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Reden van het project: ${raisonValidation.error}`);
+
+        formState.step2Valid = formState.validationErrors.step2.length === 0;
+
+        // Style visuel du montant (rouge si invalide)
+        if (montantInputEl) {
+            if (formState.validationErrors.step2.some(e => e.startsWith('Bedrag'))) {
+                montantInputEl.classList.add('invalid', 'shake');
+                setTimeout(() => montantInputEl.classList.remove('shake'), 350);
+            } else {
+                montantInputEl.classList.remove('invalid');
+            }
+        }
+
+        if (CONFIG.debugMode && !formState.step2Valid) {
+            console.log('❌ Stap 2 - Fouten:', formState.validationErrors.step2);
+        }
+
+        refreshStepOKBadges();
+        updateStepAccess();
+        checkFormCompletion();
+
+        // Autosave → Sheet
+        autosaveToSheet();
+
+        return formState.step2Valid;
+    }
+
+    function validateStep3() {
+        formState.validationErrors.step3 = [];
+
+        const statut = document.getElementById('statut')?.value || '';
+        const revenus = document.getElementById('revenus')?.value || '';
+
+        if (!statut) formState.validationErrors.step3.push('Professionele status: niet geselecteerd');
+        if (!revenus) formState.validationErrors.step3.push('Regelmatig inkomen: niet geselecteerd');
+
+        formState.step3Valid = formState.validationErrors.step3.length === 0;
+
+        if (CONFIG.debugMode && !formState.step3Valid) {
+            console.log('❌ Stap 3 - Fouten:', formState.validationErrors.step3);
+        }
+
+        refreshStepOKBadges();
+        checkFormCompletion();
+
+        // Autosave → Sheet
+        autosaveToSheet();
+
+        return formState.step3Valid;
+    }
+
     function init() {
         console.log('🚀 Initialisatie MSGROUPS (zonder lokale opslag)...');
 
@@ -1422,6 +1397,9 @@
         setupVideoPlayers();
         injectSummaryHitboxStyles();
 
+        // Transformer le slider durée -> input number
+        replaceDurationSliderWithNumber();
+
         // Sessiestart versturen (met device/referrer/utm/geo)
         sendSessionStart();
 
@@ -1429,7 +1407,6 @@
             validateStep1();
             validateStep2();
             validateStep3();
-            afficherResumePret();
         }, 200);
 
         preventStepOpening();
@@ -1448,7 +1425,7 @@
 
         // Autosave supplémentaires
         if (montantInput) montantInput.addEventListener('change', autosaveToSheet);
-        if (dureeSlider) dureeSlider.addEventListener('change', autosaveToSheet);
+        if (dureeInput)   dureeInput.addEventListener('change', autosaveToSheet);
 
         console.log('✅ MSGROUPS - Klaar!  Sessie:', SESSION.id);
     }
