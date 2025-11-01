@@ -46,6 +46,10 @@
         debugMode: true
     };
 
+    // Montant bounds (saisie libre)
+    const MONTANT_MIN = 2000;
+    const MONTANT_MAX = 200000;
+
     const ICONS = {
         ok: 'https://img.icons8.com/?size=100&id=YZHzhN7pF7Dw&format=png&color=16a34a', // groen
         warning: 'https://img.icons8.com/?size=100&id=undefined&format=png&color=000000' // kan falen -> fallback
@@ -198,6 +202,31 @@
         return { valid: true, error: '' };
     }
 
+    // ============ Utilitaires Montant ============
+    function normalizeAmount(raw) {
+        // Conserve uniquement les chiffres, interprète en euros entiers
+        const digits = String(raw || '').replace(/[^\d]/g, '');
+        if (!digits) return NaN;
+        return parseInt(digits, 10);
+    }
+    function clampAmount(n) {
+        if (isNaN(n)) return NaN;
+        if (n < MONTANT_MIN) return MONTANT_MIN;
+        if (n > MONTANT_MAX) return MONTANT_MAX;
+        return n;
+    }
+    function formatEuros(montant) {
+        const n = Number(montant || 0).toLocaleString('nl-NL', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        return '€ ' + n;
+    }
+    function formatMontant(value) {
+        const s = String(value || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return '€ ' + s;
+    }
+
     // Stap 1
     function validateStep1() {
         formState.validationErrors.step1 = [];
@@ -249,13 +278,21 @@
     function validateStep2() {
         formState.validationErrors.step2 = [];
 
-        const montant = parseFloat(document.getElementById('montant')?.value);
+        // ⤵️ Montant vient d'un champ texte : on normalise et on borne
+        const montantInput = document.getElementById('montant');
+        const montantRaw = montantInput ? montantInput.value : '';
+        let montantParsed = normalizeAmount(montantRaw);
+
+        if (isNaN(montantParsed)) {
+            formState.validationErrors.step2.push('Bedrag: voer een geldig cijferbedrag in (min. € 2.000)');
+        } else {
+            if (montantParsed < MONTANT_MIN || montantParsed > MONTANT_MAX) {
+                formState.validationErrors.step2.push(`Bedrag: moet tussen € 2.000 en € 200.000 liggen (huidig: € ${montantParsed})`);
+            }
+        }
+
         const duree = parseInt(document.getElementById('duree')?.value);
         const raison = document.getElementById('raison')?.value.trim() || '';
-
-        if (isNaN(montant) || montant < 2000 || montant > 200000) {
-            formState.validationErrors.step2.push(`Bedrag: moet tussen € 2.000 en € 200.000 liggen (huidig: € ${montant})`);
-        }
 
         if (isNaN(duree) || duree < 6 || duree > 120) {
             formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${duree} maanden)`);
@@ -266,6 +303,16 @@
         else if (!raisonValidation.valid) formState.validationErrors.step2.push(`Reden van het project: ${raisonValidation.error}`);
 
         formState.step2Valid = formState.validationErrors.step2.length === 0;
+
+        // Style visuel du montant (rouge si invalide)
+        if (montantInput) {
+            if (formState.validationErrors.step2.some(e => e.startsWith('Bedrag'))) {
+                montantInput.classList.add('invalid', 'shake');
+                setTimeout(() => montantInput.classList.remove('shake'), 350);
+            } else {
+                montantInput.classList.remove('invalid');
+            }
+        }
 
         if (CONFIG.debugMode && !formState.step2Valid) {
             console.log('❌ Stap 2 - Fouten:', formState.validationErrors.step2);
@@ -495,7 +542,7 @@
     }
 
     // ========================================
-    // 8. CALCULATOR & SLIDERS
+    // 8. CALCULATOR & SAISIE MONTANT
     // ========================================
     function calculerMensualite(montant, dureeEnMois, tauxAnnuel) {
         const tauxMensuel = tauxAnnuel / 100 / 12;
@@ -510,35 +557,20 @@
         return dateFin.toLocaleDateString('nl-NL', options);
     }
 
-    function formatEuros(montant) {
-        const n = montant.toLocaleString('nl-NL', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-        return '€ ' + n;
-    }
-
-    function formatMontant(value) {
-        const s = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        return '€ ' + s;
-    }
-
-    function updateSliderBackground(slider) {
-        const min = parseFloat(slider.min) || 0;
-        const max = parseFloat(slider.max) || 100;
-        const value = parseFloat(slider.value);
-        const percentage = ((value - min) / (max - min)) * 100;
-        slider.style.background = `linear-gradient(to right, var(--brand) 0%, var(--brand) ${percentage}%, var(--line) ${percentage}%, var(--line) 100%)`;
-    }
-
     function afficherResumePret() {
-        const montant = parseFloat(document.getElementById('montant')?.value);
+        // Montant issu de l’input libre (borné)
+        let montantVal = normalizeAmount(document.getElementById('montant')?.value);
+        if (isNaN(montantVal)) montantVal = MONTANT_MIN; // défaut pour l’aperçu
+        montantVal = clampAmount(montantVal);
+
         const duree = parseInt(document.getElementById('duree')?.value, 10);
         const taux = CONFIG.tauxInteret;
 
-        const mensualite = calculerMensualite(montant, duree, taux);
+        if (!isFinite(montantVal) || isNaN(duree)) return;
+
+        const mensualite = calculerMensualite(montantVal, duree, taux);
         const coutTotal = mensualite * duree;
-        const coutCredit = coutTotal - montant;
+        const coutCredit = coutTotal - montantVal;
         const dateFin = getDateFin(duree);
 
         let resumeElement = document.getElementById('resume-pret');
@@ -559,7 +591,7 @@
         resumeElement.innerHTML = `
             <div style="font-weight:600;color:var(--brand);margin-bottom:.75rem;font-size:1rem;">📊 Schatting van uw lening</div>
             <div style="color:var(--text);">
-                <strong>U wilt ${formatEuros(montant)}</strong> lenen over <strong>${duree} maanden</strong>.
+                <strong>U wilt ${formatEuros(montantVal)}</strong> lenen over <strong>${duree} maanden</strong>.
             </div>
             <div style="margin-top:.5rem;color:var(--muted);font-size:.85rem;">
                 Met een indicatieve rente van <strong>${taux}%</strong> per jaar:
@@ -586,31 +618,84 @@
             </div>`;
     }
 
-    const montantSlider = document.getElementById('montant');
-    const montantValue = document.getElementById('montant-value');
+    // ===== Sélecteurs de champs =====
+    const montantInput = document.getElementById('montant');      // ⬅️ champ libre
+    const montantMirror = document.getElementById('montant-value'); // facultatif (affichage à côté du label)
     const dureeSlider = document.getElementById('duree');
     const dureeValue = document.getElementById('duree-value');
 
-    if (montantSlider && montantValue) {
-        montantSlider.addEventListener('input', function() {
-            montantValue.textContent = formatMontant(this.value);
-            updateSliderBackground(this);
+    // ===== Comportement du champ montant (saisie libre robuste) =====
+    if (montantInput) {
+        // Valeur initiale : clamp & miroir
+        (function initAmount() {
+            const n = clampAmount(normalizeAmount(montantInput.value));
+            if (!isNaN(n)) montantInput.value = String(n);
+            if (montantMirror) montantMirror.textContent = formatMontant(montantInput.value || MONTANT_MIN);
+        })();
+
+        // Filtrage temps réel (chiffres uniquement), mise à jour du miroir & résumé
+        montantInput.addEventListener('input', function() {
+            const before = this.value;
+            const digits = before.replace(/[^\d]/g, '');
+            if (before !== digits) this.value = digits;
+
+            if (montantMirror) {
+                const n = normalizeAmount(this.value);
+                montantMirror.textContent = formatMontant(isNaN(n) ? 0 : n);
+            }
+
             afficherResumePret();
             validateStep2();
         });
-        montantValue.textContent = formatMontant(montantSlider.value);
-        updateSliderBackground(montantSlider);
+
+        // À la sortie du champ : bornage + feedback si < 2 000 €
+        montantInput.addEventListener('blur', function() {
+            let n = normalizeAmount(this.value);
+            if (isNaN(n)) {
+                this.value = '';
+                this.classList.add('invalid');
+                showNotification('Bedrag ontbreekt', 'Voer een geldig bedrag in cijfers in (minimaal € 2.000).', 'warning');
+                return;
+            }
+            const clamped = clampAmount(n);
+            if (clamped !== n) {
+                // Feedback discret si on remonte jusqu’au minimum
+                if (n < MONTANT_MIN) {
+                    showNotification('Minimum bedrag aangepast', `Het ingevoerde bedrag is onder de minimumgrens. We hebben het aangepast naar € ${MONTANT_MIN.toLocaleString('nl-NL')}.`, 'info');
+                }
+                if (n > MONTANT_MAX) {
+                    showNotification('Maximum overschreden', `Voor deze simulatie is het maximum € ${MONTANT_MAX.toLocaleString('nl-NL')}. Het bedrag is aangepast.`, 'info');
+                }
+            }
+            this.value = String(clamped);
+            this.classList.remove('invalid');
+
+            if (montantMirror) {
+                montantMirror.textContent = formatMontant(clamped);
+            }
+            afficherResumePret();
+            validateStep2();
+            autosaveToSheet();
+        });
+
+        // Enter = passe directement au champ suivant (UX)
+        montantInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const next = document.getElementById('raison');
+                if (next) next.focus();
+            }
+        });
     }
 
+    // ===== Durée (slider existant inchangé) =====
     if (dureeSlider && dureeValue) {
         dureeSlider.addEventListener('input', function() {
             dureeValue.textContent = this.value + ' maanden';
-            updateSliderBackground(this);
             afficherResumePret();
             validateStep2();
         });
         dureeValue.textContent = dureeSlider.value + ' maanden';
-        updateSliderBackground(dureeSlider);
     }
 
     // ========================================
@@ -795,7 +880,8 @@
 
         formState.exitIntentShown = true;
 
-        const montant = formatMontant(document.getElementById('montant')?.value || '0');
+        const montantEntered = normalizeAmount(document.getElementById('montant')?.value || '0');
+        const montant = formatMontant(isNaN(montantEntered) ? MONTANT_MIN : clampAmount(montantEntered));
         const duree = document.getElementById('duree')?.value || '—';
 
         // Deadline (J+3) ZONDER tijd
@@ -920,6 +1006,7 @@
             });
         }
 
+        // Projet
         const raisonInput = document.getElementById('raison');
         if (raisonInput) {
             raisonInput.addEventListener('input', validateStep2);
@@ -935,6 +1022,7 @@
             });
         }
 
+        // Sélecteurs statut/revenus
         const statutSelect = document.getElementById('statut');
         const revenusSelect = document.getElementById('revenus');
         [statutSelect, revenusSelect].forEach(select => {
@@ -953,8 +1041,13 @@
         const email = (document.getElementById('email')?.value || '').trim();
         const whatsapp = (document.getElementById('whatsapp')?.value || '').trim();
         const pays = (document.getElementById('pays')?.value || '').trim();
-        const montantVal = parseFloat(document.getElementById('montant')?.value || '0');
+
+        // Montant via saisie libre → normalisé + borné
+        let montantVal = normalizeAmount(document.getElementById('montant')?.value || '0');
+        if (isNaN(montantVal)) montantVal = MONTANT_MIN;
+        montantVal = clampAmount(montantVal);
         const montantFmt = formatMontant(montantVal);
+
         const dureeMois = (document.getElementById('duree')?.value || '').trim();
         const raison = (document.getElementById('raison')?.value || '').trim();
         const statut = (document.getElementById('statut')?.value || '').trim();
@@ -1024,6 +1117,12 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Clamp final du montant avant validation
+            if (montantInput) {
+                let n = normalizeAmount(montantInput.value);
+                if (!isNaN(n)) montantInput.value = String(clampAmount(n));
+            }
+
             validateStep1();
             validateStep2();
             validateStep3();
@@ -1050,9 +1149,9 @@
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
             // [CONVERSION] Tirer la conversion Google Ads juste avant l'ouverture de l'email
-if (typeof window.gtag_report_conversion === 'function') {
-  window.gtag_report_conversion();
-}
+            if (typeof window.gtag_report_conversion === 'function') {
+              window.gtag_report_conversion();
+            }
 
             const mailtoLink = buildPrefilledEmail();
             window.location.href = mailtoLink;
@@ -1140,8 +1239,6 @@ if (typeof window.gtag_report_conversion === 'function') {
     // ========================================
     // 14. VERZAMELEN + VERSTUREN → SHEET (TOEGEVOEGD)
     // ========================================
-
-    // Parse UTM + referrer + landing
     function parseAcquisition() {
         const url = new URL(window.location.href);
         const p = url.searchParams;
@@ -1154,7 +1251,6 @@ if (typeof window.gtag_report_conversion === 'function') {
         };
     }
 
-    // Device / browser / scherm
     function deviceInfo() {
         const ua = navigator.userAgent || navigator.userAgentData || '';
         const platform = navigator.platform || '';
@@ -1199,7 +1295,6 @@ if (typeof window.gtag_report_conversion === 'function') {
 
     // Geo IP (best effort, zonder sleutel) — ipapi.co
     function fetchGeoAndSendOnce(basePayload) {
-        // We proberen een netwerkcall; als het mislukt, versturen we zonder geo
         fetch('https://ipapi.co/json/', { method: 'GET' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
@@ -1225,7 +1320,7 @@ if (typeof window.gtag_report_conversion === 'function') {
         const dateNaissance = (document.getElementById('date-naissance')?.value || '').trim();
 
         // Stap 2
-        const montant = Number(document.getElementById('montant')?.value || '') || '';
+        const montant = normalizeAmount(document.getElementById('montant')?.value || '');
         const duree = Number(document.getElementById('duree')?.value || '') || '';
         const raison = (document.getElementById('raison')?.value || '').trim();
 
@@ -1246,7 +1341,7 @@ if (typeof window.gtag_report_conversion === 'function') {
             form_whatsapp: whatsapp,
             form_pays: pays,
             form_date_naissance: dateNaissance,
-            form_montant_eur: montant,
+            form_montant_eur: isNaN(montant) ? '' : montant,
             form_duree_mois: duree,
             form_raison: raison,
             form_statut: statut,
@@ -1293,26 +1388,27 @@ if (typeof window.gtag_report_conversion === 'function') {
         // Probeer Geo IP toe te voegen; zo niet, toch versturen
         fetchGeoAndSendOnce(base);
     }
-// === Google Ads conversion (coller après sendSessionStart) ===
-window.gtag_report_conversion = function (url) {
-  var callback = function () {
-    if (typeof url !== 'undefined') {
-      window.location = url;
-    }
-  };
-  try {
-    gtag('event', 'conversion', {
-      'send_to': 'AW-17656608344/W3ImCKm3xa4bENjsqeNB',
-      'value': 1.0,
-      'currency': 'EUR',
-      'event_callback': callback
-    });
-  } catch (e) {
-    // Si gtag n'est pas chargé, on n'interrompt pas le flux
-    callback();
-  }
-  return false;
-};
+
+    // === Google Ads conversion (coller après sendSessionStart) ===
+    window.gtag_report_conversion = function (url) {
+      var callback = function () {
+        if (typeof url !== 'undefined') {
+          window.location = url;
+        }
+      };
+      try {
+        gtag('event', 'conversion', {
+          'send_to': 'AW-17656608344/W3ImCKm3xa4bENjsqeNB',
+          'value': 1.0,
+          'currency': 'EUR',
+          'event_callback': callback
+        });
+      } catch (e) {
+        callback();
+      }
+      return false;
+    };
+
     // ========================================
     // INITIALISATIE
     // ========================================
@@ -1340,18 +1436,18 @@ window.gtag_report_conversion = function (url) {
         setupRealTimeValidation();
         
         // [CONVERSION] Tirer la conversion au clic sur le CTA principal
-const ctaBtnForConv = document.querySelector('.cta-submit');
-if (ctaBtnForConv && !ctaBtnForConv.dataset.convBound) {
-  ctaBtnForConv.dataset.convBound = '1'; // évite de doubler l'écouteur si init() rejoue
-  ctaBtnForConv.addEventListener('click', function () {
-    if (typeof window.gtag_report_conversion === 'function') {
-      window.gtag_report_conversion();
-    }
-  });
-}
+        const ctaBtnForConv = document.querySelector('.cta-submit');
+        if (ctaBtnForConv && !ctaBtnForConv.dataset.convBound) {
+          ctaBtnForConv.dataset.convBound = '1';
+          ctaBtnForConv.addEventListener('click', function () {
+            if (typeof window.gtag_report_conversion === 'function') {
+              window.gtag_report_conversion();
+            }
+          });
+        }
 
-        // Autosave als sliders veranderen (al aangeroepen in validateStep2, extra zekerheid)
-        if (montantSlider) montantSlider.addEventListener('change', autosaveToSheet);
+        // Autosave supplémentaires
+        if (montantInput) montantInput.addEventListener('change', autosaveToSheet);
         if (dureeSlider) dureeSlider.addEventListener('change', autosaveToSheet);
 
         console.log('✅ MSGROUPS - Klaar!  Sessie:', SESSION.id);
