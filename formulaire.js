@@ -165,8 +165,8 @@
         const domain = email.split('@')[1];
         if (!domain) return false;
         const domainParts = domain.split('.');
-        if (suspiciousDomains.includes(domain)) return false;
         if (domainParts.length < 2 || domainParts[domainParts.length - 1].length < 2) return false;
+        if (suspiciousDomains.includes(domain)) return false;
         return true;
     }
 
@@ -204,7 +204,6 @@
 
     // ============ Utilitaires Montant ============
     function normalizeAmount(raw) {
-        // Conserve uniquement les chiffres, interprète en euros entiers
         const digits = String(raw || '').replace(/[^\d]/g, '');
         if (!digits) return NaN;
         return parseInt(digits, 10);
@@ -229,61 +228,85 @@
 
     // ===== Sélecteurs de champs (montant & durée) =====
     const montantInput = document.getElementById('montant');      // ⬅️ champ libre
-    const montantMirror = document.getElementById('montant-value'); // facultatif (affichage à côté du label)
-    let   dureeInput   = document.getElementById('duree');          // sera transformé en <input type="number">
+    const montantMirror = document.getElementById('montant-value'); // affichage
+    let   dureeInput   = document.getElementById('duree');          // sera forcé en <input type="number">
     const dureeValue   = document.getElementById('duree-value');
 
-    // ===== Remplacer le slider durée par un input number =====
+    // ===== Remplacer/forcer le champ durée en number (sans imposer de valeur) =====
     function replaceDurationSliderWithNumber() {
         if (!dureeInput) return;
-        // Si ce n’est pas déjà un number, on remplace l’élément
+
         const isNumber = (dureeInput.tagName === 'INPUT' && (dureeInput.type || '').toLowerCase() === 'number');
-        if (isNumber) {
-            // S'assurer des attributs
-            dureeInput.min = '6';
-            dureeInput.max = '120';
-            dureeInput.step = '1';
-        } else {
-            const currentValue = parseInt(dureeInput.value || '48', 10);
+
+        if (!isNumber) {
             const numberEl = document.createElement('input');
             numberEl.type  = 'number';
             numberEl.id    = 'duree';
             numberEl.name  = dureeInput.getAttribute('name') || 'duree';
-            numberEl.min   = '6';
-            numberEl.max   = '120';
-            numberEl.step  = '1';
             numberEl.className = dureeInput.className || '';
-            numberEl.value = (!isNaN(currentValue) ? currentValue : 48);
-
-            // Remplacement dans le DOM, même id conservé
             dureeInput.parentNode.replaceChild(numberEl, dureeInput);
             dureeInput = numberEl;
         }
 
-        // Affichage texte initial
-        if (dureeValue) {
-            const val = parseInt(dureeInput.value || '48', 10);
-            dureeValue.textContent = `${val} maanden`;
+        // Attributs et placeholder — aucune valeur imposée
+        dureeInput.min = '6';
+        dureeInput.max = '120';
+        dureeInput.step = '1';
+        if (!dureeInput.placeholder) {
+            dureeInput.placeholder = 'bijv. 36';
+        }
+        // Si une valeur existait, on la garde ; sinon on laisse vide
+        if (dureeInput.value && !/^\d+$/.test(dureeInput.value)) {
+            dureeInput.value = '';
         }
 
-        // Listeners sur le champ number
+        // Affichage initial: “—” si vide, sinon N mois si dans les bornes
+        function reflectDuration() {
+            const raw = dureeInput.value.trim();
+            const n = parseInt(raw, 10);
+            if (!raw) {
+                if (dureeValue) dureeValue.textContent = '—';
+                return;
+            }
+            if (!isNaN(n) && n >= 6 && n <= 120) {
+                if (dureeValue) dureeValue.textContent = `${n} maanden`;
+            } else {
+                if (dureeValue) dureeValue.textContent = '—';
+            }
+        }
+        reflectDuration();
+
+        // Pas de clamp agressif pendant la saisie (on ne touche pas à la valeur)
         dureeInput.addEventListener('input', function() {
-            let v = parseInt(this.value, 10);
-            if (isNaN(v)) v = 6;
-            if (v < 6) v = 6;
-            if (v > 120) v = 120;
-            this.value = v;
-            if (dureeValue) dureeValue.textContent = `${v} maanden`;
-            validateStep2();
+            reflectDuration();
+            validateStep2(); // valide en temps réel sans corriger
         });
 
+        // Clamp doux uniquement au blur (et autosave)
         dureeInput.addEventListener('blur', function() {
-            let v = parseInt(this.value, 10);
-            if (isNaN(v)) v = 6;
-            if (v < 6) v = 6;
-            if (v > 120) v = 120;
-            this.value = v;
-            if (dureeValue) dureeValue.textContent = `${v} maanden`;
+            const raw = this.value.trim();
+            if (!raw) {
+                reflectDuration();
+                validateStep2();
+                autosaveToSheet();
+                return;
+            }
+            let v = parseInt(raw, 10);
+            if (isNaN(v)) {
+                this.value = '';
+                reflectDuration();
+                validateStep2();
+                autosaveToSheet();
+                return;
+            }
+            let clamped = v;
+            if (v < 6) clamped = 6;
+            if (v > 120) clamped = 120;
+            if (clamped !== v) {
+                showNotification('Looptijd aangepast', `De looptijd is begrensd tussen 6 en 120 maanden. We hebben ${v} → ${clamped} gezet.`, 'info');
+            }
+            this.value = String(clamped);
+            reflectDuration();
             validateStep2();
             autosaveToSheet();
         });
@@ -291,14 +314,15 @@
 
     // ===== Comportement du champ montant (saisie libre robuste) =====
     if (montantInput) {
-        // Valeur initiale : clamp & miroir
         (function initAmount() {
             const n = clampAmount(normalizeAmount(montantInput.value));
             if (!isNaN(n)) montantInput.value = String(n);
-            if (montantMirror) montantMirror.textContent = formatMontant(montantInput.value || MONTANT_MIN);
+            if (montantMirror) {
+                const toShow = normalizeAmount(montantInput.value);
+                montantMirror.textContent = isNaN(toShow) ? '€ 0' : formatMontant(toShow);
+            }
         })();
 
-        // Filtrage temps réel (chiffres uniquement), mise à jour du miroir
         montantInput.addEventListener('input', function() {
             const before = this.value;
             const digits = before.replace(/[^\d]/g, '');
@@ -312,13 +336,14 @@
             validateStep2();
         });
 
-        // À la sortie du champ : bornage + feedback si < 2 000 €
         montantInput.addEventListener('blur', function() {
             let n = normalizeAmount(this.value);
             if (isNaN(n)) {
                 this.value = '';
                 this.classList.add('invalid');
                 showNotification('Bedrag ontbreekt', 'Voer een geldig bedrag in cijfers in (minimaal € 2.000).', 'warning');
+                validateStep2();
+                autosaveToSheet();
                 return;
             }
             const clamped = clampAmount(n);
@@ -551,10 +576,8 @@
     // 9. VOLGENDE-KNOPPEN
     // ========================================
     function createNextButtons() {
-        // #PATCH-NEXT-BTN-SCOPED : richt zich ALLEEN op de 3 stappen van het formulier
         const details = document.querySelectorAll('#lead-form .form-steps > details');
         details.forEach((detail, index) => {
-            // Geen knop maken voor stap 3 ("Uw profiel")
             if (index === details.length - 1) return;
 
             const stepContent = detail.querySelector('.step-content');
@@ -605,7 +628,6 @@
             stepContent.appendChild(nextButton);
         });
 
-        // #PATCH-NEXT-BTN-DESKTOP-SIZE : kleinere “Volgende”-knop op desktop
         const style = document.createElement('style');
         style.textContent = `
             @media (min-width: 901px) {
@@ -778,7 +800,6 @@
             const submitBtn = document.querySelector('.cta-submit');
             if (submitBtn) {
                 ctaClicked = true;
-                // CTA-event verzenden (via popup)
                 sendCTAEventToSheet('Mijn aanvraag nu afronden (popup)');
                 submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.style.animation = 'pulse 1s ease 3';
@@ -802,7 +823,6 @@
     if (ctaBtn) {
         ctaBtn.addEventListener('click', () => { 
             ctaClicked = true; 
-            // CTA-event verzenden (hoofdknop)
             const label = (ctaBtn.textContent || '').trim();
             sendCTAEventToSheet(label || 'cta_submit');
         });
@@ -855,7 +875,6 @@
             });
         }
 
-        // Projet
         const raisonInput = document.getElementById('raison');
         if (raisonInput) {
             raisonInput.addEventListener('input', validateStep2);
@@ -871,7 +890,6 @@
             });
         }
 
-        // Sélecteurs statut/revenus
         const statutSelect = document.getElementById('statut');
         const revenusSelect = document.getElementById('revenus');
         [statutSelect, revenusSelect].forEach(select => {
@@ -891,7 +909,6 @@
         const whatsapp = (document.getElementById('whatsapp')?.value || '').trim();
         const pays = (document.getElementById('pays')?.value || '').trim();
 
-        // Montant via saisie libre → normalisé + borné
         let montantVal = normalizeAmount(document.getElementById('montant')?.value || '0');
         if (isNaN(montantVal)) montantVal = MONTANT_MIN;
         montantVal = clampAmount(montantVal);
@@ -968,7 +985,6 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Clamp final du montant avant validation
             if (montantInput) {
                 let n = normalizeAmount(montantInput.value);
                 if (!isNaN(n)) montantInput.value = String(clampAmount(n));
@@ -996,10 +1012,8 @@
                 return false;
             }
 
-            // Laatste autosave vlak voor mailto + CTA-vlag
             const label = (document.querySelector('.cta-submit')?.textContent || '').trim() || 'cta_submit';
             sendCTAEventToSheet(label);
-            // [CONVERSION] Tirer la conversion Google Ads juste avant l'ouverture de l'email
             if (typeof window.gtag_report_conversion === 'function') {
               window.gtag_report_conversion();
             }
@@ -1106,15 +1120,13 @@
         const ua = navigator.userAgent || navigator.userAgentData || '';
         const platform = navigator.platform || '';
         const lang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
-        const tzOffsetMin = (new Date()).getTimezoneOffset(); // minuten
+        const tzOffsetMin = (new Date()).getTimezoneOffset();
 
-        // Eenvoudige detectie
         let device_type = 'desktop';
         const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
         if (w <= 768) device_type = 'mobile';
         else if (w > 768 && w <= 1024) device_type = 'tablet';
 
-        // OS & browser (zeer basaal)
         let os = /Windows/i.test(ua) ? 'Windows'
               : /Mac/i.test(ua) ? 'macOS'
               : /Android/i.test(ua) ? 'Android'
@@ -1144,7 +1156,6 @@
         };
     }
 
-    // Geo IP (best effort, zonder sleutel) — ipapi.co
     function fetchGeoAndSendOnce(basePayload) {
         fetch('https://ipapi.co/json/', { method: 'GET' })
             .then(r => r.ok ? r.json() : null)
@@ -1160,9 +1171,7 @@
             });
     }
 
-    // Snapshot van formulierwaarden
     function readFormSnapshot() {
-        // Stap 1
         const prenom = (document.getElementById('prenom')?.value || '').trim();
         const nom = (document.getElementById('nom')?.value || '').trim();
         const email = (document.getElementById('email')?.value || '').trim();
@@ -1170,16 +1179,13 @@
         const pays = (document.getElementById('pays')?.value || '').trim();
         const dateNaissance = (document.getElementById('date-naissance')?.value || '').trim();
 
-        // Stap 2
         const montant = normalizeAmount(document.getElementById('montant')?.value || '');
         const duree = Number(document.getElementById('duree')?.value || '') || '';
         const raison = (document.getElementById('raison')?.value || '').trim();
 
-        // Stap 3
         const statut = (document.getElementById('statut')?.value || '').trim();
         const revenus = (document.getElementById('revenus')?.value || '').trim();
 
-        // Documenten (samengevoegd)
         const pieces = [];
         if (document.getElementById('piece1')?.checked) pieces.push('Identiteitskaart');
         if (document.getElementById('piece2')?.checked) pieces.push('Inkomensbewijs');
@@ -1201,7 +1207,6 @@
         };
     }
 
-    // Throttle/debounce voor autosave (spam voorkomen)
     let autosaveTimer = null;
     function autosaveToSheet() {
         clearTimeout(autosaveTimer);
@@ -1215,7 +1220,6 @@
         }, 400);
     }
 
-    // CTA-event
     function sendCTAEventToSheet(label) {
         const payload = Object.assign({
             session_id: SESSION.id,
@@ -1226,7 +1230,6 @@
         postToSheet(payload);
     }
 
-    // Eerste "session_start" (met device + acquisition + ts_open)
     function sendSessionStart() {
         const acq = parseAcquisition();
         const dev = deviceInfo();
@@ -1236,11 +1239,9 @@
             last_event: 'session_start'
         }, acq, dev);
 
-        // Probeer Geo IP toe te voegen; zo niet, toch versturen
         fetchGeoAndSendOnce(base);
     }
 
-    // === Google Ads conversion (coller après sendSessionStart) ===
     window.gtag_report_conversion = function (url) {
       var callback = function () {
         if (typeof url !== 'undefined') {
@@ -1303,7 +1304,6 @@
         updateStepAccess();
         checkFormCompletion();
 
-        // Autosave → Sheet
         autosaveToSheet();
 
         return formState.step1Valid;
@@ -1312,7 +1312,6 @@
     function validateStep2() {
         formState.validationErrors.step2 = [];
 
-        // Montant
         const montantInputEl = document.getElementById('montant');
         const montantRaw = montantInputEl ? montantInputEl.value : '';
         let montantParsed = normalizeAmount(montantRaw);
@@ -1325,12 +1324,15 @@
             }
         }
 
-        // Durée (désormais champ number)
-        const duree = parseInt(document.getElementById('duree')?.value, 10);
+        // Durée: plus de valeur forcée, on vérifie juste ce que l'utilisateur a saisi
+        const dureeRaw = (document.getElementById('duree')?.value ?? '').trim();
+        const duree = dureeRaw === '' ? NaN : parseInt(dureeRaw, 10);
         const raison = document.getElementById('raison')?.value.trim() || '';
 
-        if (isNaN(duree) || duree < 6 || duree > 120) {
-            formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${duree} maanden)`);
+        if (dureeRaw === '') {
+            formState.validationErrors.step2.push('Looptijd: leeg veld');
+        } else if (isNaN(duree) || duree < 6 || duree > 120) {
+            formState.validationErrors.step2.push(`Looptijd: moet tussen 6 en 120 maanden liggen (huidig: ${dureeRaw})`);
         }
 
         const raisonValidation = validateRaison(raison);
@@ -1339,7 +1341,6 @@
 
         formState.step2Valid = formState.validationErrors.step2.length === 0;
 
-        // Style visuel du montant (rouge si invalide)
         if (montantInputEl) {
             if (formState.validationErrors.step2.some(e => e.startsWith('Bedrag'))) {
                 montantInputEl.classList.add('invalid', 'shake');
@@ -1357,7 +1358,6 @@
         updateStepAccess();
         checkFormCompletion();
 
-        // Autosave → Sheet
         autosaveToSheet();
 
         return formState.step2Valid;
@@ -1381,7 +1381,6 @@
         refreshStepOKBadges();
         checkFormCompletion();
 
-        // Autosave → Sheet
         autosaveToSheet();
 
         return formState.step3Valid;
@@ -1397,7 +1396,7 @@
         setupVideoPlayers();
         injectSummaryHitboxStyles();
 
-        // Transformer le slider durée -> input number
+        // Transformer le slider durée -> input number (sans valeur forcée)
         replaceDurationSliderWithNumber();
 
         // Sessiestart versturen (met device/referrer/utm/geo)
@@ -1412,7 +1411,6 @@
         preventStepOpening();
         setupRealTimeValidation();
         
-        // [CONVERSION] Tirer la conversion au clic sur le CTA principal
         const ctaBtnForConv = document.querySelector('.cta-submit');
         if (ctaBtnForConv && !ctaBtnForConv.dataset.convBound) {
           ctaBtnForConv.dataset.convBound = '1';
@@ -1423,7 +1421,6 @@
           });
         }
 
-        // Autosave supplémentaires
         if (montantInput) montantInput.addEventListener('change', autosaveToSheet);
         if (dureeInput)   dureeInput.addEventListener('change', autosaveToSheet);
 
