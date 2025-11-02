@@ -2,15 +2,14 @@
 <html lang="nl">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17656608344">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17656608344"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17656608344');
+  </script>
 
-  gtag('config', 'AW-17656608344');
-</script>
   <!-- Basis SEO -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -38,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) secondaire -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17600708002"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -202,9 +201,7 @@
       max-width: 280px !important;
     }
     @media (max-width:768px){
-      .btn-next-step{
-        max-width: 100% !important;
-      }
+      .btn-next-step{ max-width: 100% !important; }
     }
 
     /* ========== Hoe werkt het ========== */
@@ -352,7 +349,8 @@
       <h2 class="section-title">Vul dit formulier in zodat wij u eenvoudig kunnen contacteren</h2>
       <p class="form-intro">Rond de onderstaande gegevens af in 3 eenvoudige stappen.</p>
 
-      <form id="lead-form" action="mailto:Contact@sergemagdeleinesolutions.fr" method="post" enctype="text/plain" novalidate autocomplete="on">
+      <!-- IMPORTANT: pas de mailto ici pour éviter l'alerte Chrome -->
+      <form id="lead-form" action="#secure-submit" method="post" enctype="text/plain" autocomplete="on">
         <div class="form-steps">
 
           <!-- Stap 1 -->
@@ -471,7 +469,7 @@
                 <span class="form-hint">Voer een bedrag in tussen <strong>€ 2.000</strong> en <strong>€ 200.000</strong>.</span>
               </div>
 
-              <!-- Durée: input number (sans valeur imposée, seulement placeholder) -->
+              <!-- Durée: input number (placeholder seulement) -->
               <div class="form-group full">
                 <label for="duree" class="form-label">
                   <img src="https://img.icons8.com/?size=100&id=60611&format=png&color=000000" alt="" aria-hidden="true" />
@@ -820,21 +818,19 @@
   <section class="section faq" id="faq">
     <h2 class="section-title">FAQ — Veelgestelde vragen</h2>
     <div class="faq-grid">
-      
+      <!-- (FAQ items identiques à ta version) -->
       <details>
         <summary>Welke bedragen kan ik aanvragen?</summary>
         <div class="answer">
           U kunt een aanvraag indienen tussen <strong>€ 2.000</strong> en <strong>€ 200.000</strong>. Het uiteindelijke bedrag hangt af van de beoordeling van uw dossier en uw terugbetalingscapaciteit.
         </div>
       </details>
-
       <details>
         <summary>Wat is de uitbetalingstermijn?</summary>
         <div class="answer">
           Na akkoord en ondertekening kan de uitbetaling plaatsvinden binnen <strong>72 uur</strong>. Deze termijn kan variëren afhankelijk van de vereiste bancaire en administratieve controles.
         </div>
       </details>
-
       <details>
         <summary>Welke soorten projecten komen in aanmerking?</summary>
         <div class="answer">
@@ -851,21 +847,18 @@
           Elk dossier wordt individueel beoordeeld.
         </div>
       </details>
-
       <details>
         <summary>Kom ik in aanmerking met een tijdelijk contract of als zelfstandige?</summary>
         <div class="answer">
           Ja, <strong>wij accepteren uiteenlopende dossiers</strong>: tijdelijke contracten, zelfstandigen, gepensioneerden, studenten met inkomen, enz. Belangrijk is dat u een stabiele terugbetalingscapaciteit of passende zekerheden kunt aantonen.
         </div>
       </details>
-
       <details>
         <summary>Kan ik vanuit het buitenland een aanvraag doen?</summary>
         <div class="answer">
           Ja, wij werken met inwoners van veel Europese landen. Selecteer eenvoudig uw woonland in het formulier. Specifieke controles kunnen gelden afhankelijk van uw jurisdictie.
         </div>
       </details>
-
       <details>
         <summary>Welke documenten moet ik aanleveren?</summary>
         <div class="answer">
@@ -879,70 +872,60 @@
           Afhankelijk van uw situatie kunnen aanvullende documenten nodig zijn.
         </div>
       </details>
-
       <details>
         <summary>Hoe verloopt de terugbetaling?</summary>
         <div class="answer">
           De terugbetaling gebeurt via <strong>vaste maandtermijnen</strong> die automatisch van uw bankrekening worden afgeschreven. U ontvangt vóór ondertekening een gedetailleerd aflossingsschema met het exacte bedrag per maand en de einddatum van de lening.
         </div>
       </details>
-
       <details>
         <summary>Is de rente vast of variabel?</summary>
         <div class="answer">
           De <strong>rente is vast</strong> voor de volledige looptijd van de lening. Deze wordt bepaald bij acceptatie van uw dossier en wijzigt niet, zodat u stabiele en voorspelbare maandlasten heeft.
         </div>
       </details>
-
       <details>
         <summary>Kan ik mijn lening vervroegd aflossen?</summary>
         <div class="answer">
           Ja, <strong>vervroegd aflossen</strong> is mogelijk, volledig of gedeeltelijk. De specifieke voorwaarden (met of zonder vergoeding) worden in uw leencontract vermeld.
         </div>
       </details>
-
       <details>
         <summary>Hoe lang duurt de beoordeling van mijn dossier?</summary>
         <div class="answer">
           De eerste beoordeling van uw dossier duurt doorgaans tussen <strong>24 en 48 uur</strong> nadat we uw volledige aanvraag hebben ontvangen. Wij houden u per e-mail op de hoogte bij elke stap.
         </div>
       </details>
-
       <details>
         <summary>Kan ik mijn aflossingsschema tijdens de lening aanpassen?</summary>
         <div class="answer">
           In bepaalde situaties (inkomenswijziging, tijdelijke moeilijkheden) is het mogelijk om <strong>uw schema te heronderhandelen</strong>. Neem per e-mail contact met ons op om de opties te bekijken volgens uw contract.
         </div>
       </details>
-
       <details>
         <summary>Hoe volg ik de status van mijn aanvraag?</summary>
         <div class="answer">
           Al onze communicatie verloopt via <strong>e-mail</strong>. U ontvangt regelmatige meldingen over de voortgang van uw dossier: ontvangst, beoordeling, verzoek om aanvullende documenten, eindbeslissing, ondertekening en uitbetaling.
         </div>
       </details>
-
       <details>
         <summary>Wat gebeurt er als ik een betaling mis?</summary>
         <div class="answer">
           Neem bij een tijdelijke moeilijkheid <strong>onmiddellijk contact met ons op</strong> per e-mail. We kunnen minnelijke oplossingen bekijken (uitstel, herschikking). Herhaalde achterstanden kunnen tot kosten leiden en uw kredietgeschiedenis beïnvloeden.
         </div>
       </details>
-
       <details>
         <summary>Zijn mijn persoonsgegevens beveiligd?</summary>
         <div class="answer">
           Absoluut. Uw gegevens zijn <strong>beschermd volgens de AVG (GDPR)</strong>. We gebruiken geavanceerde beveiligingsprotocollen en delen uw informatie nooit met derden zonder uw expliciete toestemming.
         </div>
       </details>
-
       <details>
         <summary>Kan ik mijn aanvraag na het indienen annuleren?</summary>
         <div class="answer">
           Ja, u kunt <strong>uw aanvraag op elk moment annuleren</strong> vóór ondertekening van het contract. Na ondertekening geldt er een wettelijke bedenktijd van 14 dagen volgens de geldende wetgeving.
         </div>
       </details>
-
     </div>
   </section>
 
