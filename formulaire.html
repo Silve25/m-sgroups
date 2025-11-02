@@ -455,7 +455,7 @@
                   <img src="https://img.icons8.com/?size=100&id=2800&format=png&color=000000" alt="" aria-hidden="true" />
                   Gewenst bedrag
                 </label>
-                <div class="range-value" id="montant-value" aria-live="polite">€ 10.000</div>
+                <div class="range-value" id="montant-value" aria-live="polite">€ 0</div>
                 <input
                   type="number"
                   id="montant"
@@ -471,14 +471,14 @@
                 <span class="form-hint">Voer een bedrag in tussen <strong>€ 2.000</strong> en <strong>€ 200.000</strong>.</span>
               </div>
 
-              <!-- Durée: input number (remplace le slider) -->
+              <!-- Durée: input number (sans valeur imposée, seulement placeholder) -->
               <div class="form-group full">
                 <label for="duree" class="form-label">
                   <img src="https://img.icons8.com/?size=100&id=60611&format=png&color=000000" alt="" aria-hidden="true" />
                   Gewenste looptijd
                 </label>
                 <div class="range-group">
-                  <div class="range-value" id="duree-value" aria-live="polite">36 maanden</div>
+                  <div class="range-value" id="duree-value" aria-live="polite">—</div>
                   <input
                     type="number"
                     id="duree"
@@ -487,7 +487,7 @@
                     min="6"
                     max="120"
                     step="1"
-                    value="36"
+                    placeholder="bijv. 36"
                     required
                     inputmode="numeric"
                     aria-label="Gewenste looptijd in maanden"
